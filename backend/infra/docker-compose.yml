@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  auth-service:
+    build: ./backend/auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_HOST=${AUTH_DB_HOST}
+      - DB_USER=${AUTH_DB_USER}
+      - DB_PASS=${AUTH_DB_PASS}
+      - DB_NAME=${AUTH_DB_NAME}
+    depends_on:
+      - auth-db
+    restart: unless-stopped
+
+  auth-db:
+    image: postgres:15
+    container_name: auth-db
+    environment:
+      POSTGRES_USER: ${AUTH_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${AUTH_POSTGRES_DB_NAME}
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+

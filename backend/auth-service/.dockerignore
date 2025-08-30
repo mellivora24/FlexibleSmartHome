@@ -1,0 +1,59 @@
+# Git
+.git
+.gitignore
+README.md
+
+# Documentation
+*.md
+docs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Dependency directories
+node_modules/
+vendor/ (if using vendor)
+
+# Build artifacts
+dist/
+build/
+bin/
+*.exe
+*.test
+*.out
+
+# Temporary files
+tmp/
+temp/
+
+# Environment files (if they contain sensitive data)
+# .env (comment this out if you need .env in container)
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore

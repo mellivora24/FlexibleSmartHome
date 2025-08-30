@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/shared"
+	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/user"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -21,11 +23,16 @@ func main() {
 		return
 	}
 
-	_, err = shared.InitDatabase(cfg.Database)
+	var db *gorm.DB
+	db, err = shared.InitDatabase(cfg.Database)
 	if err != nil {
 		log.Fatalf("cannot connect database: %v", err)
 		return
 	}
+
+	userRepo := user.NewRepository(db)
+	userService := user.NewService(userRepo)
+	userHandler := user.NewHandler(userService)
 
 	router := gin.Default()
 	api := router.Group(cfg.Server.BASE_PATH)
@@ -33,6 +40,8 @@ func main() {
 		api.GET("/health", func(c *gin.Context) {
 			c.JSON(200, gin.H{"status": "Auth service is working"})
 		})
+
+		userHandler.RegisterRoutes(api)
 	}
 
 	addr := fmt.Sprintf("%s:%d", cfg.Server.HOST, cfg.Server.PORT)

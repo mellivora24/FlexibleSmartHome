@@ -9,7 +9,7 @@ type UserDB struct {
 	ID           int64     `db:"id" json:"id"`
 	Name         string    `db:"name" json:"name"`
 	Email        string    `db:"email" json:"email"`
-	HashPassword string    `db:"hash_password" json:"-"` // không trả ra API
+	HashPassword string    `db:"hash_password" json:"-"`
 	CreatedAt    time.Time `db:"created_at" json:"created_at"`
 }
 

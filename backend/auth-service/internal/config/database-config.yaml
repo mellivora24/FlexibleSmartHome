@@ -1,0 +1,11 @@
+database:
+  host: ${AUTH_DB_HOST}
+  port: ${AUTH_DB_PORT}
+  database: ${AUTH_DB_NAME}
+  password: ${AUTH_DB_PASS}
+  username: ${AUTH_DB_USER}
+
+server:
+  host: 0.0.0.0
+  port: 8081
+  base_path: /api/v1

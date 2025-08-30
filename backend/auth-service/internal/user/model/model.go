@@ -1,4 +1,4 @@
-package user
+package model
 
 import (
 	"encoding/json"
@@ -38,7 +38,7 @@ type CreateResponse struct {
 }
 
 type UpdateRequest struct {
-	ID    int64  `json:"id"` // hoặc lấy từ URL param
+	ID    int64  `json:"id"` // hoặc lấy ID từ URL param
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }

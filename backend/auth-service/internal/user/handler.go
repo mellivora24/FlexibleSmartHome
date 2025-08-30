@@ -48,18 +48,15 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) CreateUser(c *gin.Context) {
 	var userCreate model.CreateRequest
-
 	if err := c.ShouldBindJSON(&userCreate); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	res, err := h.service.CreateUser(&userCreate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -72,7 +69,6 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	if err := c.ShouldBindJSON(&userUpdate); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-
 	res, err := h.service.UpdateUser(&userUpdate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -83,7 +79,6 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 func (h *Handler) DeleteUser(c *gin.Context) {
 	email := c.Param("email")
 	userDelete := model.DeleteRequest{Email: email}
-
 	res, err := h.service.DeleteUser(&userDelete)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -96,7 +91,6 @@ func (h *Handler) Login(c *gin.Context) {
 	if err := c.ShouldBindJSON(&userLogin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-
 	res, err := h.service.Login(&userLogin)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -109,7 +103,6 @@ func (h *Handler) CreateAction(c *gin.Context) {
 	if err := c.ShouldBindJSON(&action); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-
 	res, err := h.service.CreateAction(&action)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

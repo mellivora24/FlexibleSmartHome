@@ -35,6 +35,7 @@ func main() {
 	userHandler := user.NewHandler(userService)
 
 	router := gin.Default()
+	
 	api := router.Group(cfg.Server.BASE_PATH)
 	{
 		api.GET("/health", func(c *gin.Context) {

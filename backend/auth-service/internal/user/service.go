@@ -8,7 +8,7 @@ import (
 
 type Service interface {
 	GetAllUsers() ([]model.GetResponse, error)
-	GetUserByID(id int64) (*model.GetResponse, error)
+	GetUserByID(id string) (*model.GetResponse, error)
 	CreateUser(req *model.CreateRequest) (*model.CreateResponse, error)
 	UpdateUser(req *model.UpdateRequest) (*model.UpdateResponse, error)
 	DeleteUser(req *model.DeleteRequest) (*model.DeleteResponse, error)
@@ -16,7 +16,7 @@ type Service interface {
 	Login(req *model.LoginRequest) (*model.LoginResponse, error)
 
 	CreateAction(req *model.ActionCreate) (*model.ActionCreateResponse, error)
-	ListActions(req *model.ListActionsRequest) ([]model.ListActionsResponse, error)
+	ListActions(req string) ([]model.ListActionsResponse, error)
 }
 
 type service struct {
@@ -46,8 +46,9 @@ func (s *service) GetAllUsers() ([]model.GetResponse, error) {
 	return res, nil
 }
 
-func (s *service) GetUserByID(id int64) (*model.GetResponse, error) {
-	user, err := s.repo.FindByID(id)
+func (s *service) GetUserByID(id string) (*model.GetResponse, error) {
+	uid, err := shared.StringToInt64(id)
+	user, err := s.repo.FindByID(uid)
 	if err != nil {
 		return nil, err
 	}
@@ -189,8 +190,13 @@ func (s *service) CreateAction(req *model.ActionCreate) (*model.ActionCreateResp
 	return res, nil
 }
 
-func (s *service) ListActions(req *model.ListActionsRequest) ([]model.ListActionsResponse, error) {
-	actions, err := s.repo.FindActionsByUID(req.UID)
+func (s *service) ListActions(req string) ([]model.ListActionsResponse, error) {
+	uid, err := shared.StringToInt64(req)
+	if err != nil {
+		return nil, shared.ErrInvalidInput
+	}
+
+	actions, err := s.repo.FindActionsByUID(uid)
 
 	if err != nil {
 		return nil, err

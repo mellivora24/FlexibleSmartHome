@@ -1,4 +1,4 @@
-package user
+package model
 
 func ToUserDTO(u UserDB) User {
 	return User{

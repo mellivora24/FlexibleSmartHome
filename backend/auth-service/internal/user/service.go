@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/shared"
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/user/model"
 	"gorm.io/gorm/utils"
@@ -20,11 +21,15 @@ type Service interface {
 }
 
 type service struct {
-	repo Repository
+	repo   Repository
+	config shared.SERVER_CONFIG
 }
 
-func NewService(repo Repository) Service {
-	return &service{repo: repo}
+func NewService(repo Repository, config shared.SERVER_CONFIG) Service {
+	return &service{
+		repo:   repo,
+		config: config,
+	}
 }
 
 func (s *service) GetAllUsers() ([]model.GetResponse, error) {
@@ -154,13 +159,17 @@ func (s *service) Login(req *model.LoginRequest) (*model.LoginResponse, error) {
 		return nil, shared.ErrUnauthorized
 	}
 
-	// TODO: add gen token function
-	token := "null"
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"user_id": user.ID})
+	tokenString, err := token.SignedString([]byte(s.config.JWT_SECRET))
+	if err != nil {
+		return nil, shared.ErrInternalServer
+	}
+
 	res := &model.LoginResponse{
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
-		Token: token,
+		Token: tokenString,
 	}
 
 	return res, nil

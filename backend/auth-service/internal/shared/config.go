@@ -1,9 +1,11 @@
 package shared
 
 import (
+	"log"
 	"os"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -16,9 +18,10 @@ type DB_CONFIG struct {
 }
 
 type SERVER_CONFIG struct {
-	HOST      string `mapstructure:"host"`
-	PORT      int    `mapstructure:"port"`
-	BASE_PATH string `mapstructure:"base_path"`
+	HOST       string `mapstructure:"host"`
+	PORT       int    `mapstructure:"port"`
+	BASE_PATH  string `mapstructure:"base_path"`
+	JWT_SECRET string `mapstructure:"jwt_secret"`
 }
 
 type APP_CONFIG struct {
@@ -27,6 +30,11 @@ type APP_CONFIG struct {
 }
 
 func LoadConfig() (*APP_CONFIG, error) {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, skip...")
+		return nil, nil
+	}
+
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath("./internal/config")

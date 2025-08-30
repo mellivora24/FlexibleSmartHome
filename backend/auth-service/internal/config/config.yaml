@@ -6,6 +6,7 @@ database:
   username: ${AUTH_DB_USER}
 
 server:
-  host: 0.0.0.0
+  host: localhost
   port: 8081
   base_path: /api/v1
+  jwt_secret: ${JWT_SECRET}

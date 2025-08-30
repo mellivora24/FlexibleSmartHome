@@ -5,18 +5,12 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/shared"
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/user"
 	"gorm.io/gorm"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, skip...")
-		return
-	}
-
 	cfg, err := shared.LoadConfig()
 	if err != nil {
 		log.Fatalf("cannot load config: %v", err)
@@ -31,11 +25,11 @@ func main() {
 	}
 
 	userRepo := user.NewRepository(db)
-	userService := user.NewService(userRepo)
+	userService := user.NewService(userRepo, cfg.Server)
 	userHandler := user.NewHandler(userService)
 
 	router := gin.Default()
-	
+
 	api := router.Group(cfg.Server.BASE_PATH)
 	{
 		api.GET("/health", func(c *gin.Context) {

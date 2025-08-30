@@ -1,8 +1,6 @@
 package shared
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -11,7 +9,7 @@ import (
 
 type DB_CONFIG struct {
 	HOST     string `mapstructure:"host"`
-	PORT     string `mapstructure:"port"`
+	PORT     int    `mapstructure:"port"`
 	DATABASE string `mapstructure:"database"`
 	USERNAME string `mapstructure:"username"`
 	PASSWORD string `mapstructure:"password"`
@@ -28,31 +26,28 @@ type APP_CONFIG struct {
 	Server   SERVER_CONFIG `mapstructure:"server"`
 }
 
-var AppConfig *APP_CONFIG
-
-func init() {
-	fmt.Println("Connecting to database...")
-
-	viper.AddConfigPath(".")
+func LoadConfig() (*APP_CONFIG, error) {
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
-	viper.AddConfigPath("./config")
+	viper.AddConfigPath("./internal/config")
+	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file, %s", err)
+		return nil, err
 	}
 
 	for _, key := range viper.AllKeys() {
 		val := viper.GetString(key)
 		if strings.Contains(val, "${") {
-			viper.Set(key, os.ExpandEnv(val))
+			expandedVal := os.ExpandEnv(val)
+			viper.Set(key, expandedVal)
 		}
 	}
 
 	cfg := &APP_CONFIG{}
 	if err := viper.Unmarshal(cfg); err != nil {
-		log.Fatalf("Error unmarshalling config, %s", err)
+		return nil, err
 	}
 
-	AppConfig = cfg
+	return cfg, nil
 }

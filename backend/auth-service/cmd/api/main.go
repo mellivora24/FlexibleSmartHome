@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/joho/godotenv"
@@ -13,12 +12,14 @@ func main() {
 		log.Println("No .env file found, skip...")
 	}
 
-	cfg, cfgErr := shared.LoadConfig()
-
-	if cfgErr != nil {
-		log.Fatal(cfgErr)
+	cfg, err := shared.LoadConfig()
+	if err != nil {
+		log.Fatalf("cannot load config: %v", err)
 		return
-	} else {
-		fmt.Println("Using config file:", cfg)
+	}
+
+	_, err = shared.InitDatabase(cfg.Database)
+	if err != nil {
+		log.Fatalf("cannot connect database: %v", err)
 	}
 }

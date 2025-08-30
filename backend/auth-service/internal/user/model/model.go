@@ -61,14 +61,11 @@ type GetResponse struct {
 }
 
 type DeleteRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email string `json:"email"`
 }
 
 type DeleteResponse struct {
-	ID    int64  `json:"id"`
-	Email string `json:"email"`
-	Msg   string `json:"msg"`
+	MSG string `json:"status"`
 }
 
 type Action struct {
@@ -85,10 +82,19 @@ type ActionCreate struct {
 	Data json.RawMessage `json:"data"`
 }
 
+type ActionCreateResponse struct {
+	ID       int64     `json:"id"`
+	CreateAt time.Time `json:"create_at"`
+}
+
 type ListActionsRequest struct {
 	UID int64 `json:"uid"`
 }
 
 type ListActionsResponse struct {
-	Actions []Action `json:"actions"`
+	ID        int64           `json:"id"`
+	UID       int64           `json:"uid"`
+	Type      string          `json:"type"`
+	Data      json.RawMessage `json:"data"`
+	CreatedAt time.Time       `json:"created_at"`
 }

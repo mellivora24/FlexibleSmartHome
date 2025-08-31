@@ -5,6 +5,7 @@ services:
     build:
       context: ../auth-service
       dockerfile: Dockerfile
+    container_name: auth_service
     env_file:
       - ../auth-service/.env
     ports:
@@ -15,6 +16,7 @@ services:
 
   auth-db:
     image: postgres:15
+    container_name: auth_db
     env_file:
       - ../auth-service/.env
     ports:
@@ -27,6 +29,7 @@ services:
     build:
       context: ../core-service
       dockerfile: Dockerfile
+    container_name: core_service
     env_file:
       - ../core-service/.env
     ports:
@@ -39,6 +42,7 @@ services:
 
   core-db:
     image: postgres:15
+    container_name: core_db
     env_file:
       - ../core-service/.env
     ports:
@@ -49,6 +53,7 @@ services:
 
   mqtt-broker:
     image: eclipse-mosquitto:2.0
+    container_name: mqtt_broker
     env_file:
       - ../core-service/.env
     ports:

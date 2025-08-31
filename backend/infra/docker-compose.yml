@@ -46,5 +46,14 @@ services:
       - core_db_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    ports:
+      - "1883:1883"
+    volumes:
+      - ../core-service/mosquitto/config:/mosquitto/config
+    restart: unless-stopped
+
 volumes:
   auth_db_data:
+  core_db_data:

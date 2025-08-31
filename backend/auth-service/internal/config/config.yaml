@@ -8,5 +8,5 @@ database:
 server:
   host: localhost
   port: 8081
-  base_path: /api/v1
+  base_path: /api/v1/auth
   jwt_secret: ${JWT_SECRET}

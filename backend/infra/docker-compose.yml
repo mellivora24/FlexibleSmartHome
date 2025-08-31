@@ -59,7 +59,7 @@ services:
     ports:
       - "1883:1883"
     volumes:
-      - ../core-service/mosquitto/config:/mosquitto/config
+      - ../core-service/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ../core-service/mosquitto/mqtt_init.sh:/mqtt_init.sh
     entrypoint: ["/mqtt_init.sh"]
     restart: unless-stopped

@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS tbl_events;
+DROP TABLE IF EXISTS tbl_sensorData;
+DROP TABLE IF EXISTS tbl_sensor;
+DROP TABLE IF EXISTS tbl_device;
+

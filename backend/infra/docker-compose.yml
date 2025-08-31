@@ -34,6 +34,7 @@ services:
     depends_on:
       - auth-service
       - core-db
+      - mqtt-broker
     restart: unless-stopped
 
   core-db:
@@ -48,10 +49,14 @@ services:
 
   mqtt-broker:
     image: eclipse-mosquitto:2.0
+    env_file:
+      - ../core-service/.env
     ports:
       - "1883:1883"
     volumes:
       - ../core-service/mosquitto/config:/mosquitto/config
+      - ../core-service/mosquitto/mqtt_init.sh:/mqtt_init.sh
+    entrypoint: ["/mqtt_init.sh"]
     restart: unless-stopped
 
 volumes:

@@ -62,11 +62,12 @@ services:
       - MOSQUITTO_HOSTNAME=${MQTT_BROKER_HOST}
       - MOSQUITTO_USER=${MQTT_BROKER_USER}
       - MOSQUITTO_PASSWORD=${MQTT_BROKER_PASS}
+      - PASSWD_FILE=${PASSWD_FILE}
     ports:
       - "1883:1883"
     volumes:
-      - ../core-service/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ../core-service/mosquitto/mqtt_init.sh:/mqtt_init.sh
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/mqtt_init.sh:/mqtt_init.sh
     entrypoint: ["/mqtt_init.sh"]
     restart: unless-stopped
 

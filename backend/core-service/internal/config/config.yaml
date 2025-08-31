@@ -1,0 +1,21 @@
+database:
+  host: localhost
+  port: 5434
+  username: ${CORE_DB_USER}
+  password: ${CORE_DB_PASS}
+  database: ${CORE_DB_NAME}
+
+mosquitto:
+  host: localhost
+  port: 1883
+  username: ${MQTT_BROKER_USER}
+  password: ${MQTT_BROKER_PASS}
+  client_name: core_service
+
+server:
+  host: localhost
+  port: 8082
+  base_path: api/v1/core
+
+auth_service:
+  base_path: api/v1/auth

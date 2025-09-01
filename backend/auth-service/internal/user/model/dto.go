@@ -28,5 +28,5 @@ type ActionDB struct {
 }
 
 func (ActionDB) TableName() string {
-	return "tbl_userAction"
+	return "tbl_useraction"
 }

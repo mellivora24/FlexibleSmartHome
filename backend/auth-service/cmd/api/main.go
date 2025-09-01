@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/shared"
@@ -32,6 +33,9 @@ func main() {
 
 	api := router.Group(cfg.Server.BASE_PATH)
 	{
+		api.GET("/", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": "Hello World!"})
+		})
 		api.GET("/health", func(c *gin.Context) {
 			c.JSON(200, gin.H{"status": "Auth service is working"})
 		})

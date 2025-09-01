@@ -102,7 +102,9 @@ func (r *repository) Update(user *model.UserDB) (*model.UserDB, error) {
 }
 
 func (r *repository) Delete(email string) error {
-	if err := r.DB.Delete(&model.UserDB{}, email).Error; err != nil {
+	if err := r.DB.
+		Where("email = ?", email).
+		Delete(&model.UserDB{}).Error; err != nil {
 		return shared.ErrInternalServer
 	}
 	return nil

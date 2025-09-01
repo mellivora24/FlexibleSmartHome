@@ -10,7 +10,7 @@ mosquitto:
   port: 1883
   username: ${MQTT_BROKER_USER}
   password: ${MQTT_BROKER_PASS}
-  client_name: core_service
+  client_id: core_service
 
 server:
   host: localhost

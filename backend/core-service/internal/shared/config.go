@@ -29,10 +29,12 @@ type SERVER_CONFIG struct {
 	HOST      string `mapstructure:"host"`
 	PORT      string `mapstructure:"port"`
 	BASE_PATH string `mapstructure:"base_path"`
+	WS_PORT   string `mapstructure:"ws_port"`
+	WS_PATH   string `mapstructure:"ws_path"`
 }
 
 type AUTH_CONFIG struct {
-	BASE_PATH string `mapstructure:"base_path"`
+	URL string `mapstructure:"url"`
 }
 
 type APP_CONFIG struct {

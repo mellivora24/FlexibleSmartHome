@@ -16,6 +16,8 @@ server:
   host: localhost
   port: 8082
   base_path: api/v1/core
+  ws_port: ":8080"
+  ws_path: "/ws"
 
 auth_service:
-  base_path: api/v1/auth
+  url: http://localhost:8081/auth-service/api/v1/auth/verify?token=

@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24.6-alpine AS builder
 RUN apk add --no-cache git ca-certificates tzdata
 
 WORKDIR /app
@@ -18,7 +18,6 @@ WORKDIR /app
 
 COPY --from=builder /app/auth-service .
 COPY --from=builder /app/internal/config/config.yaml ./internal/config/
-COPY --from=builder /app/internal/config/.env ./internal/config/
 COPY --from=builder /app/migrations ./migrations/
 
 RUN chown -R appuser:appgroup /app

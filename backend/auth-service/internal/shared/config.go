@@ -32,7 +32,6 @@ type APP_CONFIG struct {
 func LoadConfig() (*APP_CONFIG, error) {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, skip...")
-		return nil, nil
 	}
 
 	viper.SetConfigType("yaml")

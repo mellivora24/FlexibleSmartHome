@@ -22,7 +22,7 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 		user.GET("/:id", h.GetUserByID)
 		user.POST("/", h.CreateUser)
 		user.PUT("/:id", h.UpdateUser)
-		user.DELETE("/:id", h.DeleteUser)
+		user.DELETE("/:email", h.DeleteUser)
 		user.POST("/login", h.Login)
 	}
 

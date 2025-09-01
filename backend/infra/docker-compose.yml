@@ -59,10 +59,8 @@ services:
     image: eclipse-mosquitto:2.0
     container_name: mqtt_broker
     environment:
-      - MOSQUITTO_HOSTNAME=${MQTT_BROKER_HOST}
       - MOSQUITTO_USER=${MQTT_BROKER_USER}
-      - MOSQUITTO_PASSWORD=${MQTT_BROKER_PASS}
-      - PASSWD_FILE=${PASSWD_FILE}
+      - MOSQUITTO_PASS=${MQTT_BROKER_PASS}
     ports:
       - "1883:1883"
     volumes:

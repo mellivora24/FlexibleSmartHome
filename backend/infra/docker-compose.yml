@@ -12,6 +12,7 @@ services:
       AUTH_DB_USER: ${AUTH_DB_USER}
       AUTH_DB_PASS: ${AUTH_DB_PASS}
       AUTH_DB_NAME: ${AUTH_DB_NAME}
+      SERVER_HOST: ${SERVER_HOST}
       JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8081:8081"

@@ -1,6 +1,8 @@
 package user
 
 import (
+	"fmt"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/shared"
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/user/model"
@@ -18,6 +20,8 @@ type Service interface {
 
 	CreateAction(req *model.ActionCreate) (*model.ActionCreateResponse, error)
 	ListActions(req string) ([]model.ListActionsResponse, error)
+
+	VerifyToken(token string) (*model.VerifyTokenResponse, error)
 }
 
 type service struct {
@@ -220,6 +224,49 @@ func (s *service) ListActions(req string) ([]model.ListActionsResponse, error) {
 			Data:      action.Data,
 			CreatedAt: action.CreatedAt,
 		}
+	}
+
+	return res, nil
+}
+
+func (s *service) VerifyToken(tokenString string) (*model.VerifyTokenResponse, error) {
+	tokenInvalid := model.VerifyTokenResponse{
+		UID:     -1,
+		IsValid: false,
+	}
+
+	if tokenString == "" {
+		return nil, shared.ErrInvalidInput
+	}
+
+	parsed, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		return []byte(s.config.JWT_SECRET), nil
+	})
+	if err != nil {
+		return &tokenInvalid, nil
+	}
+
+	claims, ok := parsed.Claims.(jwt.MapClaims)
+	if !ok || !parsed.Valid {
+		return &tokenInvalid, nil
+	}
+
+	userID, ok := claims["user_id"].(float64) // JWT numeric => float64
+	if !ok {
+		return &tokenInvalid, nil
+	}
+
+	user, err := s.repo.FindByID(int64(uint(userID)))
+	if err != nil {
+		return &tokenInvalid, nil
+	}
+
+	res := &model.VerifyTokenResponse{
+		UID:     user.ID,
+		IsValid: true,
 	}
 
 	return res, nil

@@ -31,6 +31,11 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 		action.POST("/", h.CreateAction)
 		action.GET("/list/:uid", h.ListActions)
 	}
+
+	verify := rg.Group("/verify")
+	{
+		verify.POST("/", h.VerifyToken)
+	}
 }
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
@@ -115,5 +120,19 @@ func (h *Handler) ListActions(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
+	c.JSON(http.StatusOK, gin.H{"data": res})
+}
+
+func (h *Handler) VerifyToken(c *gin.Context) {
+	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "token required"})
+	}
+
+	res, err := h.service.VerifyToken(token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+	
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }

@@ -98,3 +98,8 @@ type ListActionsResponse struct {
 	Data      json.RawMessage `json:"data"`
 	CreatedAt time.Time       `json:"created_at"`
 }
+
+type VerifyTokenResponse struct {
+	UID     int64 `json:"uid"`
+	IsValid bool  `json:"valid"`
+}

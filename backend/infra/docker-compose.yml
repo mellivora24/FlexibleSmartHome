@@ -6,8 +6,13 @@ services:
       context: ../auth-service
       dockerfile: Dockerfile
     container_name: auth_service
-    env_file:
-      - ../auth-service/.env
+    environment:
+      AUTH_DB_PORT: ${AUTH_DB_PORT}
+      AUTH_DB_HOST: ${AUTH_DB_HOST}
+      AUTH_DB_USER: ${AUTH_DB_USER}
+      AUTH_DB_PASS: ${AUTH_DB_PASS}
+      AUTH_DB_NAME: ${AUTH_DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8081:8081"
     depends_on:

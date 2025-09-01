@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
 
-if [ ! -f "$PASSWD_FILE" ]; then
-  mosquitto_passwd -b -c "$PASSWD_FILE" "$MQTT_BROKER_USER" "$MQTT_BROKER_PASS"
-  chown mosquitto:mosquitto "$PASSWD_FILE"
+if [ ! -f /mosquitto/config/passwd ]; then
+  mosquitto_passwd -b -c /mosquitto/config/passwd "$MOSQUITTO_USER" "$MOSQUITTO_PASS"
+  chown mosquitto:mosquitto /mosquitto/config/passwd
 fi
 
 exec mosquitto -c /mosquitto/config/mosquitto.conf

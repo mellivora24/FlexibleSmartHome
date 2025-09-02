@@ -183,3 +183,40 @@ CREATE TRIGGER trg_sensor_delete
 CREATE TRIGGER trg_sensor_update
     AFTER UPDATE OF port ON tbl_sensor
     FOR EACH ROW EXECUTE FUNCTION fn_sensor_update();
+
+
+-- Function check port (khi esp32 khoi dong)
+CREATE OR REPLACE FUNCTION get_used_ports(mcu_id INT)
+    RETURNS TABLE (
+                      gpio INT,
+                      type INT
+                  ) AS $$
+BEGIN
+    RETURN QUERY
+        -- Sensor mapping
+        SELECT s.port,
+               CASE s.type
+                   WHEN 'analog' THEN 1
+                   WHEN 'digital' THEN 2
+                   WHEN 'nrf24l01' THEN 5
+                   WHEN 'bluetooth' THEN 7
+                   ELSE 0
+                   END AS type
+        FROM tbl_sensor s
+        WHERE s.mid = mcu_id AND s.port IS NOT NULL
+
+        UNION ALL
+
+        -- Device mapping
+        SELECT d.port,
+               CASE d.type
+                   WHEN 'pwm' THEN 3
+                   WHEN 'digital' THEN 4
+                   WHEN 'nrf24l01' THEN 6
+                   WHEN 'bluetooth' THEN 8
+                   ELSE 0
+                   END AS type
+        FROM tbl_device d
+        WHERE d.mid = mcu_id AND d.port IS NOT NULL;
+END;
+$$ LANGUAGE plpgsql;

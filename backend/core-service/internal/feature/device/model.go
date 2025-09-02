@@ -6,18 +6,18 @@ import (
 )
 
 type DeviceDB struct {
-	ID          int64           `json:"id"`
-	UID         int64           `json:"uid"`
-	MID         int64           `json:"mid"`
-	RID         int64           `json:"rid"`
-	Name        string          `json:"name"`
-	Type        string          `json:"type"`
-	Port        int             `json:"port"`
-	Status      bool            `json:"status"`
-	Data        json.RawMessage `json:"data"`
-	RunningTime int             `json:"running_time"`
-	CreatedAt   time.Time       `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt   time.Time       `json:"updated_at" gorm:"autoUpdateTime"`
+	ID          int64           `gorm:"column:id;primaryKey;autoIncrement"`
+	UID         int64           `gorm:"column:uid;not null"`
+	MID         int64           `gorm:"column:mid;not null"`
+	RID         int64           `gorm:"column:rid;not null"`
+	Name        string          `gorm:"column:name;type:varchar(255)"`
+	Type        string          `gorm:"column:type;type:varchar(255)"`
+	Port        int             `gorm:"column:port"`
+	Status      bool            `gorm:"column:status"`
+	Data        json.RawMessage `gorm:"column:data;type:jsonb"`
+	RunningTime int             `gorm:"column:running_time;default:0"`
+	CreatedAt   time.Time       `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt   time.Time       `gorm:"column:updated_at;autoUpdateTime"`
 }
 
 type DeviceData struct {

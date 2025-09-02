@@ -188,7 +188,7 @@ CREATE TRIGGER trg_sensor_update
 -- Function check port (khi esp32 khoi dong)
 CREATE OR REPLACE FUNCTION get_used_ports(mcu_id INT)
     RETURNS TABLE (
-                      gpio INT,
+                      port INT,
                       type INT
                   ) AS $$
 BEGIN

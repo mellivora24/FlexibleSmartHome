@@ -1,4 +1,4 @@
-CREATE TABLE tbl_mcu (
+CREATE TABLE IF NOT EXISTS tbl_mcu (
      id SERIAL PRIMARY KEY,
      uid INT NOT NULL,
      port INT,
@@ -6,7 +6,7 @@ CREATE TABLE tbl_mcu (
      create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE tbl_room (
+CREATE TABLE IF NOT EXISTS tbl_room (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
     name VARCHAR(255),
@@ -14,7 +14,7 @@ CREATE TABLE tbl_room (
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE tbl_sensor (
+CREATE TABLE IF NOT EXISTS tbl_sensor (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
     mid INT,
@@ -30,7 +30,7 @@ CREATE TABLE tbl_sensor (
     FOREIGN KEY (rid) REFERENCES tbl_room(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tbl_device (
+CREATE TABLE IF NOT EXISTS tbl_device (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
     mid INT,
@@ -47,7 +47,7 @@ CREATE TABLE tbl_device (
     FOREIGN KEY (rid) REFERENCES tbl_room(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tbl_events (
+CREATE TABLE IF NOT EXISTS tbl_events (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
     did INT,
@@ -57,7 +57,7 @@ CREATE TABLE tbl_events (
     FOREIGN KEY (did) REFERENCES tbl_device(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tbl_sensorData (
+CREATE TABLE IF NOT EXISTS tbl_sensorData (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
     sid INT,
@@ -67,7 +67,7 @@ CREATE TABLE tbl_sensorData (
     FOREIGN KEY (sid) REFERENCES tbl_sensor(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tbl_log (
+CREATE TABLE IF NOT EXISTS tbl_log (
     id SERIAL PRIMARY KEY,
     uid INT,
     level VARCHAR(100),
@@ -76,7 +76,7 @@ CREATE TABLE tbl_log (
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE tbl_notification (
+CREATE TABLE IF NOT EXISTS tbl_notification (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
     type VARCHAR(100),

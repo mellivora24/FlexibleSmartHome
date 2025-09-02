@@ -15,10 +15,13 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
-	//devices := rg.Group("/devices")
-	//{
-	//	nil
-	//}
+	devices := rg.Group("/devices")
+	{
+		devices.GET("/all", h.ListDevices)
+		devices.POST("/create", h.CreateDevice)
+		devices.PUT("/update", h.UpdateDevice)
+		devices.DELETE("/:id", h.DeleteDevice)
+	}
 }
 
 func (h *Handler) ListDevices(c *gin.Context) {

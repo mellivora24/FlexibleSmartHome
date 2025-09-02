@@ -1,1 +1,58 @@
 package mcu
+
+import "gorm.io/gorm"
+
+type Repository interface {
+	Create(mcu *McuDB) (*McuDB, error)
+	Delete(id int64) error
+
+	UpdateFirmware(id int64, firmwareVersion string) (*McuDB, error)
+	AvailablePort(mid int64) ([]PortInfo, error)
+}
+
+type repository struct {
+	DB *gorm.DB
+}
+
+func NewRepository(db *gorm.DB) Repository {
+	return &repository{DB: db}
+}
+
+func (r *repository) Create(mcu *McuDB) (*McuDB, error) {
+	if err := r.DB.Create(mcu).Error; err != nil {
+		return nil, err
+	}
+	return mcu, nil
+}
+
+func (r *repository) UpdateFirmware(id int64, firmwareVersion string) (*McuDB, error) {
+	mcu := &McuDB{}
+	if err := r.DB.Model(mcu).
+		Where("id = ?", id).
+		Update("firmware_version", firmwareVersion).Error; err != nil {
+		return nil, err
+	}
+
+	if err := r.DB.First(mcu, id).Error; err != nil {
+		return nil, err
+	}
+
+	return mcu, nil
+}
+
+func (r *repository) Delete(id int64) error {
+	if err := r.DB.Delete(&McuDB{}, id).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repository) AvailablePort(mid int64) ([]PortInfo, error) {
+	var ports []PortInfo
+	if err := r.DB.
+		Raw("SELECT * FROM get_used_ports(?)", mid).
+		Scan(&ports).Error; err != nil {
+		return nil, err
+	}
+	return ports, nil
+}

@@ -1,0 +1,1 @@
+1-> analog sensor, 2 digital sensor, 3 pwm device, 4 digital device, 5 nrf24l01 sensor, 6 nrf24l01 device, 7 bluetooth sensor, 8 bluetooth device

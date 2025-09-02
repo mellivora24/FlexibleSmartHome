@@ -20,4 +20,4 @@ server:
   ws_path: "/ws"
 
 auth_service:
-  url: http://localhost:8081/auth-service/api/v1/auth/verify?token=
+  url: http://localhost:8081/api/v1/auth/verify?token=

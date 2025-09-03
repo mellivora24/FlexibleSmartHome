@@ -1,4 +1,4 @@
-package event
+package log
 
 import (
 	"net/http"
@@ -15,10 +15,10 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
-	event := rg.Group("/event")
+	log := rg.Group("/log")
 	{
-		event.GET("/list", h.GetListEvents)
-		event.POST("/create", h.CreateEvent)
+		log.GET("/list", h.GetListEvents)
+		log.POST("/create", h.CreateEvent)
 	}
 }
 

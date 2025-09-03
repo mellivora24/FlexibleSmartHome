@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Repository interface {
 	GetList(uid int64, pageSize int, limit int) ([]*LogDB, int64, error)
-	CreateEvent(log *LogDB) error
+	CreateLog(log *LogDB) error
 }
 
 type repository struct {
@@ -43,6 +43,6 @@ func (r *repository) GetList(uid int64, pageSize int, limit int) ([]*LogDB, int6
 	return logs, total, nil
 }
 
-func (r *repository) CreateEvent(log *LogDB) error {
+func (r *repository) CreateLog(log *LogDB) error {
 	return r.DB.Create(log).Error
 }

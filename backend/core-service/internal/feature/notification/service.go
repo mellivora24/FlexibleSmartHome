@@ -1,10 +1,11 @@
-package log
+package notification
 
 import "time"
 
 type Service interface {
 	Create(cond *CreateRequest) error
 	GetList(cond *GetListRequest) (*GetListResponse, error)
+	Update(id int) (*NotificationDB, error)
 }
 
 type service struct {
@@ -16,26 +17,31 @@ func NewService(repo Repository) Service {
 }
 
 func (s service) Create(cond *CreateRequest) error {
-	log := &LogDB{
+	noti := &NotificationDB{
 		UID:       cond.UID,
-		Level:     cond.Level,
+		Type:      cond.Type,
 		Message:   cond.Message,
 		Metadata:  cond.Metadata,
+		IsRead:    false,
 		CreatedAt: time.Now(),
 	}
 
-	return s.repo.CreateLog(log)
+	return s.repo.CreateNoti(noti)
 }
 
 func (s service) GetList(cond *GetListRequest) (*GetListResponse, error) {
-	logs, total, err := s.repo.GetList(cond.UID, cond.Page, cond.Limit)
+	notifications, total, err := s.repo.GetList(cond.UID, cond.Page, cond.Limit)
 	if err != nil {
 		return nil, err
 	}
 
 	result := &GetListResponse{
 		Total: total,
-		List:  logs,
+		List:  notifications,
 	}
 	return result, nil
+}
+
+func (s service) Update(id int) (*NotificationDB, error) {
+	return s.repo.UpdateNoti(int64(id))
 }

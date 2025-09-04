@@ -1,0 +1,7 @@
+#define XPT2046_CS 33
+#define XPT2046_CLK 25
+#define XPT2046_IRQ 36
+#define XPT2046_MOSI 32
+#define XPT2046_MISO 39
+#define SCREEN_WIDTH  320
+#define SCREEN_HEIGHT 240

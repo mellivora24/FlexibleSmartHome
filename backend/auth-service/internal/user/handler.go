@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/user/model"
 )
 
 type Handler struct {
@@ -57,7 +56,7 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 }
 
 func (h *Handler) CreateUser(c *gin.Context) {
-	var userCreate model.CreateRequest
+	var userCreate CreateRequest
 	if err := c.ShouldBindJSON(&userCreate); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -70,7 +69,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
-	var userUpdate model.UpdateRequest
+	var userUpdate UpdateRequest
 	if err := c.ShouldBindJSON(&userUpdate); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
@@ -83,7 +82,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 
 func (h *Handler) DeleteUser(c *gin.Context) {
 	email := c.Param("email")
-	userDelete := model.DeleteRequest{Email: email}
+	userDelete := DeleteRequest{Email: email}
 	res, err := h.service.DeleteUser(&userDelete)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -92,7 +91,7 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 }
 
 func (h *Handler) Login(c *gin.Context) {
-	var userLogin model.LoginRequest
+	var userLogin LoginRequest
 	if err := c.ShouldBindJSON(&userLogin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
@@ -104,7 +103,7 @@ func (h *Handler) Login(c *gin.Context) {
 }
 
 func (h *Handler) CreateAction(c *gin.Context) {
-	var action model.ActionCreate
+	var action ActionCreate
 	if err := c.ShouldBindJSON(&action); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
@@ -133,6 +132,6 @@ func (h *Handler) VerifyToken(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }

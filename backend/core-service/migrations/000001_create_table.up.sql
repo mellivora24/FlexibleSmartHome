@@ -1,11 +1,13 @@
+-- Model: true
 CREATE TABLE IF NOT EXISTS tbl_mcu (
     id SERIAL PRIMARY KEY,
-    uid INT NOT NULL,
-    available_port INT,
+    uid INT UNIQUE NOT NULL,
+    available_port INT[],
     firmware_version VARCHAR(255),
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Model: true
 CREATE TABLE IF NOT EXISTS tbl_room (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
@@ -14,10 +16,11 @@ CREATE TABLE IF NOT EXISTS tbl_room (
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Model: true
 CREATE TABLE IF NOT EXISTS tbl_sensor (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
-    mid INT,
+    mid INT NOT NULL,
     rid INT,
     name VARCHAR(255),
     type VARCHAR(255),
@@ -30,10 +33,11 @@ CREATE TABLE IF NOT EXISTS tbl_sensor (
     FOREIGN KEY (rid) REFERENCES tbl_room(id) ON DELETE CASCADE
 );
 
+-- Model: true
 CREATE TABLE IF NOT EXISTS tbl_device (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
-    mid INT,
+    mid INT NOT NULL,
     rid INT,
     name VARCHAR(255),
     type VARCHAR(255),
@@ -47,6 +51,7 @@ CREATE TABLE IF NOT EXISTS tbl_device (
     FOREIGN KEY (rid) REFERENCES tbl_room(id) ON DELETE CASCADE
 );
 
+-- Model: true
 CREATE TABLE IF NOT EXISTS tbl_events (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
@@ -57,6 +62,7 @@ CREATE TABLE IF NOT EXISTS tbl_events (
     FOREIGN KEY (did) REFERENCES tbl_device(id) ON DELETE CASCADE
 );
 
+-- Model: false
 CREATE TABLE IF NOT EXISTS tbl_sensorData (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
@@ -67,6 +73,7 @@ CREATE TABLE IF NOT EXISTS tbl_sensorData (
     FOREIGN KEY (sid) REFERENCES tbl_sensor(id) ON DELETE CASCADE
 );
 
+-- Model: true
 CREATE TABLE IF NOT EXISTS tbl_log (
     id SERIAL PRIMARY KEY,
     uid INT,
@@ -76,6 +83,7 @@ CREATE TABLE IF NOT EXISTS tbl_log (
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Model: true
 CREATE TABLE IF NOT EXISTS tbl_notification (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
@@ -92,7 +100,7 @@ CREATE INDEX IF NOT EXISTS idx_device_uid ON tbl_device(uid);
 CREATE INDEX IF NOT EXISTS idx_events_did ON tbl_events(did);
 CREATE INDEX IF NOT EXISTS idx_sensorData_sid ON tbl_sensorData(sid);
 
--- Xoa port khi them
+-- Khi thêm device -> xóa port khỏi available_port
 CREATE OR REPLACE FUNCTION fn_device_insert()
     RETURNS TRIGGER AS $$
 BEGIN
@@ -103,7 +111,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Them port khi xoa
+-- Khi xóa device -> thêm port lại
 CREATE OR REPLACE FUNCTION fn_device_delete()
     RETURNS TRIGGER AS $$
 BEGIN
@@ -114,7 +122,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Hoan doi khi update
+-- Khi update port device -> đổi port
 CREATE OR REPLACE FUNCTION fn_device_update()
     RETURNS TRIGGER AS $$
 BEGIN
@@ -159,7 +167,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 CREATE TRIGGER trg_device_insert
     AFTER INSERT ON tbl_device
     FOR EACH ROW EXECUTE FUNCTION fn_device_insert();
@@ -184,8 +191,6 @@ CREATE TRIGGER trg_sensor_update
     AFTER UPDATE OF port ON tbl_sensor
     FOR EACH ROW EXECUTE FUNCTION fn_sensor_update();
 
-
--- Function check port (khi esp32 khoi dong)
 CREATE OR REPLACE FUNCTION get_used_ports(mcu_id INT)
     RETURNS TABLE (
                       port INT,

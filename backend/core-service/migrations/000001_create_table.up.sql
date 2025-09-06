@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS tbl_events (
 );
 
 -- Model: false
-CREATE TABLE IF NOT EXISTS tbl_sensorData (
+CREATE TABLE IF NOT EXISTS tbl_sensordata (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
     sid INT,

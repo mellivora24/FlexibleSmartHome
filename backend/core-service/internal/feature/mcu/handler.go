@@ -19,9 +19,9 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	mcu := rg.Group("/mcu")
 	{
 		mcu.POST("/create", h.AssignMCU)
-		mcu.DELETE("/delete:id", h.DeleteMCU)
+		mcu.DELETE("/delete/:id", h.DeleteMCU)
 		mcu.PUT("/firmwareUpdate", h.FirmwareUpdate)
-		mcu.GET("/availablePorts", h.AvailablePort)
+		mcu.GET("/availablePorts/:id", h.AvailablePort)
 	}
 }
 

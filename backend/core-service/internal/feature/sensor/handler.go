@@ -15,7 +15,13 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
-
+	sensors := rg.Group("/sensors")
+	{
+		sensors.GET("/all", h.ListSensors)
+		sensors.POST("/create", h.CreateSensor)
+		sensors.PUT("/update", h.UpdateSensor)
+		sensors.DELETE("/:id", h.DeleteSensor)
+	}
 }
 
 func (h *Handler) ListSensors(c *gin.Context) {

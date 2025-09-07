@@ -28,11 +28,13 @@ func (h *Handler) ListDevices(c *gin.Context) {
 	var cond ListDeviceRequest
 	if err := c.ShouldBindJSON(&cond); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	res, err := h.service.ListDevices(&cond)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
@@ -41,11 +43,13 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 	var device CreateDeviceRequest
 	if err := c.ShouldBindJSON(&device); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	res, err := h.service.CreateDevice(&device)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
@@ -54,10 +58,12 @@ func (h *Handler) UpdateDevice(c *gin.Context) {
 	var device UpdateDeviceRequest
 	if err := c.ShouldBindJSON(&device); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	res, err := h.service.UpdateDevice(&device)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
@@ -66,10 +72,12 @@ func (h *Handler) DeleteDevice(c *gin.Context) {
 	var device DeviceDB
 	if err := c.ShouldBindJSON(&device); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	if err := h.service.DeleteDevice(&device); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": true})
 }

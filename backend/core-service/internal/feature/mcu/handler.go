@@ -16,7 +16,7 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
-	mcu := rg.Group("/mcu")
+	mcu := rg.Group("/mcus")
 	{
 		mcu.POST("/create", h.AssignMCU)
 		mcu.DELETE("/delete/:id", h.DeleteMCU)

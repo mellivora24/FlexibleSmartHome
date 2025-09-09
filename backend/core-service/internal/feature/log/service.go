@@ -1,9 +1,12 @@
 package log
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Service interface {
-	Create(cond *CreateRequest) error
+	Create(uid int64, level string, message string, metadata json.RawMessage) error
 	GetList(cond *GetListRequest) (*GetListResponse, error)
 }
 
@@ -15,12 +18,12 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s service) Create(cond *CreateRequest) error {
+func (s service) Create(uid int64, level string, message string, metadata json.RawMessage) error {
 	log := &LogDB{
-		UID:       cond.UID,
-		Level:     cond.Level,
-		Message:   cond.Message,
-		Metadata:  cond.Metadata,
+		UID:       uid,
+		Level:     level,
+		Message:   message,
+		Metadata:  metadata,
 		CreatedAt: time.Now(),
 	}
 

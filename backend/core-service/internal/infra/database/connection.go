@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"log"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -27,6 +28,8 @@ func InitDatabase(dbCfg shared.DB_CONFIG) (*gorm.DB, error) {
 
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
+
+	log.Printf("[DATABASE] connected to database at tpc://%s:%s", dbCfg.HOST, dbCfg.PORT)
 
 	return DB, nil
 }

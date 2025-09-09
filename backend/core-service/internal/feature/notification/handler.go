@@ -16,14 +16,14 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
-	log := rg.Group("/log")
+	noti := rg.Group("/notifications")
 	{
-		log.GET("/list", h.GetListEvents)
-		log.POST("/create", h.CreateEvent)
+		noti.GET("/list", h.GetListNoti)
+		noti.PUT("/:id", h.UpdateNoti)
 	}
 }
 
-func (h *Handler) GetListEvents(c *gin.Context) {
+func (h *Handler) GetListNoti(c *gin.Context) {
 	var req GetListRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -36,18 +36,7 @@ func (h *Handler) GetListEvents(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
-func (h *Handler) CreateEvent(c *gin.Context) {
-	var req CreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	if err := h.service.Create(&req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	}
-	c.JSON(http.StatusCreated, gin.H{"data": true})
-}
-
-func (h *Handler) UpdateEvent(c *gin.Context) {
+func (h *Handler) UpdateNoti(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

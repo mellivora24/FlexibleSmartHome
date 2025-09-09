@@ -3,12 +3,13 @@ package mosquitto
 import (
 	"fmt"
 	"log"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/shared"
 )
 
-func InitMQTT(mqttCfg shared.MQTT_CONFIG) (*mqtt.Client, error) {
+func InitMQTT(mqttCfg shared.MQTT_CONFIG) (mqtt.Client, error) {
 	brokerURI := fmt.Sprintf("tcp://%s:%s", mqttCfg.HOST, mqttCfg.PORT)
 
 	opts := mqtt.NewClientOptions()
@@ -17,12 +18,17 @@ func InitMQTT(mqttCfg shared.MQTT_CONFIG) (*mqtt.Client, error) {
 	opts.SetPassword(mqttCfg.PASSWORD)
 	opts.SetClientID(mqttCfg.CLIENT_ID)
 
+	// Reconnect
+	opts.SetAutoReconnect(true)
+	opts.SetConnectRetry(true)
+	opts.SetConnectRetryInterval(5 * time.Second)
+
 	opts.OnConnect = func(client mqtt.Client) {
-		log.Printf("Connected to MQTT broker %s", brokerURI)
+		log.Printf("[MQTT] Connected to broker %s", brokerURI)
 	}
 
 	opts.OnConnectionLost = func(client mqtt.Client, err error) {
-		log.Printf("Lost connection to MQTT broker %s", brokerURI)
+		log.Printf("[MQTT] Lost connection to broker %s, error: %v", brokerURI, err)
 	}
 
 	client := mqtt.NewClient(opts)
@@ -31,5 +37,5 @@ func InitMQTT(mqttCfg shared.MQTT_CONFIG) (*mqtt.Client, error) {
 		return nil, token.Error()
 	}
 
-	return &client, nil
+	return client, nil
 }

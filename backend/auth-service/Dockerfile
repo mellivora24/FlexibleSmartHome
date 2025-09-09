@@ -1,4 +1,5 @@
-FROM golang:1.24.6-alpine AS builder
+FROM golang:1.24-alpine AS builder
+
 RUN apk add --no-cache git ca-certificates tzdata
 
 WORKDIR /app
@@ -10,7 +11,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o auth-service ./cm
 
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates tzdata
+RUN apk update && apk add --no-cache ca-certificates tzdata
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup
 

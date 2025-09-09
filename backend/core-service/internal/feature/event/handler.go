@@ -15,10 +15,9 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
-	event := rg.Group("/event")
+	event := rg.Group("/events")
 	{
 		event.GET("/list", h.GetListEvents)
-		event.POST("/create", h.CreateEvent)
 	}
 }
 
@@ -33,15 +32,4 @@ func (h *Handler) GetListEvents(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
-}
-
-func (h *Handler) CreateEvent(c *gin.Context) {
-	var req CreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	if err := h.service.Create(&req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	}
-	c.JSON(http.StatusCreated, gin.H{"data": true})
 }

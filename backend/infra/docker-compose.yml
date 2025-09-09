@@ -1,19 +1,11 @@
-version: "3.8"
-
 services:
   auth-service:
     build:
       context: ../auth-service
       dockerfile: Dockerfile
     container_name: auth_service
-    environment:
-      AUTH_DB_PORT: ${AUTH_DB_PORT}
-      AUTH_DB_HOST: ${AUTH_DB_HOST}
-      AUTH_DB_USER: ${AUTH_DB_USER}
-      AUTH_DB_PASS: ${AUTH_DB_PASS}
-      AUTH_DB_NAME: ${AUTH_DB_NAME}
-      SERVER_HOST: ${SERVER_HOST}
-      JWT_SECRET: ${JWT_SECRET}
+    env_file:
+      - .env
     ports:
       - "8081:8081"
     depends_on:
@@ -23,14 +15,12 @@ services:
   auth-db:
     image: postgres:15
     container_name: auth_db
-    environment:
-      - POSTGRES_USER=${AUTH_DB_USER}
-      - POSTGRES_PASSWORD=${AUTH_DB_PASS}
-      - POSTGRES_DB=${AUTH_DB_NAME}
+    env_file:
+      - .env
     ports:
       - "5433:5432"
     volumes:
-      - auth_db_data:/var/lib/postgresql/data 
+      - auth_db_data:/var/lib/postgresql/data
     restart: unless-stopped
 
   core-service:
@@ -39,11 +29,10 @@ services:
       dockerfile: Dockerfile
     container_name: core_service
     env_file:
-      - ../core-service/.env
+      - .env
     ports:
       - "8082:8082"
     depends_on:
-      - auth-service
       - core-db
       - mqtt-broker
     restart: unless-stopped
@@ -51,22 +40,31 @@ services:
   core-db:
     image: postgres:15
     container_name: core_db
-    environment:
-      - POSTGRES_USER=${CORE_DB_USER}
-      - POSTGRES_PASSWORD=${CORE_DB_PASS}
-      - POSTGRES_DB=${CORE_DB_NAME}
+    env_file:
+      - .env
     ports:
       - "5434:5432"
     volumes:
       - core_db_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  gateway:
+    build:
+      context: ../gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - core-service
+    restart: unless-stopped
+
   mqtt-broker:
     image: eclipse-mosquitto:2.0
     container_name: mqtt_broker
-    environment:
-      - MOSQUITTO_USER=${MQTT_BROKER_USER}
-      - MOSQUITTO_PASS=${MQTT_BROKER_PASS}
+    env_file:
+      - .env
     ports:
       - "1883:1883"
     volumes:

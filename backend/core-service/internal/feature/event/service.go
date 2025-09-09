@@ -1,9 +1,12 @@
 package event
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Service interface {
-	Create(cond *CreateRequest) error
+	Create(uid int64, did int64, action string, payload json.RawMessage) error
 	GetList(cond *GetListRequest) (*GetListResponse, error)
 }
 
@@ -15,12 +18,13 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s service) Create(cond *CreateRequest) error {
+// Create user for: add/remove/update device || control
+func (s service) Create(uid int64, did int64, action string, payload json.RawMessage) error {
 	event := &EventDB{
-		UID:       cond.UID,
-		DID:       cond.DID,
-		Action:    cond.Action,
-		Payload:   cond.Payload,
+		UID:       uid,
+		DID:       did,
+		Action:    action,
+		Payload:   payload,
 		CreatedAt: time.Now(),
 	}
 

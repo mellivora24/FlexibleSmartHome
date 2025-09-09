@@ -1,44 +1,49 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
-	"github.com/mellivora24/flexiblesmarthome/core-service/internal/infra/websocket"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensorData"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/infra/database"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/infra/mosquitto"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/handler"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/service"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/shared"
 )
 
 func main() {
+	log.Print("Loading configuration...")
 	cfg, err := shared.LoadConfig()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+	} else if cfg == nil {
+		log.Fatal("config is nil")
 	}
 
+	mqttClient, err := mosquitto.InitMQTT(cfg.Mosquitto)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbClient, err := database.InitDatabase(cfg.Database)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sensorRepo := sensorData.NewRepository(dbClient)
+
+	manager := realtime.NewManager()
+	mqttService := service.NewMQTTService(mqttClient)
+	wsService := service.NewWebSocketService(manager)
+	sensorDataService := sensorData.NewService(sensorRepo)
+
+	mqttHandler := handler.NewMQTTHandler(mqttService, sensorDataService, wsService)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		conn, err := websocket.InitWS(w, r, cfg.AuthService)
-		if err != nil {
-			fmt.Println("Upgrade WS failed:", err)
-			return
-		}
-		defer conn.Close()
-
-		for {
-			msgType, msg, err := conn.ReadMessage()
-			if err != nil {
-				fmt.Println("read error:", err)
-				break
-			}
-			fmt.Println("Received:", string(msg))
-
-			if err := conn.WriteMessage(msgType, msg); err != nil {
-				fmt.Println("write error:", err)
-				break
-			}
-		}
+		handler.WSHandler(manager, mqttService, wsService, w, r)
 	})
 
-	fmt.Println("Server listening at :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		panic(err)
-	}
+	mqttHandler.Init()
+	log.Fatal(http.ListenAndServe(":8082", nil))
 }

@@ -94,11 +94,29 @@ CREATE TABLE IF NOT EXISTS tbl_notification (
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS pending_actions (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    mcu_id INT NOT NULL,
+    action VARCHAR(100) NOT NULL,
+    payload TEXT,
+    status VARCHAR(50) DEFAULT 'pending',
+    feedback TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES tbl_mcu(uid) ON DELETE CASCADE,
+    FOREIGN KEY (mcu_id) REFERENCES tbl_mcu(id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_log_uid ON tbl_log(uid);
 CREATE INDEX IF NOT EXISTS idx_sensor_uid ON tbl_sensor(uid);
 CREATE INDEX IF NOT EXISTS idx_device_uid ON tbl_device(uid);
 CREATE INDEX IF NOT EXISTS idx_events_did ON tbl_events(did);
 CREATE INDEX IF NOT EXISTS idx_sensorData_sid ON tbl_sensorData(sid);
+CREATE INDEX IF NOT EXISTS idx_pending_actions_user_mcu ON pending_actions(user_id, mcu_id);
+CREATE INDEX IF NOT EXISTS idx_pending_actions_status ON pending_actions(status);
+CREATE INDEX IF NOT EXISTS idx_pending_actions_created_at ON pending_actions(created_at);
+
 
 -- Khi thêm device -> xóa port khỏi available_port
 CREATE OR REPLACE FUNCTION fn_device_insert()

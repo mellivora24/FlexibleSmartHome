@@ -13,7 +13,7 @@ type repository struct {
 	DB *gorm.DB
 }
 
-func NewDeviceRepository(db *gorm.DB) Repository {
+func NewRepository(db *gorm.DB) Repository {
 	return &repository{DB: db}
 }
 

@@ -33,7 +33,7 @@ func (r *repository) GetList(uid int64, pageSize int, limit int) ([]*LogDB, int6
 		return nil, 0, err
 	}
 
-	if err := query.Order("created_at DESC").
+	if err := query.Order("create_at DESC").
 		Limit(limit).
 		Offset(offset).
 		Find(&logs).Error; err != nil {

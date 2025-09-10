@@ -41,6 +41,8 @@ func (h *MQTTHandler) Init() {
 		log.Printf("Error subscribing to response topic: %v", err)
 		return
 	}
+
+	// TODO: add logic for other topic
 }
 
 func (h *MQTTHandler) onSensorData(client mqtt.Client, msg mqtt.Message) {
@@ -90,6 +92,8 @@ func (h *MQTTHandler) onControlResponse(client mqtt.Client, msg mqtt.Message) {
 		log.Printf("Error broadcasting feedback to WebSocket: %v", err)
 	}
 }
+
+// TODO: handler other topic here
 
 func extractUIDFromTopic(topic string) string {
 	parts := strings.Split(topic, "/")

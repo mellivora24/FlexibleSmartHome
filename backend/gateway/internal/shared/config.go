@@ -18,7 +18,8 @@ type ServerConfig struct {
 }
 
 type AuthServiceConfig struct {
-	URL string `mapstructure:"url"`
+	BasePath   string `mapstructure:"url"`
+	VerifyPath string `mapstructure:"verify_path"`
 }
 
 type CoreServiceConfig struct {

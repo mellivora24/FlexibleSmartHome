@@ -4,7 +4,8 @@ server:
   base_path: /api/v1/gateway
 
 auth_service:
-  url: http://localhost:8081/api/v1/auth/verify
+  url: http://localhost:8081/api/v1/auth
+  verify_path: http://localhost:8081/api/v1/auth/verify
 
 core_service:
   url: http://localhost:8082/api/v1/core

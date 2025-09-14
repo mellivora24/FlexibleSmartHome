@@ -32,7 +32,7 @@ export default function LoginScreen() {
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
-            keyboardVerticalOffset={-100}
+            keyboardVerticalOffset={0}
         >
             <ScrollView
                 contentContainerStyle={{ flexGrow: 1 }}

@@ -26,15 +26,18 @@ export default function RegisterScreen() {
     }
 
     function handleRegister() {
-        console.log("Registering with", email, password);
+        console.log("Registering with", name, email, password);
         
         // TODO: Implement registration logic here
+
+        router.replace(ROUTES.AUTH.ONBOARDING);
     }
 
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
-            keyboardVerticalOffset={-100}
+            behavior="padding"
+            keyboardVerticalOffset={0}
         >
             <ScrollView
                 contentContainerStyle={{ flexGrow: 1 }}

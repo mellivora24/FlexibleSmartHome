@@ -41,4 +41,14 @@ export const style = StyleSheet.create({
     fontWeight: "500",
     color: "#7D39EB",
   },
+  tip: {
+    marginTop: 50,
+    marginBottom: 16,
+    fontSize: 14,
+    fontFamily: "inter-regular",
+    fontWeight: "400",
+    color: "#fff",
+    maxWidth: 300,
+    textAlign: "center",
+  },
 });

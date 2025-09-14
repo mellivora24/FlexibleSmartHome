@@ -1,8 +1,6 @@
 export const ROUTES = {
     AUTH: {
-        LOGIN: "/(auth)/login",
-        REGISTER: "/(auth)/register",
-        ONBOARDING: "/(auth)/onboarding",
+        LOGIN: "/(auth)/login"
     },
     WELCOME: "/",
 } as const;

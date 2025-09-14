@@ -21,11 +21,7 @@ export default function WelcomeScreen() {
 
     function handleLogin() {
         console.log("Logging in with", email, password);
-
-        if (!email || !password) {
-            console.log("Please fill in all fields");
-            return;
-        }
+        // TODO: Implement login logic here
     }
 
     return (

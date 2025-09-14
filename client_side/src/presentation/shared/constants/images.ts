@@ -8,7 +8,7 @@ export const IMAGES: Record<string, ImageSourcePropType> = {
 
 
 export const ICONS: Record<string, ImageSourcePropType> = {
-  REGISTER_EMAIL: require("@assets/icons/register_email_icon.png"),
-  REGISTER_NAME: require("@assets/icons/register_name_icon.png"),
-  REGISTER_PASSWORD: require("@assets/icons/register_password_icon.png"),
+  EMAIL: require("@assets/icons/register_email_icon.png"),
+  NAME: require("@assets/icons/register_name_icon.png"),
+  PASSWORD: require("@assets/icons/register_password_icon.png"),
 };

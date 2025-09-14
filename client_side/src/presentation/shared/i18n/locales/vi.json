@@ -18,6 +18,20 @@
       "registerLink": "Đăng ký",
       "buttonHide": "Ẩn",
       "buttonShow": "Hiện"
-    }
+    },
+    "register": {
+      "title": "Tạo tài khoản để bắt đầu sử dụng các dịch vụ mà chúng tôi cung cấp cho ngôi nhà thông minh của bạn.",
+      "name": "Tên của bạn",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "namePlaceholder": "Nhập họ và tên...",
+      "emailPlaceholder": "Nhập email...",
+      "passwordPlaceholder": "Nhập mật khẩu...",
+      "button": "Đăng ký ngay",
+      "haveAccount": "Bạn đã có tài khoản? ",
+      "loginLink": "Đăng nhập",
+      "buttonHide": "Ẩn",
+      "buttonShow": "Hiện"
+    },
   }
 }

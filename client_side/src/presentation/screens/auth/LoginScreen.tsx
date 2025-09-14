@@ -8,16 +8,21 @@ import { FlexButton } from "@components/FlexButton";
 import { PasswordTextField } from "@components/PasswordTextField";
 import { TextField } from "@components/TextField";
 import { ICONS, IMAGES } from "@constants/images";
+import { ROUTES } from "@constants/routes";
 import "@i18n";
 import { BACKGROUND } from "@theme/colors";
-import { style } from "./style/login";
+import { style } from "./style/auth";
 
-export default function WelcomeScreen() {
+export default function LoginScreen() {
     const { t } = useTranslation();
     const router = useRouter();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    function handleRegister() {
+        router.replace(ROUTES.AUTH.REGISTER);
+    }
 
     function handleLogin() {
         console.log("Logging in with", email, password);
@@ -62,7 +67,7 @@ export default function WelcomeScreen() {
 
                     <Text style={style.text}>
                         {t("auth.login.noAccount")}
-                        <Text style={style.link}>
+                        <Text style={style.link} onPress={handleRegister}>
                             {t("auth.login.registerLink")}
                         </Text>
                     </Text>

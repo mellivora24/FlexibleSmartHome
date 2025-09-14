@@ -17,6 +17,8 @@ export const style = StyleSheet.create({
     alignItems: "center",
   },
   title: {
+    textAlign: "center",
+    maxWidth: 310,
     fontSize: 18,
     fontFamily: "inter-regular",
     fontWeight: "500",
@@ -32,6 +34,8 @@ export const style = StyleSheet.create({
     color: "#fff",
   },
   link: {
+    marginTop: 8,
+    marginBottom: 16,
     fontSize: 16,
     fontFamily: "inter-regular",
     fontWeight: "500",

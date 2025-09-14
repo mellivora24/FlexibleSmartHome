@@ -5,9 +5,19 @@
     "getStarted": "Khám phá ngay",
   },
   "auth": {
-    "register": "Đăng ký",
-    "login": "Đăng nhập",
-    "email": "Email",
-    "password": "Mật khẩu"
+    "login": {
+      "title": "Chào mừng bạn quay trở lại!",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "emailPlaceholder": "Nhập email...",
+      "passwordPlaceholder": "Nhập mật khẩu...",
+      "button": "Đăng nhập",
+      "forgotPassword": "Quên mật khẩu? ",
+      "forgotPasswordLink": "Đặt lại",
+      "noAccount": "Bạn chưa có tài khoản? ",
+      "registerLink": "Đăng ký",
+      "buttonHide": "Ẩn",
+      "buttonShow": "Hiện"
+    }
   }
 }

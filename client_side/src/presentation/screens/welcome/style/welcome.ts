@@ -18,6 +18,7 @@ export const style = StyleSheet.create({
   },
   subtitle: {
     marginTop: 16,
+    marginBottom: 16,
     maxWidth: 250,
     textAlign: "center",
     fontSize: 18,

@@ -1,6 +1,11 @@
 import { StyleSheet } from "react-native";
 
 export const style = StyleSheet.create({
+  image: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -12,29 +17,24 @@ export const style = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  input: {
-    marginTop: 16,
-    maxWidth: 250,
-    textAlign: "center",
     fontSize: 18,
     fontFamily: "inter-regular",
-    fontWeight: "700",
-    color: "#ddd",
-  },
-  button: {
-    marginTop: 16,
-    backgroundColor: "#7D39EB",
-    paddingVertical: 14,
-    paddingHorizontal: 48,
-    borderRadius: 30,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "500",
     color: "#fff",
+    marginBottom: 16,
+  },
+  text: {
+    marginTop: 8,
+    marginBottom: 16,
+    fontSize: 16,
+    fontFamily: "inter-regular",
+    fontWeight: "500",
+    color: "#fff",
+  },
+  link: {
+    fontSize: 16,
+    fontFamily: "inter-regular",
+    fontWeight: "500",
+    color: "#7D39EB",
   },
 });

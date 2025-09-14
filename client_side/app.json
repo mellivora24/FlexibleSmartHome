@@ -14,7 +14,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.smarthome"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +25,12 @@
         "monochromeImage": "./assets/images/rounder_logo.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "package": "com.anonymous.smarthome"
     },
     "plugins": [
       "expo-router",
@@ -45,7 +51,8 @@
         {
           "microphonePermission": "Allow Smart Home to access your microphone for voice control."
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

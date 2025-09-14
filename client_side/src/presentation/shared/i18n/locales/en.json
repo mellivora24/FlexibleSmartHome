@@ -1,0 +1,13 @@
+{
+  "welcome": {
+    "title": "Flexible Smart Home",
+    "subtitle": "Make your home smarter",
+    "getStarted": "Get Started",
+  },
+  "auth": {
+    "register": "Register",
+    "login": "Login",
+    "email": "Email",
+    "password": "Password"
+  }
+}

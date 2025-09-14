@@ -1,0 +1,13 @@
+{
+  "welcome": {
+    "title": "Flexible Smart Home",
+    "subtitle": "Làm cho ngôi nhà của bạn thông minh hơn!",
+    "getStarted": "Khám phá ngay",
+  },
+  "auth": {
+    "register": "Đăng ký",
+    "login": "Đăng nhập",
+    "email": "Email",
+    "password": "Mật khẩu"
+  }
+}

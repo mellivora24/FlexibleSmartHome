@@ -1,10 +1,9 @@
-import { Stack } from "expo-router/stack";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Stack } from "expo-router";
+
+import { COLORS } from "@theme/colors";
 
 export default function Layout() {
-    return (
-        <SafeAreaView className="flex-1 bg-white">
-            <Stack screenOptions={{ headerShown: false }} />
-        </SafeAreaView>
-    );
+  return (
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: COLORS.DARK }, animation: "none" }} />
+  );
 }

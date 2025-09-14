@@ -8,13 +8,10 @@ interface FlexButtonProps {
   onPress?: () => void;
 }
 
-export const FlexButton: React.FC<FlexButtonProps> = ({
-  title,
-  onPress,
-}) => {
+export const FlexButton = ({ title, onPress }: FlexButtonProps) => {
   return (
     <TouchableOpacity style={[buttonStyle.button]} onPress={onPress}>
-      {title && <Text style={[buttonStyle.buttonText]}>{title}</Text>}
+        {title && <Text style={[buttonStyle.buttonText]}>{title}</Text>}
     </TouchableOpacity>
   );
 };

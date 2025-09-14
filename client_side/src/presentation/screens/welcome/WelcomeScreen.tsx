@@ -2,8 +2,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Image, Text, TouchableOpacity } from "react-native";
+import { Image, Text } from "react-native";
 
+import { FlexButton } from "@components/FlexButton";
 import { IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
 import "@i18n";
@@ -27,11 +28,7 @@ export default function WelcomeScreen() {
         >
             <Image source={IMAGES.LOGO_ROUNDED} style={{ width: 200, height: 200 }} resizeMode="contain" />
             <Text style={style.subtitle}>{t("welcome.subtitle")}</Text>
-
-            <TouchableOpacity style={style.button} onPress={handleGetStarted}>
-                <Text style={style.buttonText}>{t("welcome.getStarted")}</Text>
-            </TouchableOpacity>
-            
+            <FlexButton title={t("welcome.getStarted")} onPress={handleGetStarted} />
         </LinearGradient>
     );
 }

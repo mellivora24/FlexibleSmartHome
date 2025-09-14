@@ -24,17 +24,5 @@ export const style = StyleSheet.create({
     fontFamily: "inter-regular",
     fontWeight: "700",
     color: "#ddd",
-  },
-  button: {
-    marginTop: 16,
-    backgroundColor: "#7D39EB",
-    paddingVertical: 14,
-    paddingHorizontal: 48,
-    borderRadius: 30,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
-  },
+  }
 });

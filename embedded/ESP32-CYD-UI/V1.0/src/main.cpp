@@ -1,8 +1,10 @@
+#include <Arduino.h>
 #include <SPI.h>
 #include <WiFi.h>
 #include <TFT_eSPI.h>
 #include <WiFI_Config.h>
 #include <MQTT_Config.h>
+#include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <TFT_eSPI_Config.h>
 #include <XPT2046_Touchscreen.h>
@@ -50,13 +52,24 @@ void drawConnectionStatus() {
 // ===================== MQTT CALLBACK =====================
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
   payload[length] = '\0';
-  String message = String((char*)payload);
+  String jsonStr = String((char*)payload);
 
-  if (String(topic) == TOPIC_LED) {
-    if (message == "on") ledState = true;
-    else if (message == "off") ledState = false;
-    drawWidgets();
+  StaticJsonDocument<256> doc;
+  DeserializationError error = deserializeJson(doc, jsonStr);
+
+  if (error) {
+    Serial.print("JSON parse failed: ");
+    Serial.println(error.c_str());
+    return;
   }
+
+  if (doc.containsKey("led_1")) {
+    String ledVal = doc["led_1"].as<String>();
+    if (ledVal == "on") ledState = true;
+    else if (ledVal == "off") ledState = false;
+  }
+
+  drawWidgets();
 }
 
 // ===================== CONNECTION =====================
@@ -87,7 +100,16 @@ void handleTouch() {
     // Check slider area
     if (y > 100 && y < 130 && x > 100 && x < 300) {
       sliderValue = map(x, 100, 300, 0, 100);
-      client.publish(TOPIC_SLIDER, String(sliderValue).c_str());
+      
+      StaticJsonDocument<128> doc;
+      doc["led_1"] = ledState ? "on" : "off";
+      doc["slider_1"] = sliderValue;
+
+      char buffer[128];
+      serializeJson(doc, buffer);
+      client.publish(TOPIC_SLIDER, buffer);
+
+
       drawWidgets();
     }
   }

@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "Smart Home",
+    "slug": "smarthome",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/rounder_logo.png",
+    "scheme": "smarthome",
+    "splash": {
+      "image": "./assets/images/no_background_logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/rounder_logo.png",
+        "backgroundImage": "./assets/images/rounder_logo.png",
+        "monochromeImage": "./assets/images/rounder_logo.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "backgroundColor": "#000000"
+          }
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Smart Home to access your microphone for voice control."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

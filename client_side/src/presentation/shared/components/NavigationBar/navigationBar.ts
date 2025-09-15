@@ -1,0 +1,60 @@
+import { StyleSheet } from 'react-native';
+
+export const navigationBarStyle = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        bottom: 20,
+        height: 68,
+        width: '100%',
+        alignSelf: 'center',
+        position: 'absolute',
+        paddingHorizontal: 16,
+        backgroundColor: 'transparent',
+    },
+    tabBar: {
+        height: 68,
+        borderRadius: 36,
+        paddingVertical: 8,
+        flexDirection: 'row',
+        paddingHorizontal: 8,
+        backgroundColor: '#ffffff',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+    },
+    inactiveTab: {
+        width: 68,
+        height: '100%',
+        borderRadius: 36,
+        alignItems: 'center',
+        marginHorizontal: 4,
+        justifyContent: 'center',
+        backgroundColor: '#BABABA'
+    },
+    activeTab: {
+        flex: 1,
+        borderRadius: 36,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#050041'
+    },
+    voiceButton: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        backgroundColor: '#FFFFFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    voiceIcon: {
+        width: 32,
+        height: 32,
+    },
+});

@@ -13,4 +13,6 @@ export const ICONS: Record<string, ImageSourcePropType> = {
   PASSWORD: require("@assets/icons/register_password_icon.png"),
   DEVICE: require("@assets/icons/onboarding_device_icon.png"),
   PIN: require("@assets/icons/onboarding_pin_icon.png"),
+  RECORD: require("@assets/icons/navbar_record_icon.png"),
+  STOP_RECORD: require("@assets/icons/navbar_stop_record_icon.png"),
 };

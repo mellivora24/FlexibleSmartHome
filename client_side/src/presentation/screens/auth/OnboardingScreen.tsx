@@ -7,6 +7,7 @@ import { Image, KeyboardAvoidingView, ScrollView, Text } from "react-native";
 import { FlexButton } from "@components/FlexButton";
 import { TextField } from "@components/TextField";
 import { ICONS, IMAGES } from "@constants/images";
+import { ROUTES } from "@constants/routes";
 import "@i18n";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./style/auth";
@@ -22,6 +23,8 @@ export default function OnboardScreen() {
     function handleDone() {
         console.log("Assign with", deviceId, devicePin);
         // TODO: Implement onboarding logic here
+
+        router.replace(ROUTES.TABS.DASHBOARD);
     }
 
     return (

@@ -39,7 +39,7 @@ function genarateTabBar(
     });
 }
 
-const NavigationBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
+export const NavigationBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
     const [isRecording, setIsRecording] = useState(false);
 
     function togglePressIn() {
@@ -74,4 +74,3 @@ const NavigationBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
     );
 };
 
-export default NavigationBar;

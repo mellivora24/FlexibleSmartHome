@@ -41,6 +41,13 @@
       "devicePinPlaceholder": "Nhập mã PIN thiết bị của bạn...",
       "button": "Hoàn tất",
       "tip": "Mẹo: Bạn có thể tìm thấy ID và mã PIN thiết bị trên nhãn dán của thiết bị.",
+    },
+  },
+  "accountWidget": {
+    "greeting": {
+      "morning": "Chào buổi sáng, ",
+      "afternoon": "Chào buổi chiều, ",
+      "evening": "Chào buổi tối, ",
     }
   }
 }

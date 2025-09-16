@@ -4,6 +4,7 @@ export const IMAGES: Record<string, ImageSourcePropType> = {
   LOGO: require("@assets/images/circle_logo.png"),
   LOGO_NO_BG: require("@assets/images/no_background_logo.png"),
   LOGO_ROUNDED: require("@assets/images/rounder_logo.png"),
+  AVATAR_PLACEHOLDER: require("@assets/images/avatar_placeholder.png"),
 };
 
 

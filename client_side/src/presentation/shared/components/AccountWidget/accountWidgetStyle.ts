@@ -12,6 +12,7 @@ export const accountWidgetStyle = StyleSheet.create({
         marginRight: 10,
     },
     textView: {
+        flex: 1,
         alignItems: 'flex-start',
         justifyContent: 'center',
     },

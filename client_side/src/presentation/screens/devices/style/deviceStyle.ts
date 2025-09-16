@@ -2,10 +2,10 @@ import { StyleSheet } from "react-native";
 
 export const dashboardStyle = StyleSheet.create({
     container: {
-        backgroundColor: 'transparent',
         flex: 1,
-        padding: 16,
+        backgroundColor: 'transparent',
         alignItems: 'center',
+        padding: 16,
     },
     title: {
         fontSize: 24,

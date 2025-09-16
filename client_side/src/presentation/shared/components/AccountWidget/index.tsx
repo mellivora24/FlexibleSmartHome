@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Text, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import { IMAGES } from '@constants/images';
 import '@i18n';
@@ -9,9 +9,10 @@ import { accountWidgetStyle } from './accountWidgetStyle';
 interface AccountWidgetProps {
     username?: string;
     avatarUrl?: string;
+    onAvatarPress?: () => void;
 }
 
-export const AccountWidget: React.FC<AccountWidgetProps> = ({username, avatarUrl}) => {
+export const AccountWidget: React.FC<AccountWidgetProps> = ({username, avatarUrl, onAvatarPress}) => {
     const { t } = useTranslation();
     const timeNow = new Date().getHours();
 
@@ -23,10 +24,12 @@ export const AccountWidget: React.FC<AccountWidgetProps> = ({username, avatarUrl
 
     return (
         <View style={accountWidgetStyle.container}>
-            <Image
-                source={iconPath}
-                style={accountWidgetStyle.avatar}
-            />
+            <TouchableOpacity onPress={onAvatarPress}>
+                <Image
+                    source={iconPath}
+                    style={accountWidgetStyle.avatar}
+                />
+            </TouchableOpacity>
             <View style={accountWidgetStyle.textView}>
                 <Text style={accountWidgetStyle.greeting}>{greeting}</Text>
                 {username ? (

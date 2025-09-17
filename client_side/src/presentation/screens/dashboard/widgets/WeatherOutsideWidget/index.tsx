@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Image, Text, View } from "react-native";
 
 import { ICONS } from "@constants/images";
-import { LinearGradientColors, weatherWidgetStyle } from "./weatherWidgetStyle";
+import { WeatherLinearGradient, weatherWidgetStyle } from "./weatherWidgetStyle";
 
 interface WeatherOutsideWidgetProps {
     temperature?: number;
@@ -13,13 +13,13 @@ interface WeatherOutsideWidgetProps {
 }
 
 export const WeatherOutsideWidget: React.FC<WeatherOutsideWidgetProps> = ({
-    temperature = 25,
+    temperature = 24,
     weatherCondition = "sunny",
     location = "Ha Noi, Viet Nam",
 }) => {
     let weatherIcon;
-    const { t } = useTranslation();
 
+    const { t } = useTranslation();
     switch (weatherCondition.toLowerCase()) {
         case "sunny":
             weatherCondition = t('dashboard.weatherCondition.sunny')
@@ -38,10 +38,12 @@ export const WeatherOutsideWidget: React.FC<WeatherOutsideWidgetProps> = ({
             weatherIcon = ICONS.DASHBOARD_SUNNY;
             break;
     }
+
+    const linearColor = temperature >= 25 ? WeatherLinearGradient.hot : WeatherLinearGradient.normal;
     
     return (
         <LinearGradient
-            colors={LinearGradientColors as [string, string]}
+            colors={linearColor as [string, string]}
             start={{ x: 0, y: 1 }}
             end={{ x: 1, y: 1 }}
             style={weatherWidgetStyle.container}

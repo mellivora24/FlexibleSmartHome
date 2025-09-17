@@ -51,4 +51,7 @@ export const weatherWidgetStyle = StyleSheet.create({
     }
 });
 
-export const LinearGradientColors = ["#0E75E4", "#5FA9FE"] as string[] | ColorValue[];
+export const WeatherLinearGradient = {
+    hot:  ["#E94E77", "#D68189"] as string[] | ColorValue[],
+    normal: ["#0E75E4", "#5FA9FE"] as string[] | ColorValue[],
+}

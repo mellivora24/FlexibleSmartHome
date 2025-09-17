@@ -18,4 +18,8 @@ export const dashboardStyle = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'space-between',
     },
+    Section2: {
+        width: '100%',
+        marginTop: 8,
+    },
 });

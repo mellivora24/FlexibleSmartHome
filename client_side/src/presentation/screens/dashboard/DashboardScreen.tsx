@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { TopBarWidget } from '@components/TopBarWidget';
 import { BACKGROUND } from '@theme/colors';
 import { dashboardStyle } from './style/dashboardStyle';
+import { ChartWidget } from './widgets/ChartWidget';
 import { HumidityWidget } from './widgets/HumidityWidget';
 import { TemperatureWidget } from './widgets/TemperatureWidget';
 import { WeatherOutsideWidget } from './widgets/WeatherOutsideWidget';
@@ -36,9 +37,15 @@ export default function DashboardScreen() {
                 <View style={dashboardStyle.Section1}>
                     <WeatherOutsideWidget />
                     <View style={dashboardStyle.row}>
-                        <TemperatureWidget temperature={30} />
                         <HumidityWidget humidity={70} />
+                        <TemperatureWidget temperature={30} />
                     </View>
+                </View>
+                <View style={dashboardStyle.Section2}>
+                    <ChartWidget
+                        temperature={[28, 24, 26, 28, 30, 29, 27, 25, 32]}
+                        humidity={[80, 62, 65, 70, 75, 73, 80, 68, 90]}
+                    />
                 </View>
             </SafeAreaView>
         </LinearGradient>

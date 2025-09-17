@@ -62,5 +62,10 @@
     "humidityWidget": {
       "title": "Độ ẩm phòng",
     },
+    "chartWidget": {
+      "title": "Biểu đồ nhiệt độ và độ ẩm",
+      "temperature": "Nhiệt độ (°C)",
+      "humidity": "Độ ẩm (%)"
+    },
   }
 }

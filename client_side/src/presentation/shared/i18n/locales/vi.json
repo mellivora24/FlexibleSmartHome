@@ -55,6 +55,12 @@
       "sunny": "Nắng đẹp",
       "rainy": "Trời mưa",
       "cloudy": "Có mây"
-    }
+    },
+    "temperatureWidget": {
+      "title": "Nhiệt độ phòng",
+    },
+    "humidityWidget": {
+      "title": "Độ ẩm phòng",
+    },
   }
 }

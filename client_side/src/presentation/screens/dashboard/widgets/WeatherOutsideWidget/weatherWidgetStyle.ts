@@ -2,9 +2,9 @@ import { ColorValue, StyleSheet } from "react-native";
 
 export const weatherWidgetStyle = StyleSheet.create({
     container: {
-        padding: 8,
+        padding: 10,
         width: '50%',
-        borderRadius: 16,
+        borderRadius: 14,
     },
     weather: {
         flexDirection: 'row',

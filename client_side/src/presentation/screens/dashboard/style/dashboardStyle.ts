@@ -2,31 +2,20 @@ import { StyleSheet } from "react-native";
 
 export const dashboardStyle = StyleSheet.create({
     container: {
-        backgroundColor: 'transparent',
-        flex: 1,
         padding: 16,
         alignItems: 'center',
+        backgroundColor: 'transparent',
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-        marginBottom: 16,
+    Section1: {
+        width: '100%',
+        marginTop: 16,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
-    card: {
-        backgroundColor: '#1E1E1E',
-        borderRadius: 8,
-        padding: 16,
-        marginBottom: 16,
-    },
-    cardTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-        marginBottom: 8,
-    },
-    cardContent: {
-        fontSize: 14,
-        color: '#CCCCCC',
+    row: {
+        flex: 1,
+        marginLeft: 12,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
     },
 });

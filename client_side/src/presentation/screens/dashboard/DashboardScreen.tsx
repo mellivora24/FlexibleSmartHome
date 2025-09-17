@@ -1,10 +1,13 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TopBarWidget } from '@components/TopBarWidget';
 import { BACKGROUND } from '@theme/colors';
 import { dashboardStyle } from './style/dashboardStyle';
+import { HumidityWidget } from './widgets/HumidityWidget';
+import { TemperatureWidget } from './widgets/TemperatureWidget';
 import { WeatherOutsideWidget } from './widgets/WeatherOutsideWidget';
 
 export default function DashboardScreen() {
@@ -30,7 +33,13 @@ export default function DashboardScreen() {
                     onAvatarPress={onAvatarPress}
                     onNotificationPress={onNotificationPress}
                 />
-                <WeatherOutsideWidget />
+                <View style={dashboardStyle.Section1}>
+                    <WeatherOutsideWidget />
+                    <View style={dashboardStyle.row}>
+                        <TemperatureWidget temperature={30} />
+                        <HumidityWidget humidity={70} />
+                    </View>
+                </View>
             </SafeAreaView>
         </LinearGradient>
     );

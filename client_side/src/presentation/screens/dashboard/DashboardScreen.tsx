@@ -8,10 +8,18 @@ import { BACKGROUND } from '@theme/colors';
 import { dashboardStyle } from './style/dashboardStyle';
 import { ChartWidget } from './widgets/ChartWidget';
 import { HumidityWidget } from './widgets/HumidityWidget';
+import { RoomWidget } from './widgets/RoomWidget';
 import { TemperatureWidget } from './widgets/TemperatureWidget';
 import { WeatherOutsideWidget } from './widgets/WeatherOutsideWidget';
 
 export default function DashboardScreen() {
+    const devices = [
+        { id: 'd1', name: 'Light A', roomId: 0 },
+        { id: 'd2', name: 'Fan B', roomId: 2 },
+        { id: 'd3', name: 'Air Purifier', roomId: 1 },
+        { id: 'd4', name: 'Heater', roomId: 3 },
+    ];
+
     function onAvatarPress() {
         console.log('Avatar pressed');
     }
@@ -45,6 +53,11 @@ export default function DashboardScreen() {
                     <ChartWidget
                         temperature={[28, 24, 26, 28, 30, 29, 27, 25, 32]}
                         humidity={[80, 62, 65, 70, 75, 73, 80, 68, 90]}
+                    />
+                </View>
+                <View style={dashboardStyle.Section3}>
+                    <RoomWidget
+                        devices={devices}
                     />
                 </View>
             </SafeAreaView>

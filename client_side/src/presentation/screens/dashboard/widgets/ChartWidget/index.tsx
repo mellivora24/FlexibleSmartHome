@@ -27,7 +27,7 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({ temperature, humidity 
                 }}
                 chartConfig={{
                     decimalPlaces: 0,
-                    propsForDots: { r: "3" },
+                    propsForDots: { r: "2" },
                     style: { borderRadius: 8 },
                     backgroundColor: "#f5f5f5",
                     backgroundGradientTo: "#f5f5f5",

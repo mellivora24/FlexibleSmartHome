@@ -2,7 +2,9 @@ import { StyleSheet } from "react-native";
 
 export const dashboardStyle = StyleSheet.create({
     container: {
+        flex: 1,
         padding: 16,
+        marginBottom: 52,
         alignItems: 'center',
         backgroundColor: 'transparent',
     },
@@ -21,5 +23,12 @@ export const dashboardStyle = StyleSheet.create({
     Section2: {
         width: '100%',
         marginTop: 8,
+    },
+    Section3: {
+        flex: 1,
+        width: '100%',
+        marginTop: 16,
+        borderRadius: 16,
+        backgroundColor: 'rgb(160, 149, 255)',
     },
 });

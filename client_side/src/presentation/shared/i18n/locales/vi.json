@@ -67,5 +67,11 @@
       "temperature": "Nhiệt độ (°C)",
       "humidity": "Độ ẩm (%)"
     },
+    "roomTabBar": {
+      "livingRoom": "Khách",
+      "bedRoom": "Ngủ",
+      "kitchen": "Bếp",
+      "prefix": "Phòng "
+    },
   }
 }

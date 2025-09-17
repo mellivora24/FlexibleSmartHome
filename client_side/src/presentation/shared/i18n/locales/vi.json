@@ -49,5 +49,12 @@
       "afternoon": "Chào buổi chiều, ",
       "evening": "Chào buổi tối, ",
     }
+  },
+  "dashboard": {
+    "weatherCondition": {
+      "sunny": "Nắng đẹp",
+      "rainy": "Trời mưa",
+      "cloudy": "Có mây"
+    }
   }
 }

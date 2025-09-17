@@ -18,4 +18,8 @@ export const ICONS: Record<string, ImageSourcePropType> = {
   STOP_RECORD: require("@assets/icons/navbar_stop_record_icon.png"),
   NOTIFICATION_0: require("@assets/icons/topbar_notification_0_icon.png"),
   NOTIFICATION_1: require("@assets/icons/topbar_notification_1_icon.png"),
+  DASHBOARD_LOCATION: require("@assets/icons/dashboard_location_icon.png"),
+  DASHBOARD_CLOUDY: require("@assets/icons/dashboard_cloudy_icon.png"),
+  DASHBOARD_RAINY: require("@assets/icons/dashboard_rainny_icon.png"),
+  DASHBOARD_SUNNY: require("@assets/icons/dashboard_sunny_icon.png"),
 };

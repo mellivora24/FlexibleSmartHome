@@ -7,7 +7,6 @@ import { Image, Text } from "react-native";
 import { FlexButton } from "@components/FlexButton";
 import { IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
-import "@i18n";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./style/welcome";
 

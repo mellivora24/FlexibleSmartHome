@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { TopBarWidget } from '@components/TopBarWidget';
 import { BACKGROUND } from '@theme/colors';
 import { dashboardStyle } from './style/dashboardStyle';
+import { WeatherOutsideWidget } from './widgets/WeatherOutsideWidget';
 
 export default function DashboardScreen() {
     function onAvatarPress() {
@@ -29,6 +30,7 @@ export default function DashboardScreen() {
                     onAvatarPress={onAvatarPress}
                     onNotificationPress={onNotificationPress}
                 />
+                <WeatherOutsideWidget />
             </SafeAreaView>
         </LinearGradient>
     );

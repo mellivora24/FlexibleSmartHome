@@ -31,9 +31,8 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     deviceName: {
-        fontSize: 18,
         height: 44,
-        marginBottom: 6,
+        fontSize: 18,
         maxWidth: '80%',
         fontWeight: 'bold',
     },
@@ -49,8 +48,12 @@ export const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: 'red',
     },
+    section_body: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     section_footer: {
-        padding: 6,
+        padding: 4,
         borderRadius: 12,
         backgroundColor: '#f0f0f0',
         flexDirection: 'row',

@@ -18,14 +18,20 @@ function renderCardContent(
     data: Device['Data'],
     t: (key: string) => string
 ) {
+    function onValueChange(value: number) {
+        console.log('Slider value changed to:', value);
+    }
+
     return (
         <View>
             <View style={styles.section_header}>
                 <Text style={styles.deviceName}>{name}</Text>
                 <View style={status ? styles.connectedStatus : styles.disconnectedStatus} />
             </View>
-            <View>
-                <CustomSlider />
+            <View style={styles.section_body}>
+                <CustomSlider
+                    onValueChange={onValueChange}
+                />
             </View>
             {status ? (
                 <TouchableOpacity style={styles.section_footer} activeOpacity={0.7}>

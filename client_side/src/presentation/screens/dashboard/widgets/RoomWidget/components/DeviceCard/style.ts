@@ -1,0 +1,71 @@
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
+    card: {
+        margin: 8,
+        width: 200,
+        padding: 16,
+        borderRadius: 12,
+        backgroundColor: '#fff',
+        elevation: 8,
+        shadowRadius: 6,
+        shadowColor: '#000',
+        shadowOpacity: 0.25,
+        shadowOffset: { width: 0, height: 4 },
+    },
+    cardActive: {
+        margin: 8,
+        width: 200,
+        padding: 16,
+        borderRadius: 12,
+        backgroundColor: '#e0f7fa',
+        elevation: 8,
+        shadowRadius: 6,
+        shadowColor: '#000',
+        shadowOpacity: 0.25,
+        shadowOffset: { width: 0, height: 4 },
+    },
+    section_header: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+    },
+    deviceName: {
+        fontSize: 18,
+        height: 44,
+        marginBottom: 6,
+        maxWidth: '80%',
+        fontWeight: 'bold',
+    },
+    connectedStatus: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: 'green',
+    },
+    disconnectedStatus: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: 'red',
+    },
+    section_footer: {
+        padding: 6,
+        borderRadius: 12,
+        backgroundColor: '#f0f0f0',
+        flexDirection: 'row',
+        alignSelf: 'center',
+        alignItems: 'center',
+    },
+    tipIcon: {
+        width: 16,
+        height: 16,
+        marginRight: 6,
+        tintColor: '#666',
+    },
+    tips: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+    },
+});

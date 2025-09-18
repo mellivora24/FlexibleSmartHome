@@ -22,4 +22,5 @@ export const ICONS: Record<string, ImageSourcePropType> = {
   DASHBOARD_CLOUDY: require("@assets/icons/dashboard_cloudy_icon.png"),
   DASHBOARD_RAINY: require("@assets/icons/dashboard_rainny_icon.png"),
   DASHBOARD_SUNNY: require("@assets/icons/dashboard_sunny_icon.png"),
+  CARD_TAP: require("@assets/icons/dashboard_tap_icon.png"),
 };

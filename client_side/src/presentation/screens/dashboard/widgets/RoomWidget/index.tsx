@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 
+import { Device } from '@domain/entities/Device';
+import { dashboardStyle } from '@screens/dashboard/style/dashboardStyle';
+import { DeviceCard } from './components/DeviceCard';
 import { RoomTabBar } from './components/RoomTabBar';
-
-interface Device {
-  id: string;
-  name: string;
-  roomId: number;
-}
 
 interface RoomWidgetProps {
   devices: Device[];
@@ -19,38 +16,25 @@ export const RoomWidget: React.FC<RoomWidgetProps> = ({ devices }) => {
   const [activeRoomIndex, setActiveRoomIndex] = useState(0);
 
   const handleRoomPress = (index: number) => {
-    setActiveRoomIndex(index);
+      setActiveRoomIndex(index);
   };
 
-  const filteredDevices = devices.filter((device) => device.roomId === activeRoomIndex);
+  const filteredDevices = devices.filter((device) => device.rid === activeRoomIndex);
 
   return (
     <View style={{ flex: 1 }}>
       <RoomTabBar 
         onTabChange={handleRoomPress}
       />
-      <ScrollView style={{ flex: 1, padding: 10 }}>
+      <ScrollView style={{ flex: 1, padding: 10 }} horizontal={true} showsHorizontalScrollIndicator={false}>
         {filteredDevices.length > 0 ? (
           filteredDevices.map((device) => (
-            <View 
-              key={device.id} 
-              style={{
-                padding: 15,
-                marginVertical: 8,
-                borderRadius: 12,
-                backgroundColor: '#f2f2f2',
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: '600' }}>{device.name}</Text>
-              <Text style={{ fontSize: 12, color: '#555' }}>
-                {t('Device ID')}: {device.id}
-              </Text>
-            </View>
+            <DeviceCard key={device.id} device={device} />
           ))
         ) : (
-          <Text style={{ textAlign: 'center', marginTop: 20, color: '#999' }}>
-            {t('No devices in this room')}
-          </Text>
+          <View style={dashboardStyle.noDeviceContainer}>
+            <Text style={dashboardStyle.noDeviceText}>{t('dashboard.noDevice.message')}</Text>
+          </View>
         )}
       </ScrollView>
     </View>

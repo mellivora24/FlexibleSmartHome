@@ -73,5 +73,11 @@
       "kitchen": "Bếp",
       "prefix": "Phòng "
     },
+    "noDevice": {
+      "message": "Chưa có thiết bị nào được kết nối."
+    },
+    "tips": {
+      "tapToControl": "Nhấn để bật/tắt.",
+    }
   }
 }

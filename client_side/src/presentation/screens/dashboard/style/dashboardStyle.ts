@@ -31,4 +31,14 @@ export const dashboardStyle = StyleSheet.create({
         borderRadius: 16,
         backgroundColor: 'rgb(160, 149, 255)',
     },
+    noDeviceContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 50
+    },
+    noDeviceText: {
+        color: '#fff',
+        fontSize: 16,
+    },
 });

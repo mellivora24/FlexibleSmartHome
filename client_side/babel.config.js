@@ -18,6 +18,7 @@ module.exports = function (api) {
             "@screens": "./src/presentation/screens",
             "@state": "./src/presentation/state",
             "@i18n": "./src/presentation/shared/i18n",
+            "@domain": "./src/domain",
           },
         },
       ],

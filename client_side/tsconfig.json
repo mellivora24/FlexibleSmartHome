@@ -10,7 +10,8 @@
       "@screens/*": ["src/presentation/screens/*"],
       "@state/*": ["src/presentation/state/*"],
       "@app/*": ["app/*"],
-      "@i18n/*": ["src/presentation/shared/i18n/*"]
+      "@i18n/*": ["src/presentation/shared/i18n/*"],
+      "@domain/*": ["src/domain/*"]
     }
   },
   "include": [

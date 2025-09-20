@@ -2,9 +2,8 @@ package sensorData
 
 type Service interface {
 	CreateData(uid int64, sid int64, value float64, unit string) error
-
-	GetDataByUID(uid int) ([]GetListResponse, error)
-	GetDataBySID(uid int) ([]GetListResponse, error)
+	GetList(uid int64, req *GetListRequest) ([]GetListResponse, int64, error)
+	GetOne(uid int64, req *GetOneRequest) (*GetListResponse, error)
 }
 
 type service struct {
@@ -22,14 +21,13 @@ func (s *service) CreateData(uid int64, sid int64, value float64, unit string) e
 		Value: value,
 		Unit:  unit,
 	}
-
 	return s.repo.CreateRecord(&record)
 }
 
-func (s *service) GetDataByUID(uid int) ([]GetListResponse, error) {
-	return s.repo.GetListByUID(int64(uid))
+func (s *service) GetList(uid int64, req *GetListRequest) ([]GetListResponse, int64, error) {
+	return s.repo.GetList(uid, req)
 }
 
-func (s *service) GetDataBySID(sid int) ([]GetListResponse, error) {
-	return s.repo.GetListBySID(int64(sid))
+func (s *service) GetOne(uid int64, req *GetOneRequest) (*GetListResponse, error) {
+	return s.repo.GetOne(uid, req)
 }

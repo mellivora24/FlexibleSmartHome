@@ -31,7 +31,6 @@ type CreateRequest struct {
 }
 
 type GetListRequest struct {
-	UID       int64     `form:"uid"`
 	Page      int       `form:"page"`
 	Limit     int       `form:"limit"`
 	SortBy    string    `form:"sort_by"`
@@ -44,7 +43,6 @@ type GetListRequest struct {
 
 type GetOneRequest struct {
 	ID     int64     `form:"id"`
-	UID    int64     `form:"uid"`
 	DID    int64     `form:"did"`
 	Action string    `form:"action"`
 	AtTime time.Time `form:"at_time" time_format:"2006-01-02 15:04:05"`

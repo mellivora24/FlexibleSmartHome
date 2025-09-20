@@ -7,7 +7,8 @@ import (
 
 type Service interface {
 	Create(uid int64, level string, message string, metadata json.RawMessage) error
-	GetList(cond *GetListRequest) (*GetListResponse, error)
+	GetList(uid int64, req *GetListRequest) (*GetListResponse, error)
+	GetOne(uid int64, req *GetOneRequest) (*LogDB, error)
 }
 
 type service struct {
@@ -26,19 +27,17 @@ func (s service) Create(uid int64, level string, message string, metadata json.R
 		Metadata:  metadata,
 		CreatedAt: time.Now(),
 	}
-
 	return s.repo.CreateLog(log)
 }
 
-func (s service) GetList(cond *GetListRequest) (*GetListResponse, error) {
-	logs, total, err := s.repo.GetList(cond.UID, cond.Page, cond.Limit)
+func (s service) GetList(uid int64, req *GetListRequest) (*GetListResponse, error) {
+	logs, total, err := s.repo.GetList(uid, req)
 	if err != nil {
 		return nil, err
 	}
+	return &GetListResponse{Total: total, List: logs}, nil
+}
 
-	result := &GetListResponse{
-		Total: total,
-		List:  logs,
-	}
-	return result, nil
+func (s service) GetOne(uid int64, req *GetOneRequest) (*LogDB, error) {
+	return s.repo.GetOne(uid, req)
 }

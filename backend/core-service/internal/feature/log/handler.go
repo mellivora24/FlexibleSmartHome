@@ -18,18 +18,36 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	log := rg.Group("/logs")
 	{
 		log.GET("/list", h.GetListLogs)
+		log.GET("/get", h.GetLog)
 	}
 }
 
 func (h *Handler) GetListLogs(c *gin.Context) {
 	var req GetListRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindQuery(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-
-	res, err := h.service.GetList(&req)
+	uid := c.GetInt64("uid")
+	res, err := h.service.GetList(uid, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, res)
+}
+
+func (h *Handler) GetLog(c *gin.Context) {
+	var req GetOneRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	uid := c.GetInt64("uid")
+	log, err := h.service.GetOne(uid, &req)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": log})
 }

@@ -1,0 +1,175 @@
+{
+  "info": {
+    "name": "Core Service API",
+    "_postman_id": "f6c3b99f-1234-5678-9876-abcdef123456",
+    "description": "Test API cho event, log, sensorData",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Event",
+      "item": [
+        {
+          "name": "Create Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-User-Id", "value": "123" }
+            ],
+            "url": { "raw": "http://localhost:8080/events/create", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["events", "create"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"did\": 10,\n  \"action\": \"turn_on\",\n  \"payload\": {\"state\":\"on\"}\n}"
+            }
+          }
+        },
+        {
+          "name": "Get List Events",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-User-Id", "value": "123" }],
+            "url": {
+              "raw": "http://localhost:8080/events/list?page=1&limit=5&sort_by=created_at&sort_type=desc",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["events", "list"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "5" },
+                { "key": "sort_by", "value": "created_at" },
+                { "key": "sort_type", "value": "desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get One Event",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-User-Id", "value": "123" }],
+            "url": {
+              "raw": "http://localhost:8080/events/get?id=42",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["events", "get"],
+              "query": [{ "key": "id", "value": "42" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Log",
+      "item": [
+        {
+          "name": "Create Log",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-User-Id", "value": "123" }
+            ],
+            "url": { "raw": "http://localhost:8080/logs/create", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["logs", "create"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"error\",\n  \"message\": \"device not responding\",\n  \"metadata\": {\"device\":\"lamp01\"}\n}"
+            }
+          }
+        },
+        {
+          "name": "Get List Logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-User-Id", "value": "123" }],
+            "url": {
+              "raw": "http://localhost:8080/logs/list?page=1&limit=10&level=error",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["logs", "list"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "level", "value": "error" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get One Log",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-User-Id", "value": "123" }],
+            "url": {
+              "raw": "http://localhost:8080/logs/get?id=100",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["logs", "get"],
+              "query": [{ "key": "id", "value": "100" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SensorData",
+      "item": [
+        {
+          "name": "Create SensorData",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-User-Id", "value": "123" }
+            ],
+            "url": { "raw": "http://localhost:8080/sensordata/create", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["sensordata", "create"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sid\": 5,\n  \"value\": 28.7,\n  \"unit\": \"C\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get List SensorData",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-User-Id", "value": "123" }],
+            "url": {
+              "raw": "http://localhost:8080/sensordata/list?sid=5&page=1&limit=5&sort_by=sd.value&sort_type=asc",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["sensordata", "list"],
+              "query": [
+                { "key": "sid", "value": "5" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "5" },
+                { "key": "sort_by", "value": "sd.value" },
+                { "key": "sort_type", "value": "asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get One SensorData",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-User-Id", "value": "123" }],
+            "url": {
+              "raw": "http://localhost:8080/sensordata/get?id=200",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["sensordata", "get"],
+              "query": [{ "key": "id", "value": "200" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

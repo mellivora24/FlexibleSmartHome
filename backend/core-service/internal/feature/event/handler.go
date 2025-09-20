@@ -28,8 +28,8 @@ func (h *Handler) GetListEvents(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	res, err := h.service.GetList(&req)
+	uid := c.GetInt64("uid")
+	res, err := h.service.GetList(uid, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

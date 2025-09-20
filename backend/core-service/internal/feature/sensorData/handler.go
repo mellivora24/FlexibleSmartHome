@@ -2,7 +2,6 @@ package sensorData
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,43 +16,37 @@ func NewHandler(service Service) *Handler {
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.GET("/list", h.ListSensorData)
+	rg.GET("/get", h.GetSensorData)
 }
 
 func (h *Handler) ListSensorData(c *gin.Context) {
-	uidPr, sidPr := c.Query("uid"), c.Query("sid")
-
-	if uidPr == "" && sidPr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "uid or sid must be provided"})
+	var req GetListRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	if uidPr != "" {
-		uid, err := strconv.ParseInt(uidPr, 10, 64)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "invalid uid"})
-			return
-		}
-
-		res, err := h.service.GetDataByUID(int(uid))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{"data": res})
-		return
-	}
-
-	sid, err := strconv.ParseInt(sidPr, 10, 64)
+	uid := c.GetInt64("uid")
+	data, total, err := h.service.GetList(uid, &req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid sid"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	res, err := h.service.GetDataBySID(int(sid))
+	c.JSON(http.StatusOK, gin.H{"total": total, "data": data})
+}
+
+func (h *Handler) GetSensorData(c *gin.Context) {
+	var req GetOneRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	uid := c.GetInt64("uid")
+	data, err := h.service.GetOne(uid, &req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, gin.H{"data": data})
 }

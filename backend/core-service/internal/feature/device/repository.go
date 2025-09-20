@@ -3,7 +3,7 @@ package device
 import "gorm.io/gorm"
 
 type Repository interface {
-	GetList(uid int64, rid int64) ([]DeviceDB, error)
+	GetList(uid int64) ([]DeviceDB, error)
 	Create(db *DeviceDB) (*DeviceDB, error)
 	Update(db *DeviceDB) (*DeviceDB, error)
 	Delete(id int64) error
@@ -17,9 +17,9 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{DB: db}
 }
 
-func (r *repository) GetList(uid int64, rid int64) ([]DeviceDB, error) {
+func (r *repository) GetList(uid int64) ([]DeviceDB, error) {
 	var devices []DeviceDB
-	if err := r.DB.Where("uid = ? AND rid = ?", uid, rid).Find(&devices).Error; err != nil {
+	if err := r.DB.Where("uid = ?", uid).Find(&devices).Error; err != nil {
 		return nil, err
 	}
 	return devices, nil

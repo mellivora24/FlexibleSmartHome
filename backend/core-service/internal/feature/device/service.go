@@ -21,8 +21,8 @@ func NewService(repository Repository) Service {
 }
 
 func (s *service) ListDevices(cond *ListDeviceRequest) ([]DeviceDB, error) {
-	uid, rid := int64(cond.UID), int64(cond.RID)
-	devices, err := s.repo.GetList(uid, rid)
+	uid := int64(cond.UID)
+	devices, err := s.repo.GetList(uid)
 	if err != nil {
 		return nil, err
 	}

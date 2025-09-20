@@ -8,6 +8,7 @@ import (
 type Service interface {
 	Create(uid int64, did int64, action string, payload json.RawMessage) error
 	GetList(cond *GetListRequest) (*GetListResponse, error)
+	GetOne(req *GetOneRequest) (*EventDB, error)
 }
 
 type service struct {
@@ -32,14 +33,13 @@ func (s service) Create(uid int64, did int64, action string, payload json.RawMes
 }
 
 func (s service) GetList(cond *GetListRequest) (*GetListResponse, error) {
-	events, total, err := s.repo.GetList(cond.UID, cond.Page, cond.Limit)
+	events, total, err := s.repo.GetList(cond)
 	if err != nil {
 		return nil, err
 	}
+	return &GetListResponse{Total: total, List: events}, nil
+}
 
-	result := &GetListResponse{
-		Total: total,
-		List:  events,
-	}
-	return result, nil
+func (s service) GetOne(req *GetOneRequest) (*EventDB, error) {
+	return s.repo.GetOne(req)
 }

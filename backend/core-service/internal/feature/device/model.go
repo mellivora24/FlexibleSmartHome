@@ -33,7 +33,6 @@ func (DeviceDB) TableName() string {
 
 type ListDeviceRequest struct {
 	UID int `json:"uid"`
-	RID int `json:"rid"`
 }
 
 type CreateDeviceRequest struct {

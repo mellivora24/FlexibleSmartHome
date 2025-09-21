@@ -13,74 +13,42 @@ import { RoomWidget } from './widgets/RoomWidget';
 import { TemperatureWidget } from './widgets/TemperatureWidget';
 import { WeatherOutsideWidget } from './widgets/WeatherOutsideWidget';
 
-export default function DashboardScreen() {
-    const mockDevices: Device[] = [
-        {
-            id: 1,
-            uid: 101,
-            mid: 501,
-            rid: 0,
-            name: 'Living Room Light',
-            type: 'digitalDevice',
-            port: 1,
-            status: true,
-            Data: { onOff: false },
-            RunningTime: 3600,
-            CreatedAt: new Date('2025-09-01T10:00:00Z'),
-            UpdatedAt: new Date('2025-09-18T08:00:00Z'),
-        },
-        {
-            id: 2,
-            uid: 102,
-            mid: 502,
-            rid: 0,
-            name: 'Bedroom Fan',
-            type: 'analogDevice',
-            port: 2,
-            status: false,
-            Data: { onOff: true, pwm: 75, unit: '%' },
-            RunningTime: 7200,
-            CreatedAt: new Date('2025-09-02T09:30:00Z'),
-            UpdatedAt: new Date('2025-09-18T07:45:00Z'),
-        },
-        {
-            id: 3,
-            uid: 103,
-            mid: 503,
-            rid: 0,
-            name: 'Kitchen Heater',
-            type: 'analogSensor',
-            port: 3,
-            status: true,
-            Data: { value: 80, unit: '°C' },
-            RunningTime: 5400,
-            CreatedAt: new Date('2025-09-05T12:00:00Z'),
-            UpdatedAt: new Date('2025-09-18T07:50:00Z'),
-        },
-        {
-            id: 4,
-            uid: 104,
-            mid: 504,
-            rid: 0,
-            name: 'Air Purifier',
-            type: 'digitalSensor',
-            port: 4,
-            status: true,
-            Data: { signal: false },
-            RunningTime: 1800,
-            CreatedAt: new Date('2025-09-10T14:00:00Z'),
-            UpdatedAt: new Date('2025-09-18T07:55:00Z'),
-        },
-    ];
+interface DashboardScreenProps {
+    username?: string;
+    isHavingNotification?: boolean;
+    outsideTemperature?: number;
+    outsideWeatherCondition?: string;
+    outsideLocation?: string;
+    insideTemperature?: number;
+    insideHumidity?: number;
+    temperatureHistory?: number[];
+    humidityHistory?: number[];
+    devices?: Device[];
+    onAvatarPress?: () => void;
+    onNotificationPress?: () => void;
+    onDevicePress?: (deviceId: number) => void;
+    onDeviceValueChange?: (deviceId: number, value: number) => void;
+}
 
-    function onAvatarPress() {
-        console.log('Avatar pressed');
+export const DashboardScreen: React.FC<DashboardScreenProps> = ({
+    username = "default user",
+    isHavingNotification = false,
+    outsideTemperature = 0,
+    outsideWeatherCondition = "sunny",
+    outsideLocation = "default location",
+    insideTemperature = 0,
+    insideHumidity = 0,
+    temperatureHistory = [28, 24, 26, 28, 30, 29, 27, 25, 32],
+    humidityHistory = [80, 62, 65, 70, 75, 73, 80, 68, 90],
+    devices = [],
+    onAvatarPress,
+    onNotificationPress,
+    onDevicePress,
+    onDeviceValueChange,
+}) => {
+    if (outsideWeatherCondition !== "sunny" && outsideWeatherCondition !== "cloudy" && outsideWeatherCondition !== "rainy") {
+        throw new Error("Invalid weather condition");
     }
-    
-    function onNotificationPress() {
-        console.log('Notification pressed');
-    }
-
     return (
         <LinearGradient
             colors={BACKGROUND.GRADIENT as [string, string]}
@@ -90,27 +58,33 @@ export default function DashboardScreen() {
         >
             <SafeAreaView style={dashboardStyle.container}>
                 <TopBarWidget
-                    username="Quyet Thanh"
-                    isHavingNotification={false}
+                    username={username}
+                    isHavingNotification={isHavingNotification}
                     onAvatarPress={onAvatarPress}
                     onNotificationPress={onNotificationPress}
                 />
                 <View style={dashboardStyle.Section1}>
-                    <WeatherOutsideWidget />
+                    <WeatherOutsideWidget
+                        temperature={outsideTemperature}
+                        weatherCondition={outsideWeatherCondition}
+                        location={outsideLocation}
+                    />
                     <View style={dashboardStyle.row}>
-                        <HumidityWidget humidity={70} />
-                        <TemperatureWidget temperature={30} />
+                        <HumidityWidget humidity={insideHumidity} />
+                        <TemperatureWidget temperature={insideTemperature} />
                     </View>
                 </View>
                 <View style={dashboardStyle.Section2}>
                     <ChartWidget
-                        temperature={[28, 24, 26, 28, 30, 29, 27, 25, 32]}
-                        humidity={[80, 62, 65, 70, 75, 73, 80, 68, 90]}
+                        temperature={temperatureHistory}
+                        humidity={humidityHistory}
                     />
                 </View>
                 <View style={dashboardStyle.Section3}>
                     <RoomWidget
-                        devices={mockDevices}
+                        devices={devices}
+                        onDevicePress={onDevicePress}
+                        onDeviceValueChange={onDeviceValueChange}
                     />
                 </View>
             </SafeAreaView>

@@ -9,14 +9,16 @@ import { RoomTabBar } from './components/RoomTabBar';
 
 interface RoomWidgetProps {
   devices: Device[];
+  onDevicePress?: (deviceId: number) => void;
+  onDeviceValueChange?: (deviceId: number, value: number) => void;
 }
 
-export const RoomWidget: React.FC<RoomWidgetProps> = ({ devices }) => {
+export const RoomWidget: React.FC<RoomWidgetProps> = ({ devices, onDevicePress, onDeviceValueChange }) => {
   const { t } = useTranslation();
   const [activeRoomIndex, setActiveRoomIndex] = useState(0);
 
   const handleRoomPress = (index: number) => {
-      setActiveRoomIndex(index);
+    setActiveRoomIndex(index);
   };
 
   const filteredDevices = devices.filter((device) => device.rid === activeRoomIndex);
@@ -36,7 +38,11 @@ export const RoomWidget: React.FC<RoomWidgetProps> = ({ devices }) => {
         <ScrollView style={{ flex: 1, padding: 10 }} horizontal={true} showsHorizontalScrollIndicator={false}>
           {filteredDevices.length > 0 ? (
             filteredDevices.map((device) => (
-              <DeviceCard key={device.id} device={device} />
+              <DeviceCard
+                key={device.id} device={device}
+                onPress={() => onDevicePress && onDevicePress(device.id)}
+                onValueChange={(value) => onDeviceValueChange && onDeviceValueChange(device.id, value)}
+              />
             ))
           ) : (
             <View style={dashboardStyle.noDeviceContainer}>

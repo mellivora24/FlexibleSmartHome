@@ -78,6 +78,10 @@
     },
     "tips": {
       "tapToControl": "Nhấn để bật/tắt.",
+    },
+    "status": {
+      "high": "Phát hiện",
+      "low": "Không phát hiện",
     }
   }
 }

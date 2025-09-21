@@ -26,17 +26,25 @@ export const RoomWidget: React.FC<RoomWidgetProps> = ({ devices }) => {
       <RoomTabBar 
         onTabChange={handleRoomPress}
       />
-      <ScrollView style={{ flex: 1, padding: 10 }} horizontal={true} showsHorizontalScrollIndicator={false}>
-        {filteredDevices.length > 0 ? (
-          filteredDevices.map((device) => (
-            <DeviceCard key={device.id} device={device} />
-          ))
-        ) : (
-          <View style={dashboardStyle.noDeviceContainer}>
-            <Text style={dashboardStyle.noDeviceText}>{t('dashboard.noDevice.message')}</Text>
-          </View>
-        )}
-      </ScrollView>
+      {filteredDevices.length === 0 ? (
+        <View style={dashboardStyle.noDeviceContainer}>
+          <Text style={dashboardStyle.noDeviceText}>
+            {t('dashboard.roomWidget.noDevice', { defaultValue: 'Không có thiết bị trong phòng này' })}
+          </Text>
+        </View>
+      ) : (
+        <ScrollView style={{ flex: 1, padding: 10 }} horizontal={true} showsHorizontalScrollIndicator={false}>
+          {filteredDevices.length > 0 ? (
+            filteredDevices.map((device) => (
+              <DeviceCard key={device.id} device={device} />
+            ))
+          ) : (
+            <View style={dashboardStyle.noDeviceContainer}>
+              <Text style={dashboardStyle.noDeviceText}>{t('dashboard.noDevice.message')}</Text>
+            </View>
+          )}
+        </ScrollView>
+      )}
     </View>
   );
 };

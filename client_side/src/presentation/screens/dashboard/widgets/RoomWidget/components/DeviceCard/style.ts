@@ -49,16 +49,18 @@ export const styles = StyleSheet.create({
         backgroundColor: 'red',
     },
     section_body: {
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
     },
     section_footer: {
         padding: 4,
+        marginTop: 12,
         borderRadius: 12,
-        backgroundColor: '#f0f0f0',
-        flexDirection: 'row',
         alignSelf: 'center',
+        flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: '#f0f0f0',
     },
     tipIcon: {
         width: 16,
@@ -70,5 +72,31 @@ export const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
         textAlign: 'center',
+    },
+    digitalSensor: {
+        marginTop: 18,
+        alignItems: 'center',
+    },
+    digitalSensorHigh: {
+        height: 100,
+        width: 100,
+        borderRadius: 50,
+        borderWidth: 2,
+        borderColor: 'red',
+        backgroundColor: '#ffcccc',
+    },
+    digitalSensorLow: {
+        width: 100,
+        height: 100,
+        borderWidth: 2,
+        borderRadius: 50,
+        borderColor: 'green',
+        backgroundColor: '#ccffcc',
+    },
+    digitalSensorText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+        marginTop: 24,
     },
 });

@@ -5,8 +5,9 @@ export const IMAGES: Record<string, ImageSourcePropType> = {
   LOGO_NO_BG: require("@assets/images/no_background_logo.png"),
   LOGO_ROUNDED: require("@assets/images/rounder_logo.png"),
   AVATAR_PLACEHOLDER: require("@assets/images/avatar_placeholder.png"),
+  PUB_LIGHT_ON: require("@assets/images/pub_light_on.png"),
+  PUB_LIGHT_OFF: require("@assets/images/pub_light_off.png"),
 };
-
 
 export const ICONS: Record<string, ImageSourcePropType> = {
   EMAIL: require("@assets/icons/register_email_icon.png"),

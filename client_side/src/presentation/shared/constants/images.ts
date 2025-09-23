@@ -24,4 +24,19 @@ export const ICONS: Record<string, ImageSourcePropType> = {
   DASHBOARD_RAINY: require("@assets/icons/dashboard_rainny_icon.png"),
   DASHBOARD_SUNNY: require("@assets/icons/dashboard_sunny_icon.png"),
   CARD_TAP: require("@assets/icons/dashboard_tap_icon.png"),
+  SEARCH_ICON: require("@assets/icons/components_search_icon.png"),
+  FILTER_ICON: require("@assets/icons/components_filter_icon.png"),
 };
+
+export const TAB_ICON = {
+  DASHBOARD_ACTIVE: require("@assets/icons/navbar_dashboard_active_icon.png"),
+  DASHBOARD_INACTIVE: require("@assets/icons/navbar_dashboard_inactive_icon.png"),
+  SENSOR_ACTIVE: require("@assets/icons/navbar_sensor_active_icon.png"),
+  SENSOR_INACTIVE: require("@assets/icons/navbar_sensor_inactive_icon.png"),
+  DEVICE_ACTIVE: require("@assets/icons/navbar_device_active_icon.png"),
+  DEVICE_INACTIVE: require("@assets/icons/navbar_device_inactive_icon.png"),
+  EVENT_ACTIVE: require("@assets/icons/navbar_event_active_icon.png"),
+  EVENT_INACTIVE: require("@assets/icons/navbar_event_inactive_icon.png"),
+  ACCOUNT_ACTIVE: require("@assets/icons/navbar_account_active_icon.png"),
+  ACCOUNT_INACTIVE: require("@assets/icons/navbar_account_inactive_icon.png"),
+}

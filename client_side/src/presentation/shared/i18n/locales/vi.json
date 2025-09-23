@@ -83,5 +83,43 @@
       "high": "Phát hiện",
       "low": "Không phát hiện",
     }
+  },
+  "deviceList": {
+    "yourDevices": "Thiết bị của bạn",
+    "noDevice": "Chưa có thiết bị nào được kết nối.",
+    "addDevice": "Thêm thiết bị",
+    "loading": "Đang tải thiết bị...",
+    "error": "Đã xảy ra lỗi khi tải thiết bị.",
+    "tryAgain": "Thử lại",
+    "deviceStatus": {
+      "online": "Trực tuyến",
+      "offline": "Ngoại tuyến"
+    }
+  },
+  "deviceCard": {
+    "id": "ID Thiết Bị: ",
+    "port": "Cổng",
+    "data": "Dữ liệu: ",
+    "room": "Phòng",
+    "runningTime": "Thời gian hoạt động",
+    "lastUpdated": "Cập nhật lần cuối",
+    "lastData": "Dữ liệu cuối cùng",
+    "type": {
+      "type": "Loại thiết bị",
+      "analogSensor": "Cảm biến analog",
+      "digitalSensor": "Cảm biến kỹ thuật số",
+      "analogDevice": "Thiết bị analog",
+      "digitalDevice": "Thiết bị kỹ thuật số"
+    },
+    "status": {
+      "status": "Trạng thái",
+      "online": "Trực tuyến",
+      "offline": "Ngoại tuyến"
+    },
+    "currentState": {
+      "state": "Trạng thái hiện tại",
+      "on": "Bật",
+      "off": "Tắt"
+    }
   }
 }

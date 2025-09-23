@@ -13,7 +13,7 @@ export default [
             ['@state', './src/presentation/state'],
             ['@app', './app'],
             ['@i18n', './src/presentation/shared/i18n'],
-            ['@domain', './src/domain'],
+            ['@model', './src/model'],
           ],
           extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
         }

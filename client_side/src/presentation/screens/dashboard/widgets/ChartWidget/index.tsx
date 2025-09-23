@@ -35,7 +35,7 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({ temperature, humidity 
                     color: (opacity = 1) => `rgba(34, 94, 168, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 }}
-                height={168}
+                height={200}
                 yAxisInterval={1}
                 withShadow={true}
                 withInnerLines={false}

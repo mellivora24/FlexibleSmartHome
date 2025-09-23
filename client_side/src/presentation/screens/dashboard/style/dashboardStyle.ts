@@ -10,7 +10,6 @@ export const dashboardStyle = StyleSheet.create({
     },
     Section1: {
         width: '100%',
-        marginTop: 16,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
@@ -34,8 +33,7 @@ export const dashboardStyle = StyleSheet.create({
     noDeviceContainer: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 50
+        alignItems: 'center'
     },
     noDeviceText: {
         color: '#fff',

@@ -1,7 +1,8 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import React, { useState } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
+import { ICONS } from '@constants/images';
 import { navigationBarStyle } from './navigationBar';
 
 function genarateTabBar(
@@ -33,7 +34,10 @@ function genarateTabBar(
                 onPress={onPress}
                 style={[navigationBarStyle.inactiveTab, isFocused ? navigationBarStyle.activeTab : null]}
             >
-                {options.tabBarIcon && options.tabBarIcon({ focused: isFocused, color: isFocused ? '#ffffff' : '#000000', size: isFocused ? 24 : 20 })}
+                <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+                    {options.tabBarIcon && options.tabBarIcon({ focused: isFocused, color: isFocused ? '#fff' : '#000', size: isFocused ? 24 : 20 })}
+                    {options.title && isFocused && <Text style={{ color: isFocused ? '#fff' : '#000', fontSize: isFocused ? 14 : 12, marginTop: 4, marginLeft: 8 }}>{options.title}</Text>}
+                </View>
             </TouchableOpacity>
         );
     });
@@ -55,7 +59,7 @@ export const NavigationBar: React.FC<BottomTabBarProps> = ({ state, descriptors,
 
     return (
         <View style={navigationBarStyle.container}>
-            <View style={[navigationBarStyle.tabBar, (state.index === 0) ? { width: '80%' } : { width: '100%' }]}>
+            <View style={[navigationBarStyle.tabBar, (state.index === 0) ? { width: '90%' } : { width: '100%' }]}>
                 {genarateTabBar(state, descriptors, navigation)}
             </View>
             {(state.index === 0) && (
@@ -65,7 +69,7 @@ export const NavigationBar: React.FC<BottomTabBarProps> = ({ state, descriptors,
                     onPressOut={togglePressOut}
                 >
                     <Image
-                        source={isRecording ? require('@assets/icons/navbar_stop_record_icon.png') : require('@assets/icons/navbar_record_icon.png')}
+                        source={isRecording ? ICONS.STOP_RECORD : ICONS.RECORD}
                         style={navigationBarStyle.voiceIcon}
                     />
                 </TouchableOpacity>

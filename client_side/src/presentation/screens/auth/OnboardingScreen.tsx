@@ -10,7 +10,7 @@ import { ICONS, IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
 import "@i18n";
 import { BACKGROUND } from "@theme/colors";
-import { style } from "./style/auth";
+import { style } from "./auth";
 
 export default function OnboardScreen() {
     const { t } = useTranslation();

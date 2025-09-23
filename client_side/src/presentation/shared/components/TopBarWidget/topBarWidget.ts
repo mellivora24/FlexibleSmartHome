@@ -4,9 +4,9 @@ export const topBarWidgetStyle = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingLeft: 16,
-        paddingRight: 18,
+        paddingHorizontal: 16,
         justifyContent: 'space-between',
+        marginBottom: 16,
     },
     notificationIcon: {
         width: 32,

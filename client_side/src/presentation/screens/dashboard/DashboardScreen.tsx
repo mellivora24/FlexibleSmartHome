@@ -1,10 +1,11 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TopBarWidget } from '@components/TopBarWidget';
-import { Device } from '@domain/entities/Device';
+import { Device } from '@model/Device';
 import { BACKGROUND } from '@theme/colors';
 import { dashboardStyle } from './style/dashboardStyle';
 import { ChartWidget } from './widgets/ChartWidget';
@@ -14,8 +15,6 @@ import { TemperatureWidget } from './widgets/TemperatureWidget';
 import { WeatherOutsideWidget } from './widgets/WeatherOutsideWidget';
 
 interface DashboardScreenProps {
-    username?: string;
-    isHavingNotification?: boolean;
     outsideTemperature?: number;
     outsideWeatherCondition?: string;
     outsideLocation?: string;
@@ -31,37 +30,36 @@ interface DashboardScreenProps {
 }
 
 export const DashboardScreen: React.FC<DashboardScreenProps> = ({
-    username = "default user",
-    isHavingNotification = false,
     outsideTemperature = 0,
     outsideWeatherCondition = "sunny",
     outsideLocation = "default location",
     insideTemperature = 0,
     insideHumidity = 0,
-    temperatureHistory = [28, 24, 26, 28, 30, 29, 27, 25, 32],
-    humidityHistory = [80, 62, 65, 70, 75, 73, 80, 68, 90],
+    temperatureHistory = [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    humidityHistory = [0, 0, 0, 0, 0, 0, 0, 0, 0],
     devices = [],
-    onAvatarPress,
-    onNotificationPress,
     onDevicePress,
     onDeviceValueChange,
 }) => {
     if (outsideWeatherCondition !== "sunny" && outsideWeatherCondition !== "cloudy" && outsideWeatherCondition !== "rainy") {
         throw new Error("Invalid weather condition");
     }
+
+    const router = useRouter();
+
     return (
         <LinearGradient
             colors={BACKGROUND.GRADIENT as [string, string]}
             start={{ x: 0, y: 1 }}
             end={{ x: 0.8, y: 0 }}
-            style={{ flex: 1 }}
+            style={{flex: 1 }}
         >
             <SafeAreaView style={dashboardStyle.container}>
                 <TopBarWidget
-                    username={username}
-                    isHavingNotification={isHavingNotification}
-                    onAvatarPress={onAvatarPress}
-                    onNotificationPress={onNotificationPress}
+                    username="Quyet Thanh"
+                    isHavingNotification={false}
+                    onAvatarPress={() => router.push('/add-on/account')}
+                    onNotificationPress={() => router.push('/add-on/notification')}
                 />
                 <View style={dashboardStyle.Section1}>
                     <WeatherOutsideWidget

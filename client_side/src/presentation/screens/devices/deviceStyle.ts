@@ -33,5 +33,30 @@ export const deviceScreenStyle = StyleSheet.create({
     noDeviceContext: {
         fontSize: 16,
         color: '#fff',
-    }
+    },
+    shimmerItem: {
+        width: '100%',
+        height: 100,
+        borderRadius: 12,
+        marginBottom: 16,
+        backgroundColor: '#e0e0e0'
+    },
+    shimmerSmall: {
+        width: '60%',
+        height: 16,
+        borderRadius: 8,
+        marginBottom: 8,
+    },
+    shimmerMedium: {
+        width: '80%',
+        height: 16,
+        borderRadius: 8,
+        marginBottom: 8,
+    },
+    shimmerLarge: {
+        width: '100%',
+        height: 200,
+        borderRadius: 12,
+        marginBottom: 16,
+    },
 });

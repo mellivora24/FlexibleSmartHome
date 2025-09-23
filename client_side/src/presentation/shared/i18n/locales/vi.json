@@ -121,5 +121,14 @@
       "on": "Bật",
       "off": "Tắt"
     }
+  },
+  "searchWidget": {
+    "searchType": {
+      "all": "Tất cả",
+      "room": "Phòng",
+      "value": "Giá trị",
+      "name": "Cảm biến",
+      "timeRange": "Thời gian",
+    }
   }
 }

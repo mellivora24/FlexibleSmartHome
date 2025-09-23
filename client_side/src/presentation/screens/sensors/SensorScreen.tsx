@@ -4,7 +4,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { SearchWidget } from '@components/SearchWidget';
+import { SearchWidget } from '@components/SearchTableWidget';
 import { TopBarWidget } from '@components/TopBarWidget';
 import { BACKGROUND } from '@theme/colors';
 import { sensorScreenStyle } from './sensorScreenStyle';

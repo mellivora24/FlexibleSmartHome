@@ -4,9 +4,14 @@
 #include <Adafruit_NeoPixel.h>
 #include <DallasTemperature.h>
 
+#define TYPE_ANALOG_SENSOR     1
+#define TYPE_DIGITAL_SENSOR    2
+#define TYPE_ANALOG_DEVICE     3
+#define TYPE_DIGITAL_DEVICE    4
+
 struct Device {
-  String name;
-  String type;
+  int64_t id;
+  int8_t type;
   uint8_t pin;
   uint8_t extra;
   void* instance;
@@ -41,36 +46,22 @@ void parseConfig(JsonDocument& doc) {
   JsonArray arr = doc["devices"].as<JsonArray>();
   for (JsonObject obj : arr) {
     if (deviceCount >= 10) break;
-    devices[deviceCount].name = obj["name"].as<String>();
-    devices[deviceCount].type = obj["type"].as<String>();
+    devices[deviceCount].id = obj["id"].as<int64_t>();
+    devices[deviceCount].type = obj["type"].as<int8_t>();
     devices[deviceCount].pin = obj["pin"].as<uint8_t>();
     devices[deviceCount].extra = obj["extra"].as<uint8_t>();
     devices[deviceCount].instance = nullptr;
 
-    if (devices[deviceCount].type == "digitalSensor" || devices[deviceCount].type == "analogSensor") {
+    if (devices[deviceCount].type == TYPE_ANALOG_SENSOR || devices[deviceCount].type == TYPE_DIGITAL_SENSOR) {
       pinMode(devices[deviceCount].pin, INPUT);
-    } else if (devices[deviceCount].type == "digitalDevice") {
+    } else if (devices[deviceCount].type == TYPE_DIGITAL_DEVICE) {
       pinMode(devices[deviceCount].pin, OUTPUT);
       digitalWrite(devices[deviceCount].pin, LOW);
-    } else if (devices[deviceCount].type == "analogDevice") {
+    } else if (devices[deviceCount].type == TYPE_ANALOG_DEVICE) {
       pinMode(devices[deviceCount].pin, OUTPUT);    // IN1 - direction
       pinMode(devices[deviceCount].extra, OUTPUT);  // IN2 - speed (PWM)
       digitalWrite(devices[deviceCount].pin, LOW);
       analogWrite(devices[deviceCount].extra, 0);
-    } else if (devices[deviceCount].type == "ws2812") {
-      strip = new Adafruit_NeoPixel(devices[deviceCount].extra, devices[deviceCount].pin, NEO_GRB + NEO_KHZ800);
-      strip->begin();
-      strip->show();
-      devices[deviceCount].instance = strip;
-    } else if (devices[deviceCount].type == "dht11") {
-      DHT* dht = new DHT(devices[deviceCount].pin, DHT11);
-      dht->begin();
-      devices[deviceCount].instance = dht;
-    } else if (devices[deviceCount].type == "ds18b20") {
-      OneWire* oneWire = new OneWire(devices[deviceCount].pin);
-      DallasTemperature* sensors = new DallasTemperature(oneWire);
-      sensors->begin();
-      devices[deviceCount].instance = sensors;
     }
 
     deviceCount++;
@@ -82,14 +73,14 @@ void handleCommand(JsonDocument& cmd) {
   if (cmd["type"] != "request" || cmd["topic"] != "control" || !cmd.containsKey("data")) return;
 
   JsonObject data = cmd["data"].as<JsonObject>();
-  String name = data["name"].as<String>();
+  int64_t deviceId = data["id"].as<int64_t>();
 
   for (int i = 0; i < deviceCount; i++) {
-    if (devices[i].name == name) {
-      if (devices[i].type == "digitalDevice") {
+    if (devices[i].id == deviceId) {
+      if (devices[i].type == TYPE_DIGITAL_DEVICE) {
         bool status = data["status"];
         digitalWrite(devices[i].pin, status ? HIGH : LOW);
-      } else if (devices[i].type == "analogDevice") {
+      } else if (devices[i].type == TYPE_ANALOG_DEVICE) {
         bool status = data["status"];
         int value = constrain(data["value"] | 0, 0, 255);
         if (status) {
@@ -99,15 +90,6 @@ void handleCommand(JsonDocument& cmd) {
           digitalWrite(devices[i].pin, LOW);
           analogWrite(devices[i].extra, 0);
         }
-      } else if (devices[i].type == "ws2812" && strip != nullptr) {
-        bool status = data["status"];
-        if (status) {
-          uint32_t color = strip->Color(255, 255, 255);
-          strip->fill(color, 0, strip->numPixels());
-        } else {
-          strip->clear();
-        }
-        strip->show();
       }
       break;
     }
@@ -144,24 +126,15 @@ void loop() {
     JsonArray arr = data.createNestedArray("data");
 
     for (int i = 0; i < deviceCount; i++) {
-      JsonObject obj = arr.createNestedObject();
-      obj["name"] = devices[i].name;
+      if (devices[i].type == TYPE_ANALOG_SENSOR || devices[i].type == TYPE_DIGITAL_SENSOR) {
+        JsonObject obj = arr.createNestedObject();
+        obj["id"] = devices[i].id;
 
-      if (devices[i].type == "digitalSensor") {
-        obj["value"] = digitalRead(devices[i].pin);
-      } else if (devices[i].type == "analogSensor") {
-        obj["value"] = readMappedAnalog(devices[i].pin);
-      } else if (devices[i].type == "dht11") {
-        DHT* dht = (DHT*)devices[i].instance;
-        float h = dht->readHumidity();
-        if (isnan(h)) h = randomFloat(24.0, 26.0); // fallback
-        obj["value"] = h;
-      } else if (devices[i].type == "ds18b20") {
-        DallasTemperature* sensors = (DallasTemperature*)devices[i].instance;
-        sensors->requestTemperatures();
-        float t = sensors->getTempCByIndex(0);
-        if (t == DEVICE_DISCONNECTED_C) t = randomFloat(24.0, 26.0); // fallback
-        obj["value"] = t;
+        if (devices[i].type == TYPE_DIGITAL_SENSOR) {
+          obj["value"] = digitalRead(devices[i].pin);
+        } else if (devices[i].type == TYPE_ANALOG_SENSOR) {
+          obj["value"] = readMappedAnalog(devices[i].pin);
+        }
       }
     }
 

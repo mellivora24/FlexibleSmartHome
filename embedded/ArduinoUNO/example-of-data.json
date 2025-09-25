@@ -1,0 +1,58 @@
+// Example of config JSON:
+{
+  "type": "response",
+  "topic": "config",
+  "devices": [
+    {"name": "fan1",       "type": "analogDevice",  "pin": 4,  "extra": 5},
+    {"name": "light1",     "type": "ws2812",        "pin": 6,  "extra": 8},
+    {"name": "gasSensor",  "type": "analogSensor",  "pin": "A0", "extra": 0},
+    {"name": "humiSensor", "type": "dht11",         "pin": 2,  "extra": 0},
+    {"name": "tempSensor", "type": "ds18b20",       "pin": 7,  "extra": 0}
+  ]
+}
+
+// Example of command JSON:
+// Turn on fan1 with speed 128 (0-255):
+{
+  "type": "request",
+  "topic": "control",
+  "data": {"name": "fan1", "status": 1, "value": 128}
+}
+// Turn off fan1:
+{
+  "type": "request",
+  "topic": "control",
+  "data": {"name": "fan1", "status": 0}
+}
+// Turn on light1 (ws2812):
+{
+  "type": "request",
+  "topic": "control",
+  "data": {"name": "light1", "status": 1}
+}
+// Turn off light1:
+{
+  "type": "request",
+  "topic": "control",
+  "data": {"name": "light1", "status": 0}
+}
+
+
+// Example of control response JSON:
+{
+  "type": "response",  //=> change request to response
+  "topic": "control",
+  "data": {"name": "fan1", "status": 1, "value": 128}
+}
+
+
+// Example of sensor data JSON:
+{
+  "type": "response",
+  "topic": "sensorData",
+  "data": [
+    {"name": "gasSensor",  "value": 12.7},
+    {"name": "humiSensor", "value": 45.3},
+    {"name": "tempSensor", "value": 25.1}
+  ]
+}

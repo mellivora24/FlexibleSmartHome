@@ -15,10 +15,11 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
-	event := rg.Group("/events")
+	events := rg.Group("/events")
 	{
-		event.GET("/list", h.GetListEvents)
-		event.GET("/get", h.GetEvent)
+		events.GET("/list", h.GetListEvents)
+		events.GET("/get", h.GetEvent)
+		events.POST("/create", h.CreateEvent)
 	}
 }
 
@@ -43,12 +44,24 @@ func (h *Handler) GetEvent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	event, err := h.service.GetOne(&req)
+	uid := c.GetInt64("uid")
+	event, err := h.service.GetOne(uid, &req)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"data": event})
+}
+
+func (h *Handler) CreateEvent(c *gin.Context) {
+	var req CreateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := h.service.Create(req.UID, req.DID, req.Action, req.Payload); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"message": "event created"})
 }

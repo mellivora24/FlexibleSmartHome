@@ -15,12 +15,17 @@ func (SensorDataDB) TableName() string {
 	return "tbl_sensordata"
 }
 
-type GetListResponse struct {
+type SensorDataItem struct {
 	ID         int64     `json:"id"`
 	SensorName string    `json:"sensorName"`
 	Value      float64   `json:"value"`
 	Unit       string    `json:"unit"`
 	CreatedAt  time.Time `json:"createdAt"`
+}
+
+type GetListResponse struct {
+	Total int64            `json:"total"`
+	List  []SensorDataItem `json:"list"`
 }
 
 type GetListRequest struct {
@@ -36,5 +41,6 @@ type GetListRequest struct {
 type GetOneRequest struct {
 	ID     int64     `form:"id"`
 	SID    int64     `form:"sid"`
+	Value  float64   `form:"value"`
 	AtTime time.Time `form:"at_time" time_format:"2006-01-02 15:04:05"`
 }

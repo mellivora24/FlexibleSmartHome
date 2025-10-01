@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/shared"
 	"gorm.io/gorm"
@@ -59,6 +60,7 @@ func (r *repository) FindByEmail(email string) (*UserDB, error) {
 
 func (r *repository) Create(user *UserDB) (*UserDB, error) {
 	if user == nil {
+		fmt.Println("Invalid user input")
 		return nil, shared.ErrInvalidInput
 	}
 

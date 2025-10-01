@@ -9,10 +9,11 @@ type WSClient struct {
 }
 
 type WSMessage struct {
-	Type string      `json:"type"` // control, firmware, hardware...
-	UID  string      `json:"uid"`
-	MID  string      `json:"mid"`
-	Data interface{} `json:"data"`
+	Type        string      `json:"type"` // control, firmware, hardware...
+	UID         string      `json:"uid"`
+	MID         string      `json:"mid"`
+	Data        interface{} `json:"data"`
+	Information interface{} `json:"information,omitempty"`
 }
 
 type PendingAction struct {

@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,7 +28,6 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 
 	action := rg.Group("/actions")
 	{
-		action.POST("/", h.CreateAction)
 		action.GET("/list/:uid", h.ListActions)
 	}
 
@@ -43,7 +43,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *Handler) GetUserByID(c *gin.Context) {
@@ -52,7 +52,7 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *Handler) CreateUser(c *gin.Context) {
@@ -65,7 +65,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
@@ -77,7 +77,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *Handler) DeleteUser(c *gin.Context) {
@@ -87,7 +87,7 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *Handler) Login(c *gin.Context) {
@@ -99,19 +99,7 @@ func (h *Handler) Login(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
-}
-
-func (h *Handler) CreateAction(c *gin.Context) {
-	var action ActionCreate
-	if err := c.ShouldBindJSON(&action); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	res, err := h.service.CreateAction(&action)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *Handler) ListActions(c *gin.Context) {
@@ -119,19 +107,28 @@ func (h *Handler) ListActions(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *Handler) VerifyToken(c *gin.Context) {
-	token := c.Query("token")
-	if token == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "token required"})
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Authorization header required"})
+		return
 	}
+
+	parts := strings.SplitN(authHeader, " ", 2)
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Authorization header format"})
+		return
+	}
+	token := parts[1]
 
 	res, err := h.service.VerifyToken(token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, res)
 }

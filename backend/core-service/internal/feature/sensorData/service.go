@@ -1,33 +1,40 @@
 package sensorData
 
 type Service interface {
-	CreateData(uid int64, sid int64, value float64, unit string) error
-	GetList(uid int64, req *GetListRequest) ([]GetListResponse, int64, error)
-	GetOne(uid int64, req *GetOneRequest) (*GetListResponse, error)
+	Create(uid, sid int64, value float64, unit string) error
+	GetList(uid int64, req *GetListRequest) (*GetListResponse, error)
+	GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, error)
 }
 
 type service struct {
 	repo Repository
 }
 
-func NewService(repository Repository) Service {
-	return &service{repo: repository}
+func NewService(repo Repository) Service {
+	return &service{repo: repo}
 }
 
-func (s *service) CreateData(uid int64, sid int64, value float64, unit string) error {
-	record := SensorDataDB{
+func (s service) Create(uid, sid int64, value float64, unit string) error {
+	record := &SensorDataDB{
 		UID:   uid,
 		SID:   sid,
 		Value: value,
 		Unit:  unit,
 	}
-	return s.repo.CreateRecord(&record)
+	return s.repo.CreateRecord(record)
 }
 
-func (s *service) GetList(uid int64, req *GetListRequest) ([]GetListResponse, int64, error) {
-	return s.repo.GetList(uid, req)
+func (s service) GetList(uid int64, req *GetListRequest) (*GetListResponse, error) {
+	items, total, err := s.repo.GetList(uid, req)
+	if err != nil {
+		return nil, err
+	}
+	return &GetListResponse{
+		Total: total,
+		List:  items,
+	}, nil
 }
 
-func (s *service) GetOne(uid int64, req *GetOneRequest) (*GetListResponse, error) {
+func (s service) GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, error) {
 	return s.repo.GetOne(uid, req)
 }

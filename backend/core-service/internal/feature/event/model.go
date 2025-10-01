@@ -18,9 +18,19 @@ func (EventDB) TableName() string {
 	return "tbl_events"
 }
 
+// Trả về cho API (JOIN tbl_device)
+type EventResponse struct {
+	ID         int64           `json:"id"`
+	UID        int64           `json:"uid"`
+	DeviceName string          `json:"device_name"`
+	Action     string          `json:"action"`
+	Payload    json.RawMessage `json:"payload"`
+	CreatedAt  time.Time       `json:"created_at"`
+}
+
 type GetListResponse struct {
-	Total int64      `json:"total"`
-	List  []*EventDB `json:"list"`
+	Total int64            `json:"total"`
+	List  []*EventResponse `json:"list"`
 }
 
 type CreateRequest struct {

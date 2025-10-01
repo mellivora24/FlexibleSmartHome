@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/eclipse/paho.mqtt.golang"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensorData"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/model"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/service"
@@ -36,9 +36,9 @@ func (h *MQTTHandler) Init() {
 		return
 	}
 
-	err = h.mqttService.Subscribe("user/+/mcu/+/response", h.onControlResponse)
+	err = h.mqttService.Subscribe("user/+/mcu/+/feedback", h.onControlResponse)
 	if err != nil {
-		log.Printf("Error subscribing to response topic: %v", err)
+		log.Printf("Error subscribing to feedback topic: %v", err)
 		return
 	}
 
@@ -55,15 +55,18 @@ func (h *MQTTHandler) onSensorData(client mqtt.Client, msg mqtt.Message) {
 	uid := extractUIDFromTopic(msg.Topic())
 	mid := extractMIDFromTopic(msg.Topic())
 
-	//if err := h.sensorDataService.CreateData(data.UID, data.SID, data.Value, data.Unit); err != nil {
-	//	log.Printf("Error saving sensor data: %v", err)
-	//}
+	// if err := h.sensorDataService.Create(data.UID, data.SID, data.Value, data.Unit); err != nil {
+	// 	log.Printf("Error saving sensor data: %v", err)
+	// }
 
 	wsMessage := model.WSMessage{
 		Type: "sensor_data",
 		UID:  uid,
 		MID:  mid,
 		Data: data,
+		Information: map[string]string{
+			"dataSaved": "true",
+		},
 	}
 
 	if err := h.wsService.SendMessage(wsMessage.UID, wsMessage); err != nil {

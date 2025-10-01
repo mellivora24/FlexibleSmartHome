@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
 
 	ws "github.com/gorilla/websocket"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/infra/websocket"
@@ -42,16 +41,10 @@ func (c *WSClient) WritePump() {
 		}
 	}()
 
-	for {
-		select {
-		case msg, ok := <-c.send:
-			if !ok {
-				return
-			}
-			if err := c.conn.WriteMessage(ws.TextMessage, msg); err != nil {
-				log.Println("Error writing message:", err)
-				return
-			}
+	for msg := range c.send {
+		if err := c.conn.WriteMessage(ws.TextMessage, msg); err != nil {
+			log.Println("Error writing WebSocket message:", err)
+			return
 		}
 	}
 }
@@ -61,34 +54,6 @@ func (c *WSClient) ReadPump(mqttService service.MQTTService, wsService service.W
 		err := wsService.CloseClient(uid, c)
 		if err != nil {
 			log.Println("Error closing WebSocket client:", err)
-		}
-	}()
-
-	err := c.conn.SetReadDeadline(time.Now().Add(60 * time.Second))
-	if err != nil {
-		log.Println("Error setting read deadline:", err)
-		return
-	}
-	c.conn.SetPongHandler(func(string) error {
-		err := c.conn.SetReadDeadline(time.Now().Add(60 * time.Second))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	ticker := time.NewTicker(54 * time.Second)
-	defer ticker.Stop()
-
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				if err := c.conn.WriteMessage(ws.PingMessage, nil); err != nil {
-					log.Println("Error sending ping:", err)
-					return
-				}
-			}
 		}
 	}()
 
@@ -126,20 +91,21 @@ func (c *WSClient) ReadPump(mqttService service.MQTTService, wsService service.W
 }
 
 func WSHandler(manager *realtime.Manager, mqttService service.MQTTService, wsService service.WebSocketService, w http.ResponseWriter, r *http.Request) {
-	conn, err := websocket.InitWS(w, r)
-	if err != nil {
-		http.Error(w, "Could not upgrade WebSocket", http.StatusBadRequest)
-		return
-	}
-
 	uid := r.URL.Query().Get("uid")
 	if uid == "" {
 		http.Error(w, "Missing uid", http.StatusBadRequest)
 		return
 	}
 
+	conn, err := websocket.InitWS(w, r)
+	if err != nil {
+		http.Error(w, "Could not upgrade WebSocket", http.StatusBadRequest)
+		return
+	}
+
 	client := NewWSClient(conn)
 	manager.AddClient(uid, client)
+	client.Send([]byte("Connected to WebSocket server"))
 
 	go client.WritePump()
 	go client.ReadPump(mqttService, wsService, uid)

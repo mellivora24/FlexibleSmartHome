@@ -15,8 +15,10 @@ services:
   auth-db:
     image: postgres:15
     container_name: auth_db
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_PASSWORD=13M09Q24T
+      - POSTGRES_DB=auth_db
+      - POSTGRES_USER=auth_service
     ports:
       - "5433:5432"
     volumes:

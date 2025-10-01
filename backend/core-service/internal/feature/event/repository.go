@@ -1,13 +1,11 @@
 package event
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type Repository interface {
-	GetList(uid int64, req *GetListRequest) ([]*EventDB, int64, error)
+	GetList(uid int64, req *GetListRequest) ([]*EventResponse, int64, error)
+	GetOne(uid int64, req *GetOneRequest) (*EventResponse, error)
 	CreateEvent(event *EventDB) error
-	GetOne(uid int64, req *GetOneRequest) (*EventDB, error)
 }
 
 type repository struct {
@@ -18,8 +16,8 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{DB: db}
 }
 
-func (r *repository) GetList(uid int64, req *GetListRequest) ([]*EventDB, int64, error) {
-	var events []*EventDB
+func (r *repository) GetList(uid int64, req *GetListRequest) ([]*EventResponse, int64, error) {
+	var events []*EventResponse
 	var total int64
 
 	if req.Limit <= 0 {
@@ -28,28 +26,31 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]*EventDB, int64,
 	if req.Page <= 0 {
 		req.Page = 1
 	}
-
 	offset := (req.Page - 1) * req.Limit
-	query := r.DB.Model(&EventDB{}).Where("uid = ?", uid)
+
+	query := r.DB.Table("tbl_events AS e").
+		Select("e.id, e.uid, d.name AS device_name, e.action, e.payload, e.created_at").
+		Joins("JOIN tbl_device d ON e.did = d.id").
+		Where("e.uid = ?", uid)
 
 	if req.Action != "" {
-		query = query.Where("action = ?", req.Action)
+		query = query.Where("e.action = ?", req.Action)
 	}
 	if req.DID > 0 {
-		query = query.Where("did = ?", req.DID)
+		query = query.Where("e.did = ?", req.DID)
 	}
 	if !req.StartTime.IsZero() {
-		query = query.Where("created_at >= ?", req.StartTime)
+		query = query.Where("e.created_at >= ?", req.StartTime)
 	}
 	if !req.EndTime.IsZero() {
-		query = query.Where("created_at <= ?", req.EndTime)
+		query = query.Where("e.created_at <= ?", req.EndTime)
 	}
 
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	sortBy := "created_at"
+	sortBy := "e.created_at"
 	if req.SortBy != "" {
 		sortBy = req.SortBy
 	}
@@ -57,40 +58,45 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]*EventDB, int64,
 	if req.SortType == "asc" {
 		sortType = "ASC"
 	}
-	query = query.Order(sortBy + " " + sortType)
 
-	if err := query.Limit(req.Limit).Offset(offset).Find(&events).Error; err != nil {
+	if err := query.
+		Order(sortBy + " " + sortType).
+		Limit(req.Limit).
+		Offset(offset).
+		Scan(&events).Error; err != nil {
 		return nil, 0, err
 	}
 
 	return events, total, nil
 }
 
-func (r *repository) CreateEvent(event *EventDB) error {
-	return r.DB.Create(event).Error
-}
+func (r *repository) GetOne(uid int64, req *GetOneRequest) (*EventResponse, error) {
+	var event EventResponse
 
-func (r *repository) GetOne(uid int64, req *GetOneRequest) (*EventDB, error) {
-	var event EventDB
-	query := r.DB.Model(&EventDB{})
-	query = query.Where("uid = ?", uid)
+	query := r.DB.Table("tbl_events AS e").
+		Select("e.id, e.uid, d.name AS device_name, e.action, e.payload, e.created_at").
+		Joins("JOIN tbl_device d ON e.did = d.id").
+		Where("e.uid = ?", uid)
 
 	if req.ID > 0 {
-		query = query.Where("id = ?", req.ID)
+		query = query.Where("e.id = ?", req.ID)
 	}
-
 	if req.DID > 0 {
-		query = query.Where("did = ?", req.DID)
+		query = query.Where("e.did = ?", req.DID)
 	}
 	if req.Action != "" {
-		query = query.Where("action = ?", req.Action)
+		query = query.Where("e.action = ?", req.Action)
 	}
 	if !req.AtTime.IsZero() {
-		query = query.Where("created_at = ?", req.AtTime)
+		query = query.Where("e.created_at = ?", req.AtTime)
 	}
 
 	if err := query.First(&event).Error; err != nil {
 		return nil, err
 	}
 	return &event, nil
+}
+
+func (r *repository) CreateEvent(event *EventDB) error {
+	return r.DB.Create(event).Error
 }

@@ -90,6 +90,7 @@ func main() {
 		sensorDataHandler.RegisterRoutes(api)
 		notificationHandler.RegisterRoutes(api)
 
+		// WebSocket
 		api.GET("/ws", func(c *gin.Context) {
 			handler.WSHandler(manager, mqttService, wsService, c.Writer, c.Request)
 		})

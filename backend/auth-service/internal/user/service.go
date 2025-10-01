@@ -1,7 +1,9 @@
 package user
 
 import (
+	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/mellivora24/flexiblesmarthome/auth-service/internal/shared"
@@ -16,7 +18,6 @@ type Service interface {
 
 	Login(req *LoginRequest) (*LoginResponse, error)
 
-	CreateAction(req *ActionCreate) (*ActionCreateResponse, error)
 	ListActions(req string) ([]ListActionsResponse, error)
 
 	VerifyToken(token string) (*VerifyTokenResponse, error)
@@ -105,6 +106,14 @@ func (s *service) CreateUser(req *CreateRequest) (*CreateResponse, error) {
 		return nil, shared.ErrInternalServer
 	}
 
+	action := ActionDB{
+		UID:  created.ID,
+		Type: "create_user",
+		Data: json.RawMessage([]byte(fmt.Sprintf("User %s created", created.Email))),
+	}
+
+	_, err = s.repo.CreateAction(&action)
+
 	res := &CreateResponse{
 		ID:        created.ID,
 		MID:       created.MID,
@@ -185,36 +194,24 @@ func (s *service) Login(req *LoginRequest) (*LoginResponse, error) {
 		return nil, shared.ErrInternalServer
 	}
 
+	action := ActionDB{
+		UID:       user.ID,
+		Type:      "login",
+		Data:      json.RawMessage(fmt.Sprintf(`"%s"`, fmt.Sprintf("User %s logged in", user.Email))),
+		CreatedAt: time.Now(),
+	}
+
+	_, err = s.repo.CreateAction(&action)
+	if err != nil {
+		return nil, err
+	}
+
 	res := &LoginResponse{
 		ID:    user.ID,
 		MID:   user.MID,
 		Name:  user.Name,
 		Email: user.Email,
 		Token: tokenString,
-	}
-
-	return res, nil
-}
-
-func (s *service) CreateAction(req *ActionCreate) (*ActionCreateResponse, error) {
-	if req == nil {
-		return nil, shared.ErrInvalidInput
-	}
-
-	action := ActionDB{
-		UID:  req.UID,
-		Type: req.Type,
-		Data: req.Data,
-	}
-
-	ac, err := s.repo.CreateAction(&action)
-	if err != nil {
-		return nil, err
-	}
-
-	res := &ActionCreateResponse{
-		ID:       ac.ID,
-		CreateAt: ac.CreatedAt,
 	}
 
 	return res, nil
@@ -275,7 +272,11 @@ func (s *service) VerifyToken(tokenString string) (*VerifyTokenResponse, error) 
 	mid, _ := claims["mid"].(float64)
 
 	user, err := s.repo.FindByID(int64(userID))
-	if err != nil {
+	if err != nil || user == nil {
+		return &tokenInvalid, nil
+	}
+
+	if mid <= 0 {
 		return &tokenInvalid, nil
 	}
 

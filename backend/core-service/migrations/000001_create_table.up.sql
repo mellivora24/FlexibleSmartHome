@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS tbl_events (
     did INT,
     action VARCHAR(255),
     payload JSONB,
-    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (did) REFERENCES tbl_device(id) ON DELETE CASCADE
 );
 
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS tbl_sensordata (
     sid INT,
     value FLOAT,
     unit VARCHAR(50),
-    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sid) REFERENCES tbl_sensor(id) ON DELETE CASCADE
 );
 
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS tbl_log (
     level VARCHAR(100),
     message TEXT,
     metadata JSONB,
-    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Model: true
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS tbl_notification (
     message TEXT,
     metadata JSONB,
     is_read BOOLEAN DEFAULT FALSE,
-    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS pending_actions (
@@ -116,7 +116,6 @@ CREATE INDEX IF NOT EXISTS idx_sensorData_sid ON tbl_sensorData(sid);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_user_mcu ON pending_actions(user_id, mcu_id);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_status ON pending_actions(status);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_created_at ON pending_actions(created_at);
-
 
 -- Khi thêm device -> xóa port khỏi available_port
 CREATE OR REPLACE FUNCTION fn_device_insert()

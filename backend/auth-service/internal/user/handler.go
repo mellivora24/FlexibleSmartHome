@@ -43,7 +43,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) GetUserByID(c *gin.Context) {
@@ -52,7 +52,7 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) CreateUser(c *gin.Context) {
@@ -65,7 +65,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
@@ -77,7 +77,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) DeleteUser(c *gin.Context) {
@@ -87,7 +87,7 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) Login(c *gin.Context) {
@@ -99,7 +99,7 @@ func (h *Handler) Login(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) ListActions(c *gin.Context) {
@@ -107,7 +107,7 @@ func (h *Handler) ListActions(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) VerifyToken(c *gin.Context) {
@@ -130,5 +130,5 @@ func (h *Handler) VerifyToken(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }

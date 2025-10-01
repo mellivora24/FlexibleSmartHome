@@ -6,13 +6,13 @@
 
 class WidgetCard;
 
-class HomeScreen {
+class Screen {
 private:
     TFT_eSPI* screen;
     std::vector<WidgetCard*> widgets;
 
 public:
-    HomeScreen(TFT_eSPI* tft);
+    Screen(TFT_eSPI* tft);
 
     void addWidget(WidgetCard* widget);
     void onTouch(int tx, int ty);

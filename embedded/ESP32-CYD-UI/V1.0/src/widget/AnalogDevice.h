@@ -3,34 +3,126 @@
 
 class AnalogDevice : public WidgetCard {
 private:
-    int level; // 0 = Low, 1 = Medium, 2 = High
+    uint8_t level; // 0 = Low, 1 = Medium, 2 = High
+    const char* label;
+    uint8_t textSize;
+    bool isOn;
+    
+    uint16_t getLevelColor(uint8_t lvl) {
+        switch(lvl) {
+            case 0: return tft->color565(100, 149, 237); // Cornflower blue - Low
+            case 1: return tft->color565(255, 165, 0);   // Orange - Medium
+            case 2: return tft->color565(255, 69, 58);   // Red - High
+            default: return TFT_DARKGREY;
+        }
+    }
+
 public:
-    AnalogDevice(TFT_eSPI* tft, int x, int y, int w, int h)
-        : WidgetCard(tft, x, y, w, h, true), level(1) {}
+    AnalogDevice(TFT_eSPI* tft, int x, int y, int w, int h, const char* label, uint8_t textSize)
+        : WidgetCard(tft, x, y, w, h, true), 
+          level(0), label(label), textSize(textSize), isOn(false) {}
 
     int getLevel() { return level; }
+    bool getStatus() { return isOn; }
+    
+    void setLevel(uint8_t newLevel) {
+        level = constrain(newLevel, 0, 2);
+    }
+    
+    void setStatus(bool status) {
+        isOn = status;
+    }
+    
+    void toggle() {
+        isOn = !isOn;
+    }
 
     void render() override {
-        tft->drawRect(x, y, w, h, TFT_WHITE);
+        uint16_t bgColor = isOn ? tft->color565(30, 30, 35) : tft->color565(20, 20, 25);
+        uint16_t borderColor = isOn ? tft->color565(60, 60, 70) : tft->color565(40, 40, 50);
+        
+        tft->fillRoundRect(x, y, w, h, 8, bgColor);
+        tft->drawRoundRect(x, y, w, h, 8, borderColor);
 
-        int sliderX = x + w - 20;
-        int sliderY = y + 10;
-        int sliderH = h - 20;
+        uint16_t labelColor = isOn ? TFT_WHITE : tft->color565(100, 100, 110);
+        tft->setTextColor(labelColor);
+        tft->setTextSize(textSize);
+        tft->setTextDatum(TL_DATUM);
+        tft->drawString(label, x + 10, y + 10);
+        
+        tft->setTextSize(1);
+        tft->setTextColor(isOn ? TFT_GREEN : TFT_RED);
+        tft->setTextDatum(TR_DATUM);
+        tft->drawString(isOn ? "ON" : "OFF", x + w - 10, y + 12);
 
-        tft->drawRect(sliderX, sliderY, 10, sliderH, TFT_LIGHTGREY);
+        if (isOn) {
+            const char* levelText[] = {"LOW", "MED", "HIGH"};
+            tft->setTextSize(textSize);
+            tft->setTextColor(getLevelColor(level));
+            tft->setTextDatum(TC_DATUM);
+            tft->drawString(levelText[level], x + w/2, y + 35);
+        }
+        
+        int buttonW = (w - 40) / 3;
+        int buttonH = 30;
+        int buttonY = y + h - buttonH - 10;
+        int spacing = 5;
+        
         for (int i = 0; i < 3; i++) {
-            int posY = sliderY + i * (sliderH / 3);
-            uint16_t c = (i == level) ? TFT_WHITE : TFT_DARKGREY;
-            tft->fillRect(sliderX + 1, posY + 1, 8, sliderH / 3 - 2, c);
+            int buttonX = x + 10 + i * (buttonW + spacing);
+
+            uint16_t bgBtnColor, borderBtnColor, textBtnColor;
+            
+            if (!isOn) {
+                bgBtnColor = tft->color565(40, 40, 50);
+                borderBtnColor = tft->color565(50, 50, 60);
+                textBtnColor = tft->color565(80, 80, 90);
+            } else if (i == level) {
+                bgBtnColor = getLevelColor(i);
+                borderBtnColor = TFT_WHITE;
+                textBtnColor = TFT_WHITE;
+            } else {
+                bgBtnColor = tft->color565(50, 50, 60);
+                borderBtnColor = tft->color565(70, 70, 80);
+                textBtnColor = tft->color565(150, 150, 160);
+            }
+
+            tft->fillRoundRect(buttonX, buttonY, buttonW, buttonH, 6, bgBtnColor);
+            tft->drawRoundRect(buttonX, buttonY, buttonW, buttonH, 6, borderBtnColor);
+            
+            tft->setTextColor(textBtnColor);
+            tft->setTextSize(2);
+            tft->setTextDatum(MC_DATUM);
+            tft->drawString(String(i + 1), buttonX + buttonW/2, buttonY + buttonH/2);
         }
     }
 
     void onTouch(int tx, int ty) override {
         if (tx >= x && tx <= x + w && ty >= y && ty <= y + h) {
-            int sliderY = y + 10;
-            int sliderH = h - 20;
-            int section = (ty - sliderY) / (sliderH / 3);
-            level = constrain(section, 0, 2);
+            int buttonW = (w - 40) / 3;
+            int buttonH = 30;
+            int buttonY = y + h - buttonH - 10;
+            int spacing = 5;
+            
+            bool touchedButton = false;
+
+            if (isOn) {
+                for (int i = 0; i < 3; i++) {
+                    int buttonX = x + 10 + i * (buttonW + spacing);
+                    
+                    if (tx >= buttonX && tx <= buttonX + buttonW && 
+                        ty >= buttonY && ty <= buttonY + buttonH) {
+                        setLevel(i);
+                        touchedButton = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!touchedButton) {
+                toggle();
+            }
         }
+        delay(100);
     }
 };

@@ -60,10 +60,12 @@ class TabBar {
         
         if (ty >= y) {
             int index = tx / w;
-            if (autoSwitch) {
-                setActive(items[index].id);
+            if (index >= 0 && index < itemCount) {
+                if (autoSwitch) {
+                    setActive(items[index].id);
+                }
+                return items[index].id;
             }
-            return items[index].id;
         }
         return -1;
     }

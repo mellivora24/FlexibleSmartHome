@@ -17,5 +17,5 @@ public:
     
     virtual ~WidgetCard() {}
 
-    friend class HomeScreen;
+    friend class Screen;
 };

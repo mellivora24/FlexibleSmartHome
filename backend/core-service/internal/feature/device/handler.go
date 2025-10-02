@@ -2,6 +2,7 @@ package device
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,28 +26,37 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 }
 
 func (h *Handler) ListDevices(c *gin.Context) {
-	var cond ListDeviceRequest
-	if err := c.ShouldBindJSON(&cond); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
 		return
 	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
 
-	res, err := h.service.ListDevices(&cond)
+	res, err := h.service.ListDevices(intUid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) CreateDevice(c *gin.Context) {
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
+	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
 	var device CreateDeviceRequest
 	if err := c.ShouldBindJSON(&device); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	res, err := h.service.CreateDevice(&device)
+	res, err := h.service.CreateDevice(intUid, &device)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -55,12 +65,19 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 }
 
 func (h *Handler) UpdateDevice(c *gin.Context) {
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
+	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
 	var device UpdateDeviceRequest
 	if err := c.ShouldBindJSON(&device); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.service.UpdateDevice(&device)
+	res, err := h.service.UpdateDevice(intUid, &device)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

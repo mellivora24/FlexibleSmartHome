@@ -20,19 +20,11 @@ func (NotificationDB) TableName() string {
 }
 
 type GetListRequest struct {
-	UID   int64 `json:"uid"`
-	Page  int   `json:"page"`
-	Limit int   `json:"limit"`
+	Page  int `json:"page"`
+	Limit int `json:"limit"`
 }
 
 type GetListResponse struct {
 	Total int64             `json:"total"`
 	List  []*NotificationDB `json:"list"`
-}
-
-type CreateRequest struct {
-	UID      int64           `json:"uid"`
-	Type     string          `json:"type"`
-	Message  string          `json:"message"`
-	Metadata json.RawMessage `json:"metadata"`
 }

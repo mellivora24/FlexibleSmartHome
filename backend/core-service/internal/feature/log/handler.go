@@ -2,6 +2,7 @@ package log
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,8 +29,15 @@ func (h *Handler) GetListLogs(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	uid := c.GetInt64("uid")
-	res, err := h.service.GetList(uid, &req)
+
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
+	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
+	res, err := h.service.GetList(intUid, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -43,8 +51,15 @@ func (h *Handler) GetLog(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	uid := c.GetInt64("uid")
-	log, err := h.service.GetOne(uid, &req)
+
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
+	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
+	log, err := h.service.GetOne(intUid, &req)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return

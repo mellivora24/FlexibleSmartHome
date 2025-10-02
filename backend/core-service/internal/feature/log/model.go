@@ -23,13 +23,6 @@ type GetListResponse struct {
 	List  []*LogDB `json:"list"`
 }
 
-type CreateRequest struct {
-	UID      int64           `json:"uid"`
-	Level    string          `json:"level"`
-	Message  string          `json:"message"`
-	Metadata json.RawMessage `json:"metadata"`
-}
-
 type GetListRequest struct {
 	Page      int       `form:"page"`
 	Limit     int       `form:"limit"`

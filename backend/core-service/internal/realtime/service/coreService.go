@@ -21,6 +21,8 @@ type CoreService interface {
 	CreateSensorData(uid string, data model.MQTTMessage) (err error)
 	CreateEvent(uid string, data model.MQTTMessage) (err error)
 	UpdateDeviceStatus(data model.MQTTMessage) (err error)
+	GetDeviceList(uid string) (devices []device.MQTTGetDeviceData, err error)
+	GetSensorList(uid string) (sensors []sensor.MQTTGetListSensor, err error)
 }
 
 type coreService struct {
@@ -159,4 +161,46 @@ func (s *coreService) UpdateDeviceStatus(data model.MQTTMessage) (err error) {
 	}
 
 	return nil
+}
+
+func (s *coreService) GetDeviceList(uid string) (devices []device.MQTTGetDeviceData, err error) {
+	intUid, convErr := strconv.ParseInt(uid, 10, 64)
+	if convErr != nil {
+		l.Printf("Error converting uid to int64: %v", convErr)
+		return nil, convErr
+	}
+
+	devices, err = s.device.RealtimeGetList(intUid)
+	if err != nil {
+		l.Printf("[CoreService] Error getting device list: %v", err)
+		return nil, err
+	}
+
+	if len(devices) == 0 {
+		l.Printf("[CoreService] No devices found for UID=%s", uid)
+		return nil, nil
+	}
+
+	return devices, nil
+}
+
+func (s *coreService) GetSensorList(uid string) (sensors []sensor.MQTTGetListSensor, err error) {
+	intUid, convErr := strconv.ParseInt(uid, 10, 64)
+	if convErr != nil {
+		l.Printf("Error converting uid to int64: %v", convErr)
+		return nil, convErr
+	}
+
+	sensors, err = s.sensor.RealtimeGetListSensors(intUid)
+	if err != nil {
+		l.Printf("[CoreService] Error getting sensor list: %v", err)
+		return nil, err
+	}
+
+	if len(sensors) == 0 {
+		l.Printf("[CoreService] No sensors found for UID=%s", uid)
+		return nil, nil
+	}
+
+	return sensors, nil
 }

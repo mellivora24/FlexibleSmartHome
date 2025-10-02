@@ -14,13 +14,7 @@ func (RoomDB) TableName() string {
 	return "tbl_room"
 }
 
-type GetRequest struct {
-	ID  int `json:"id,omitempty"`
-	UID int `json:"uid,omitempty"`
-}
-
 type CreateRequest struct {
-	UID         int    `json:"uid,omitempty"`
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
 }

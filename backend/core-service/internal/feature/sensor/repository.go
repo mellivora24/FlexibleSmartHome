@@ -3,7 +3,7 @@ package sensor
 import "gorm.io/gorm"
 
 type Repository interface {
-	GetList(uid int64, rid int64) ([]SensorDB, error)
+	GetList(uid int64) ([]SensorDB, error)
 	Create(db *SensorDB) (*SensorDB, error)
 	Update(db *SensorDB) (*SensorDB, error)
 	Delete(id int64) error
@@ -17,11 +17,12 @@ func NewSensorRepository(db *gorm.DB) Repository {
 	return &repository{DB: db}
 }
 
-func (r *repository) GetList(uid int64, rid int64) ([]SensorDB, error) {
+func (r *repository) GetList(uid int64) ([]SensorDB, error) {
 	var devices []SensorDB
-	if err := r.DB.Where("uid = ? AND rid = ?", uid, rid).Find(&devices).Error; err != nil {
+	if err := r.DB.Where("uid = ?", uid).Find(&devices).Error; err != nil {
 		return nil, err
 	}
+
 	return devices, nil
 }
 

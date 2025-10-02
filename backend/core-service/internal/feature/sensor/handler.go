@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,12 +26,14 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 }
 
 func (h *Handler) ListSensors(c *gin.Context) {
-	var req ListSensorRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
 	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
 
-	res, err := h.service.ListSensors(&req)
+	res, err := h.service.ListSensors(intUid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
@@ -42,22 +45,41 @@ func (h *Handler) CreateSensor(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	res, err := h.service.CreateSensor(&req)
+
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
+	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
+	res, err := h.service.CreateSensor(intUid, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
+
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) UpdateSensor(c *gin.Context) {
 	var req UpdateSensorRequest
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	res, err := h.service.UpdateSensor(&req)
+
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
+	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
+	res, err := h.service.UpdateSensor(intUid, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
+	
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 

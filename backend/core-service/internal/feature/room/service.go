@@ -3,8 +3,8 @@ package room
 import "time"
 
 type Service interface {
-	GetRoomInfor(cond *GetRequest) (*RoomDB, error)
-	CreateRoom(infor *CreateRequest) (*RoomDB, error)
+	GetRoom(uid int64) ([]RoomDB, error)
+	CreateRoom(uid int64, room *CreateRequest) (*RoomDB, error)
 }
 
 type service struct {
@@ -15,26 +15,25 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) GetRoomInfor(cond *GetRequest) (*RoomDB, error) {
-	id, uid := int64(cond.ID), int64(cond.UID)
-	room, err := s.repo.GetByID(id, uid)
+func (s *service) GetRoom(uid int64) ([]RoomDB, error) {
+	rooms, err := s.repo.GetList(uid)
 	if err != nil {
 		return nil, err
 	}
-	return room, nil
+	return rooms, nil
 }
 
-func (s *service) CreateRoom(infor *CreateRequest) (*RoomDB, error) {
+func (s *service) CreateRoom(uid int64, room *CreateRequest) (*RoomDB, error) {
 	a := &RoomDB{
-		UID:         int64(infor.UID),
-		Name:        infor.Name,
-		Description: infor.Description,
+		UID:         uid,
+		Name:        room.Name,
+		Description: room.Description,
 		CreatedAt:   time.Now(),
 	}
 
-	room, err := s.repo.Create(a)
+	r, err := s.repo.Create(a)
 	if err != nil {
 		return nil, err
 	}
-	return room, nil
+	return r, nil
 }

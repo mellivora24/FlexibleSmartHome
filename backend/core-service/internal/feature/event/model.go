@@ -18,7 +18,6 @@ func (EventDB) TableName() string {
 	return "tbl_events"
 }
 
-// Trả về cho API (JOIN tbl_device)
 type EventResponse struct {
 	ID         int64           `json:"id"`
 	UID        int64           `json:"uid"`
@@ -31,13 +30,6 @@ type EventResponse struct {
 type GetListResponse struct {
 	Total int64            `json:"total"`
 	List  []*EventResponse `json:"list"`
-}
-
-type CreateRequest struct {
-	UID     int64           `json:"uid"`
-	DID     int64           `json:"did"`
-	Action  string          `json:"action"`
-	Payload json.RawMessage `json:"payload"`
 }
 
 type GetListRequest struct {

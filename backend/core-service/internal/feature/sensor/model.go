@@ -20,13 +20,7 @@ func (SensorDB) TableName() string {
 	return "tbl_sensor"
 }
 
-type ListSensorRequest struct {
-	UID int `json:"uid"`
-	RID int `json:"rid"`
-}
-
 type CreateSensorRequest struct {
-	UID  int64  `json:"uid"`
 	MID  int64  `json:"mid"`
 	RID  int64  `json:"rid"`
 	Name string `json:"name"`
@@ -36,7 +30,6 @@ type CreateSensorRequest struct {
 
 type UpdateSensorRequest struct {
 	ID          int64  `json:"id"`
-	UID         int64  `json:"uid,omitempty"`
 	MID         int64  `json:"mid,omitempty"`
 	RID         int64  `json:"rid,omitempty"`
 	Name        string `json:"name,omitempty"`
@@ -44,4 +37,11 @@ type UpdateSensorRequest struct {
 	Port        int    `json:"port,omitempty"`
 	Status      bool   `json:"status,omitempty"`
 	RunningTime int    `json:"running_time,omitempty"`
+}
+
+type MQTTGetListSensor struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+	Port int    `json:"port"`
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type Service interface {
-	CreateMCU(mcu *CreateMCURequest) (*McuDB, error)
+	CreateMCU(uid int64, mcu *CreateMCURequest) (*McuDB, error)
 	FirmwareUpdate(mcu *FirmwareUpdateRequest) (*McuDB, error)
 	DeleteMCU(id int) error
 	GetAvailablePorts(mid int) ([]PortInfo, error)
@@ -22,14 +22,14 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) CreateMCU(mcu *CreateMCURequest) (*McuDB, error) {
+func (s *service) CreateMCU(uid int64, mcu *CreateMCURequest) (*McuDB, error) {
 	availablePorts := make(pq.Int64Array, 10) // TODO: de xem dung STM32 hay Arduino Nano
 	for i := int64(1); i <= 10; i++ {
 		availablePorts[i-1] = i
 	}
 
 	newMcu := &McuDB{
-		UID:             mcu.UID,
+		UID:             uid,
 		AvailablePort:   availablePorts,
 		FirmwareVersion: mcu.FirmwareVersion,
 		CreatedAt:       time.Now(),

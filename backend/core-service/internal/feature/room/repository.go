@@ -5,6 +5,7 @@ import "gorm.io/gorm"
 type Repository interface {
 	GetByID(id int64, uid int64) (*RoomDB, error)
 	Create(room *RoomDB) (*RoomDB, error)
+	GetList(uid int64) ([]RoomDB, error)
 }
 
 type repository struct {
@@ -28,4 +29,12 @@ func (r *repository) Create(room *RoomDB) (*RoomDB, error) {
 		return nil, err
 	}
 	return room, nil
+}
+
+func (r *repository) GetList(uid int64) ([]RoomDB, error) {
+	var rooms []RoomDB
+	if err := r.DB.Where("uid = ?", uid).Find(&rooms).Error; err != nil {
+		return nil, err
+	}
+	return rooms, nil
 }

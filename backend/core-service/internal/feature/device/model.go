@@ -36,7 +36,6 @@ type ListDeviceRequest struct {
 }
 
 type CreateDeviceRequest struct {
-	UID  int64  `json:"uid"`
 	MID  int64  `json:"mid"`
 	RID  int64  `json:"rid"`
 	Name string `json:"name"`
@@ -46,7 +45,6 @@ type CreateDeviceRequest struct {
 
 type UpdateDeviceRequest struct {
 	ID          int64           `json:"id"`
-	UID         int64           `json:"uid,omitempty"`
 	MID         int64           `json:"mid,omitempty"`
 	RID         int64           `json:"rid,omitempty"`
 	Name        string          `json:"name,omitempty"`
@@ -55,4 +53,13 @@ type UpdateDeviceRequest struct {
 	Status      bool            `json:"status,omitempty"`
 	Data        json.RawMessage `json:"data,omitempty"`
 	RunningTime int             `json:"running_time,omitempty"`
+}
+
+type MQTTGetDeviceData struct {
+	ID     int64           `json:"id"`
+	Name   string          `json:"name"`
+	Type   string          `json:"type"`
+	Port   int             `json:"port"`
+	Status bool            `json:"status"`
+	Data   json.RawMessage `json:"data"`
 }

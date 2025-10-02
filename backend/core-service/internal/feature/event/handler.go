@@ -2,6 +2,7 @@ package event
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +20,6 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	{
 		events.GET("/list", h.GetListEvents)
 		events.GET("/get", h.GetEvent)
-		events.POST("/create", h.CreateEvent)
 	}
 }
 
@@ -29,8 +29,15 @@ func (h *Handler) GetListEvents(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	uid := c.GetInt64("uid")
-	res, err := h.service.GetList(uid, &req)
+
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
+	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
+	res, err := h.service.GetList(intUid, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -44,24 +51,18 @@ func (h *Handler) GetEvent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	uid := c.GetInt64("uid")
-	event, err := h.service.GetOne(uid, &req)
+
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
+	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
+	event, err := h.service.GetOne(intUid, &req)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": event})
-}
-
-func (h *Handler) CreateEvent(c *gin.Context) {
-	var req CreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	if err := h.service.Create(req.UID, req.DID, req.Action, req.Payload); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusCreated, gin.H{"message": "event created"})
 }

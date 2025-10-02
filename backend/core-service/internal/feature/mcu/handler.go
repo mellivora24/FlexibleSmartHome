@@ -26,14 +26,23 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 }
 
 func (h *Handler) AssignMCU(c *gin.Context) {
+	uid := c.GetHeader("X-UID")
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		return
+	}
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
 	var req CreateMCURequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	res, err := h.service.CreateMCU(&req)
+	res, err := h.service.CreateMCU(intUid, &req)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
+
 	c.JSON(http.StatusCreated, gin.H{"data": res})
 }
 
@@ -46,6 +55,7 @@ func (h *Handler) FirmwareUpdate(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
+
 	c.JSON(http.StatusCreated, gin.H{"data": res})
 }
 

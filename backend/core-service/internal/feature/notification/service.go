@@ -7,7 +7,7 @@ import (
 
 type Service interface {
 	Create(uid int64, t string, message string, metadata json.RawMessage) error
-	GetList(cond *GetListRequest) (*GetListResponse, error)
+	GetList(uid int64, cond *GetListRequest) (*GetListResponse, error)
 	Update(id int) (*NotificationDB, error)
 }
 
@@ -32,8 +32,8 @@ func (s service) Create(uid int64, t string, message string, metadata json.RawMe
 	return s.repo.CreateNoti(noti)
 }
 
-func (s service) GetList(cond *GetListRequest) (*GetListResponse, error) {
-	notifications, total, err := s.repo.GetList(cond.UID, cond.Page, cond.Limit)
+func (s service) GetList(uid int64, cond *GetListRequest) (*GetListResponse, error) {
+	notifications, total, err := s.repo.GetList(uid, cond.Page, cond.Limit)
 	if err != nil {
 		return nil, err
 	}

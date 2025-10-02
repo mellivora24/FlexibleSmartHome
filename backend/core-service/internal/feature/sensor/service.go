@@ -5,10 +5,11 @@ import (
 )
 
 type Service interface {
-	ListSensors(cond *ListSensorRequest) ([]SensorDB, error)
-	CreateSensor(device *CreateSensorRequest) (*SensorDB, error)
-	UpdateSensor(device *UpdateSensorRequest) (*SensorDB, error)
+	ListSensors(uid int64) ([]SensorDB, error)
+	CreateSensor(uid int64, device *CreateSensorRequest) (*SensorDB, error)
+	UpdateSensor(uid int64, device *UpdateSensorRequest) (*SensorDB, error)
 	DeleteSensor(device *SensorDB) error
+	RealtimeGetListSensors(uid int64) ([]MQTTGetListSensor, error)
 }
 
 type service struct {
@@ -19,18 +20,17 @@ func NewService(repository Repository) Service {
 	return &service{repo: repository}
 }
 
-func (s *service) ListSensors(cond *ListSensorRequest) ([]SensorDB, error) {
-	uid, rid := int64(cond.UID), int64(cond.RID)
-	sensors, err := s.repo.GetList(uid, rid)
+func (s *service) ListSensors(uid int64) ([]SensorDB, error) {
+	sensors, err := s.repo.GetList(uid)
 	if err != nil {
 		return nil, err
 	}
 	return sensors, nil
 }
 
-func (s *service) CreateSensor(sensor *CreateSensorRequest) (*SensorDB, error) {
+func (s *service) CreateSensor(uid int64, sensor *CreateSensorRequest) (*SensorDB, error) {
 	x := &SensorDB{
-		UID:         sensor.UID,
+		UID:         uid,
 		MID:         sensor.MID,
 		RID:         sensor.RID,
 		Name:        sensor.Name,
@@ -43,14 +43,14 @@ func (s *service) CreateSensor(sensor *CreateSensorRequest) (*SensorDB, error) {
 	return s.repo.Create(x)
 }
 
-func (s *service) UpdateSensor(sensor *UpdateSensorRequest) (*SensorDB, error) {
+func (s *service) UpdateSensor(uid int64, sensor *UpdateSensorRequest) (*SensorDB, error) {
 	if sensor.ID == 0 {
 		return nil, errors.New("missing device ID")
 	}
 
 	x := &SensorDB{
 		ID:          sensor.ID,
-		UID:         sensor.UID,
+		UID:         uid,
 		MID:         sensor.MID,
 		RID:         sensor.RID,
 		Name:        sensor.Name,
@@ -68,4 +68,22 @@ func (s *service) DeleteSensor(sensor *SensorDB) error {
 		return err
 	}
 	return nil
+}
+
+func (s *service) RealtimeGetListSensors(uid int64) ([]MQTTGetListSensor, error) {
+	sensors, err := s.repo.GetList(uid)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []MQTTGetListSensor
+	for _, sensor := range sensors {
+		result = append(result, MQTTGetListSensor{
+			ID:   sensor.ID,
+			Name: sensor.Name,
+			Type: sensor.Type,
+			Port: sensor.Port,
+		})
+	}
+	return result, nil
 }

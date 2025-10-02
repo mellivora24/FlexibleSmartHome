@@ -9,8 +9,11 @@ VALUES
     (3, 1, 'Bếp', 'Phòng bếp')
 ON CONFLICT (id) DO NOTHING; -- Nếu ID đã tồn tại thì bỏ qua
 
-SELECT id, name FROM tbl_sensor;
+SELECT * FROM tbl_sensor;
 
 SELECT * FROM tbl_sensordata;
 
 SELECT * FROM pending_actions;
+
+SELECT * FROM tbl_device
+WHERE uid = 1;

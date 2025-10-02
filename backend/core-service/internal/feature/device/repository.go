@@ -1,11 +1,16 @@
 package device
 
-import "gorm.io/gorm"
+import (
+	"encoding/json"
+
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	GetList(uid int64) ([]DeviceDB, error)
 	Create(db *DeviceDB) (*DeviceDB, error)
 	Update(db *DeviceDB) (*DeviceDB, error)
+	UpdateStatusAndData(id int64, status bool, data json.RawMessage) error
 	Delete(id int64) error
 }
 
@@ -49,6 +54,18 @@ func (r *repository) Update(db *DeviceDB) (*DeviceDB, error) {
 
 func (r *repository) Delete(id int64) error {
 	if err := r.DB.Where("id = ?", id).Delete(&DeviceDB{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repository) UpdateStatusAndData(id int64, status bool, data json.RawMessage) error {
+	if err := r.DB.Model(&DeviceDB{}).
+		Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"status": status,
+			"data":   data,
+		}).Error; err != nil {
 		return err
 	}
 	return nil

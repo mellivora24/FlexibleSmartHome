@@ -10,15 +10,16 @@ import (
 	l "github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/log"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/mcu"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/notification"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/pendingActions"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/room"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensor"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensorData"
 
-	"github.com/mellivora24/flexiblesmarthome/core-service/internal/infra/database"
-	"github.com/mellivora24/flexiblesmarthome/core-service/internal/infra/mosquitto"
-	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/handler"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/service"
+
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/infra/database"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/infra/mosquitto"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/shared"
 )
 
@@ -49,6 +50,7 @@ func main() {
 	sensorRepo := sensor.NewSensorRepository(dbClient)
 	sensorDataRepo := sensorData.NewRepository(dbClient)
 	notificationRepo := notification.NewRepository(dbClient)
+	pendingActionsRepo := pendingActions.NewRepository(dbClient)
 
 	// Init services
 	logService := l.NewService(logRepo)
@@ -59,10 +61,19 @@ func main() {
 	deviceService := device.NewService(deviceRepo)
 	sensorDataService := sensorData.NewService(sensorDataRepo)
 	notificationService := notification.NewService(notificationRepo)
+	pendingActionsService := pendingActions.NewService(pendingActionsRepo)
 
-	manager := realtime.NewManager()
-	mqttService := service.NewMQTTService(mqttClient)
-	wsService := service.NewWebSocketService(manager)
+	coreService := service.NewCoreService(
+		logService,
+		eventService,
+		deviceService,
+		sensorService,
+		sensorDataService,
+		notificationService,
+		pendingActionsService,
+	)
+	wsService := service.NewWebSocketService()
+	mqttService := service.NewMQTTService(mqttClient, cfg.Mosquitto)
 
 	// Handlers
 	logHandler := l.NewHandler(logService)
@@ -74,8 +85,11 @@ func main() {
 	sensorDataHandler := sensorData.NewHandler(sensorDataService)
 	notificationHandler := notification.NewHandler(notificationService)
 
-	mqttHandler := handler.NewMQTTHandler(mqttService, sensorDataService, wsService)
-	mqttHandler.Init()
+	wsHandler := handler.WSHandler(wsService, mqttService)
+	mqttHandler := handler.NewMQTTHandler(mqttService, wsService, coreService)
+	if err := mqttHandler.Init(); err != nil {
+		log.Fatalf("cannot init mqtt handler: %v", err)
+	}
 
 	// Endpoint
 	router := gin.Default()
@@ -90,9 +104,8 @@ func main() {
 		sensorDataHandler.RegisterRoutes(api)
 		notificationHandler.RegisterRoutes(api)
 
-		// WebSocket
 		api.GET("/ws", func(c *gin.Context) {
-			handler.WSHandler(manager, mqttService, wsService, c.Writer, c.Request)
+			wsHandler(c.Writer, c.Request)
 		})
 	}
 

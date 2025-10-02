@@ -9,6 +9,7 @@ type Service interface {
 	ListDevices(cond *ListDeviceRequest) ([]DeviceDB, error)
 	CreateDevice(device *CreateDeviceRequest) (*DeviceDB, error)
 	UpdateDevice(device *UpdateDeviceRequest) (*DeviceDB, error)
+	UpdateDeviceStatusAndData(id int64, status bool, data json.RawMessage) error
 	DeleteDevice(device *DeviceDB) error
 }
 
@@ -64,6 +65,10 @@ func (s *service) UpdateDevice(device *UpdateDeviceRequest) (*DeviceDB, error) {
 	}
 
 	return s.repo.Update(db)
+}
+
+func (s *service) UpdateDeviceStatusAndData(id int64, status bool, data json.RawMessage) error {
+	return s.repo.UpdateStatusAndData(id, status, data)
 }
 
 func (s *service) DeleteDevice(device *DeviceDB) error {

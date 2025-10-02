@@ -5,6 +5,7 @@ import "gorm.io/gorm"
 type Repository interface {
 	Create(mcu *McuDB) (*McuDB, error)
 	Delete(id int64) error
+	FindByUID(uid string) (int64, error)
 
 	UpdateFirmware(id int64, firmwareVersion string) (*McuDB, error)
 	AvailablePort(mid int64) ([]PortInfo, error)
@@ -55,4 +56,12 @@ func (r *repository) AvailablePort(mid int64) ([]PortInfo, error) {
 		return nil, err
 	}
 	return ports, nil
+}
+
+func (r *repository) FindByUID(uid string) (int64, error) {
+	mcu := &McuDB{}
+	if err := r.DB.Where("uid = ?", uid).First(mcu).Error; err != nil {
+		return -1, err
+	}
+	return mcu.UID, nil
 }

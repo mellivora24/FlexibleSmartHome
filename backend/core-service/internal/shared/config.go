@@ -18,11 +18,16 @@ type DB_CONFIG struct {
 }
 
 type MQTT_CONFIG struct {
-	HOST      string `mapstructure:"host"`
-	PORT      string `mapstructure:"port"`
-	USERNAME  string `mapstructure:"username"`
-	PASSWORD  string `mapstructure:"password"`
-	CLIENT_ID string `mapstructure:"client_id"`
+	HOST                   string `mapstructure:"host"`
+	PORT                   string `mapstructure:"port"`
+	USERNAME               string `mapstructure:"username"`
+	PASSWORD               string `mapstructure:"password"`
+	CLIENT_ID              string `mapstructure:"client_id"`
+	CONFIG_TOPIC           string `mapstructure:"config_topic"`
+	FIRMWARE_TOPIC         string `mapstructure:"firmware_topic"`
+	DATA_TOPIC             string `mapstructure:"data_topic"`
+	CONTROL_TOPIC          string `mapstructure:"control_topic"`
+	CONTROL_RESPONSE_TOPIC string `mapstructure:"control_response_topic"`
 }
 
 type SERVER_CONFIG struct {

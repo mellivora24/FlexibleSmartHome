@@ -96,16 +96,14 @@ CREATE TABLE IF NOT EXISTS tbl_notification (
 
 CREATE TABLE IF NOT EXISTS pending_actions (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
-    mcu_id INT NOT NULL,
+    uid INT NOT NULL,
+    mid INT NOT NULL,
     action VARCHAR(100) NOT NULL,
-    payload TEXT,
     status VARCHAR(50) DEFAULT 'pending',
-    feedback TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES tbl_mcu(uid) ON DELETE CASCADE,
-    FOREIGN KEY (mcu_id) REFERENCES tbl_mcu(id) ON DELETE CASCADE
+    FOREIGN KEY (uid) REFERENCES tbl_mcu(uid) ON DELETE CASCADE,
+    FOREIGN KEY (mid) REFERENCES tbl_mcu(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_log_uid ON tbl_log(uid);
@@ -242,3 +240,6 @@ BEGIN
         WHERE d.mid = mcu_id AND d.port IS NOT NULL;
 END;
 $$ LANGUAGE plpgsql;
+
+
+SELECT * FROM tbl_sensordata;

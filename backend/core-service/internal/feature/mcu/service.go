@@ -11,6 +11,7 @@ type Service interface {
 	FirmwareUpdate(mcu *FirmwareUpdateRequest) (*McuDB, error)
 	DeleteMCU(id int) error
 	GetAvailablePorts(mid int) ([]PortInfo, error)
+	GetMcuByUID(uid string) (int64, error)
 }
 
 type service struct {
@@ -60,4 +61,9 @@ func (s *service) GetAvailablePorts(mid int) ([]PortInfo, error) {
 		return nil, err
 	}
 	return ports, nil
+}
+
+func (s *service) GetMcuByUID(uid string) (int64, error) {
+	mcuId, _ := s.repo.FindByUID(uid)
+	return mcuId, nil
 }

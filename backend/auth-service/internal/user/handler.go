@@ -40,7 +40,11 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	res, err := h.service.GetAllUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get users"})
+		return
+	}
+	if len(res) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "no users found"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
@@ -50,7 +54,8 @@ func (h *Handler) GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.service.GetUserByID(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
@@ -63,19 +68,30 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	}
 	res, err := h.service.CreateUser(&userCreate)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if strings.Contains(err.Error(), "duplicate") {
+			c.JSON(http.StatusConflict, gin.H{"error": "user already exists"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't create user"})
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusCreated, gin.H{"data": res})
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
 	var userUpdate UpdateRequest
 	if err := c.ShouldBindJSON(&userUpdate); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	res, err := h.service.UpdateUser(&userUpdate)
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
@@ -85,7 +101,12 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 	userDelete := DeleteRequest{Email: email}
 	res, err := h.service.DeleteUser(&userDelete)
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
@@ -94,10 +115,16 @@ func (h *Handler) Login(c *gin.Context) {
 	var userLogin LoginRequest
 	if err := c.ShouldBindJSON(&userLogin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	res, err := h.service.Login(&userLogin)
 	if err != nil {
+		if strings.Contains(err.Error(), "invalid credentials") {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
@@ -106,6 +133,11 @@ func (h *Handler) ListActions(c *gin.Context) {
 	res, err := h.service.ListActions(c.Param("uid"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if len(res) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "no actions found"})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
@@ -126,7 +158,11 @@ func (h *Handler) VerifyToken(c *gin.Context) {
 
 	res, err := h.service.VerifyToken(token)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if strings.Contains(err.Error(), "expired") {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "token expired"})
+			return
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 		return
 	}
 

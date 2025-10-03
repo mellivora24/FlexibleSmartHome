@@ -38,11 +38,14 @@ services:
     container_name: core_service
     env_file:
       - .env
+    environment:
+      - CORE_DB_NAME=${CORE_DB_NAME}
+      - CORE_DB_USER=${CORE_DB_USER}
+      - CORE_DB_PASS=${CORE_DB_PASS}
+      - MQTT_BROKER_USER=${MQTT_BROKER_USER}
+      - MQTT_BROKER_PASS=${MQTT_BROKER_PASS}
     ports:
-      - "8082:8082"
-    depends_on:
-      - core-db
-      - mqtt-broker
+      - "127.0.0.1:8082:8082"
     restart: unless-stopped
 
   core-db:
@@ -54,21 +57,15 @@ services:
       POSTGRES_PASSWORD: ${CORE_DB_PASS}
     ports:
       - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CORE_DB_USER} -d ${CORE_DB_NAME}"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
     volumes:
       - core_db_data:/var/lib/postgresql/data
     restart: unless-stopped
 
-  gateway:
-    build:
-      context: ../gateway
-      dockerfile: Dockerfile
-    container_name: gateway
-    ports:
-      - "8080:8080"
-    depends_on:
-      - auth-service
-      - core-service
-    restart: unless-stopped
 
   mqtt-broker:
     image: eclipse-mosquitto:2.0
@@ -81,6 +78,18 @@ services:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/mqtt_init.sh:/mqtt_init.sh
     entrypoint: ["/mqtt_init.sh"]
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: ../gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - core-service
     restart: unless-stopped
 
 volumes:

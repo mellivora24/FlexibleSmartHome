@@ -1,7 +1,6 @@
 package shared
 
 import (
-	"log"
 	"os"
 	"strings"
 
@@ -30,9 +29,7 @@ type APP_CONFIG struct {
 }
 
 func LoadConfig() (*APP_CONFIG, error) {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, skip...")
-	}
+	_ = godotenv.Load()
 
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")

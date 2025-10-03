@@ -1,12 +1,12 @@
 database:
-  host: ${AUTH_DB_HOST}
-  port: ${AUTH_DB_PORT}
+  host: auth_db
+  port: 5432
   database: ${AUTH_DB_NAME}
   password: ${AUTH_DB_PASS}
   username: ${AUTH_DB_USER}
 
 server:
-  host: ${SERVER_HOST}
+  host: 0.0.0.0
   port: 8081
   base_path: api/v1/auth
   jwt_secret: ${JWT_SECRET}

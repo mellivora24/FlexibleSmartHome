@@ -1,12 +1,12 @@
 database:
-  host: localhost
-  port: 5434
+  host: core_db
+  port: 5432
   username: ${CORE_DB_USER}
   password: ${CORE_DB_PASS}
   database: ${CORE_DB_NAME}
 
 mosquitto:
-  host: localhost
+  host: mqtt_broker
   port: 1883
   username: ${MQTT_BROKER_USER}
   password: ${MQTT_BROKER_PASS}
@@ -18,7 +18,7 @@ mosquitto:
   control_response_topic: user/+/mcu/+/control/response
 
 server:
-  host: localhost
+  host: 0.0.0.0
   port: 8082
   base_path: api/v1/core
   ws_port: ":8080"

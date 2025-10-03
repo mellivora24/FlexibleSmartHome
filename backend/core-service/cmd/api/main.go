@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/device"
@@ -106,6 +107,10 @@ func main() {
 
 		api.GET("/ws", func(c *gin.Context) {
 			wsHandler(c.Writer, c.Request)
+		})
+
+		api.GET("/health", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"status": "healthy"})
 		})
 	}
 

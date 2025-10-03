@@ -1,7 +1,7 @@
 package shared
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"strings"
 
@@ -50,31 +50,28 @@ type APP_CONFIG struct {
 }
 
 func LoadConfig() (*APP_CONFIG, error) {
-	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
-		return nil, nil
-	}
+	_ = godotenv.Load()
 
 	viper.AutomaticEnv()
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath("./internal/config/")
+	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read config: %w", err)
 	}
 
 	for _, key := range viper.AllKeys() {
 		val := viper.GetString(key)
 		if strings.Contains(val, "${") {
-			expandedVal := os.ExpandEnv(val)
-			viper.Set(key, expandedVal)
+			viper.Set(key, os.ExpandEnv(val))
 		}
 	}
 
 	cfg := &APP_CONFIG{}
 	if err := viper.Unmarshal(cfg); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
 	return cfg, nil

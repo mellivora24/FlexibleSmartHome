@@ -26,7 +26,7 @@ func NewAuthProxy(authServiceURL string) *AuthProxy {
 }
 
 func (p *AuthProxy) ProxyRequest(c *gin.Context) {
-	path := strings.TrimPrefix(c.Request.URL.Path, "/api/v1/gateway/auth")
+	path := strings.TrimPrefix(c.Request.URL.Path, "/api/v1/auth")
 	if path == "" {
 		path = "/"
 	}

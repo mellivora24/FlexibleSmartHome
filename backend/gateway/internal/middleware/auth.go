@@ -33,7 +33,7 @@ func AuthMiddleware(authService auth.Service) gin.HandlerFunc {
 		// Call auth service verify token API
 		authResp, err := authService.VerifyToken(token)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "can't authenticate token"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "can't authenticate token", "details": err.Error()})
 			c.Abort()
 			return
 		}

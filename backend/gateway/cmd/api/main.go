@@ -19,7 +19,7 @@ func main() {
 
 	authToken := auth.NewService(cfg.AuthService.VerifyPath)
 	authProxy := proxy.NewAuthProxy(cfg.AuthService.BasePath)
-	//coreProxy := proxy.NewCoreProxy(cfg.CoreService.URL)
+	coreProxy := proxy.NewCoreProxy(cfg.CoreService.URL, cfg.CoreService.WS_URL)
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
@@ -53,15 +53,12 @@ func main() {
 			})
 		})
 
-		//core := protected.Group("/core")
-		//{
-		//	core.Any("/*path", coreProxy.ProxyRequest)
-		//}
+		api.GET("/ws", coreProxy.ProxyWebSocket)
 
-		//ws := protected.Group("/ws")
-		//{
-		//	ws.GET("/gateway", coreProxy.ProxyWebSocket)
-		//}
+		coreGroup := api.Group("/core")
+		{
+			coreGroup.Any("/*path", coreProxy.ProxyRequest)
+		}
 	}
 
 	serverAddr := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)

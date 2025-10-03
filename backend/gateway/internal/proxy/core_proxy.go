@@ -5,55 +5,59 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 type CoreProxy struct {
-	coreServiceURL string
-	httpClient     *http.Client
+	coreServiceURL   string
+	coreServiceWSURL string
+	httpClient       *http.Client
 }
 
-func NewCoreProxy(coreServiceURL string) *CoreProxy {
+func NewCoreProxy(coreServiceURL string, coreServiceWSURL string) *CoreProxy {
 	return &CoreProxy{
-		coreServiceURL: coreServiceURL,
+		coreServiceURL:   coreServiceURL,
+		coreServiceWSURL: coreServiceWSURL,
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
 	}
 }
 
-// ProxyRequest forwards the request to core service
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true // TODO: kiểm soát origin
+	},
+}
+
 func (p *CoreProxy) ProxyRequest(c *gin.Context) {
-	// Get the path after /api/v1/gateway/core
-	path := strings.TrimPrefix(c.Request.URL.Path, "/api/v1/gateway/core")
+	path := strings.TrimPrefix(c.Request.URL.Path, "/api/v1/core")
 	if path == "" {
 		path = "/"
 	}
 
-	// Build the target URL
 	targetURL := p.coreServiceURL + path
 	if c.Request.URL.RawQuery != "" {
 		targetURL += "?" + c.Request.URL.RawQuery
 	}
 
-	// Create the request
 	req, err := http.NewRequest(c.Request.Method, targetURL, c.Request.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
 		return
 	}
 
-	// Copy headers
 	for key, values := range c.Request.Header {
 		for _, value := range values {
 			req.Header.Add(key, value)
 		}
 	}
 
-	// Add user information from context to headers for core service
 	if userID, exists := c.Get("user_id"); exists {
 		req.Header.Set("X-User-ID", fmt.Sprintf("%v", userID))
 	}
@@ -61,7 +65,6 @@ func (p *CoreProxy) ProxyRequest(c *gin.Context) {
 		req.Header.Set("X-MID", fmt.Sprintf("%v", mid))
 	}
 
-	// Make the request
 	resp, err := p.httpClient.Do(req)
 	if err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Core service unavailable"})
@@ -74,17 +77,14 @@ func (p *CoreProxy) ProxyRequest(c *gin.Context) {
 		}
 	}(resp.Body)
 
-	// Copy response headers
 	for key, values := range resp.Header {
 		for _, value := range values {
 			c.Header(key, value)
 		}
 	}
 
-	// Set status code
 	c.Status(resp.StatusCode)
 
-	// Copy response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read response"})
@@ -94,75 +94,64 @@ func (p *CoreProxy) ProxyRequest(c *gin.Context) {
 	c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
 }
 
-// ProxyWebSocket handles WebSocket connections to core service
 func (p *CoreProxy) ProxyWebSocket(c *gin.Context) {
-	// For WebSocket connections, we need to handle the upgrade differently
-	// This is a simplified implementation - in production, you might want to use
-	// a proper WebSocket proxy library
+	uid, _ := c.Get("user_id")
+	mid, _ := c.Get("mid")
 
-	// Get the path after /api/v1/gateway/ws
-	path := strings.TrimPrefix(c.Request.URL.Path, "/api/v1/gateway/ws")
-	if path == "" {
-		path = "/"
-	}
-
-	// Build the target URL for core service WebSocket
-	targetURL := p.coreServiceURL + "/realtime" + path
+	targetURL := fmt.Sprintf("%s/ws?uid=%v&mid=%v", p.coreServiceWSURL, uid, mid)
 	if c.Request.URL.RawQuery != "" {
-		targetURL += "?" + c.Request.URL.RawQuery
+		targetURL += "&" + c.Request.URL.RawQuery
 	}
 
-	// Create the request
-	req, err := http.NewRequest(c.Request.Method, targetURL, c.Request.Body)
+	fmt.Println("Connecting to core WebSocket at:", targetURL)
+
+	clientConn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
+		http.Error(c.Writer, "Failed to upgrade client connection", http.StatusBadRequest)
 		return
 	}
+	defer clientConn.Close()
 
-	// Copy headers
-	for key, values := range c.Request.Header {
-		for _, value := range values {
-			req.Header.Add(key, value)
-		}
-	}
-
-	// Add user information from context to headers for core service
-	if userID, exists := c.Get("user_id"); exists {
-		req.Header.Set("X-User-ID", fmt.Sprintf("%v", userID))
-	}
-	if mid, exists := c.Get("mid"); exists {
-		req.Header.Set("X-MID", fmt.Sprintf("%v", mid))
-	}
-
-	// Make the request
-	resp, err := p.httpClient.Do(req)
+	u, _ := url.Parse(targetURL)
+	coreConn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Core service unavailable"})
+		_ = clientConn.WriteMessage(websocket.CloseMessage,
+			websocket.FormatCloseMessage(websocket.CloseInternalServerErr, "Failed to connect core service"))
 		return
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Print("Failed to close response body")
+	defer coreConn.Close()
+
+	errc := make(chan error, 2)
+
+	go func() {
+		for {
+			mt, msg, err := clientConn.ReadMessage()
+			if err != nil {
+				errc <- err
+				return
+			}
+			err = coreConn.WriteMessage(mt, msg)
+			if err != nil {
+				errc <- err
+				return
+			}
 		}
-	}(resp.Body)
+	}()
 
-	// Copy response headers
-	for key, values := range resp.Header {
-		for _, value := range values {
-			c.Header(key, value)
+	go func() {
+		for {
+			mt, msg, err := coreConn.ReadMessage()
+			if err != nil {
+				errc <- err
+				return
+			}
+			err = clientConn.WriteMessage(mt, msg)
+			if err != nil {
+				errc <- err
+				return
+			}
 		}
-	}
+	}()
 
-	// Set status code
-	c.Status(resp.StatusCode)
-
-	// Copy response body
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read response"})
-		return
-	}
-
-	c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
+	<-errc
 }

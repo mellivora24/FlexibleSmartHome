@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/mellivora24/flexiblesmarthome/gateway/internal/shared"
@@ -35,27 +33,18 @@ func (s *service) VerifyToken(token string) (*VerifyTokenResponse, error) {
 		return nil, shared.ErrInvalidInput
 	}
 
-	u, _ := url.Parse(s.authServiceURL)
-	q := u.Query()
-	q.Set("token", token)
-	u.RawQuery = q.Encode()
-
-	req, err := http.NewRequest("POST", u.String(), nil)
+	req, err := http.NewRequest("POST", s.authServiceURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to call auth service: %w", err)
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Print("failed to close response body")
-			return
-		}
-	}(resp.Body)
+	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -63,7 +52,6 @@ func (s *service) VerifyToken(token string) (*VerifyTokenResponse, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		//log.Print("Error when verifying token: status not ok")
 		return nil, shared.ErrUnauthorized
 	}
 
@@ -76,7 +64,6 @@ func (s *service) VerifyToken(token string) (*VerifyTokenResponse, error) {
 	}
 
 	if !authResp.Data.IsValid {
-		//log.Print("Token is invalid")
 		return nil, shared.ErrUnauthorized
 	}
 

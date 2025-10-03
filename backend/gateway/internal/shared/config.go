@@ -23,7 +23,8 @@ type AuthServiceConfig struct {
 }
 
 type CoreServiceConfig struct {
-	URL string `mapstructure:"url"`
+	URL    string `mapstructure:"url"`
+	WS_URL string `mapstructure:"ws_url"`
 }
 
 type CORSConfig struct {

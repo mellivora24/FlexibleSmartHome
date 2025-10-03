@@ -16,45 +16,86 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
-	room := rg.Group("/room")
+	rooms := rg.Group("/rooms")
 	{
-		room.GET("/infor", h.GetRoom)
-		room.POST("/create", h.CreateRoom)
+		rooms.GET("/", h.GetRoom)
+		rooms.POST("/", h.CreateRoom)
 	}
 }
 
 func (h *Handler) GetRoom(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
 	if uid == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "missing X-UID header",
+		})
 		return
 	}
-	intUid, _ := strconv.ParseInt(uid, 10, 64)
+
+	intUid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid X-UID",
+		})
+		return
+	}
 
 	room, err := h.service.GetRoom(intUid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": room})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    room,
+	})
 }
 
 func (h *Handler) CreateRoom(c *gin.Context) {
-	var room CreateRequest
-	if err := c.ShouldBindJSON(&room); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req CreateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
 	}
 
 	uid := c.GetHeader("X-UID")
 	if uid == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "missing X-UID header",
+		})
 		return
 	}
-	intUid, _ := strconv.ParseInt(uid, 10, 64)
 
-	r, err := h.service.CreateRoom(intUid, &room)
+	intUid, err := strconv.ParseInt(uid, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid X-UID",
+		})
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": r})
+
+	r, err := h.service.CreateRoom(intUid, &req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"data":    r,
+	})
 }

@@ -18,8 +18,8 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	events := rg.Group("/events")
 	{
-		events.GET("/list", h.GetListEvents)
-		events.GET("/get", h.GetEvent)
+		events.GET("/", h.GetListEvents)
+		events.GET("/:id", h.GetEvent)
 	}
 }
 
@@ -35,14 +35,23 @@ func (h *Handler) GetListEvents(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
 		return
 	}
-	intUid, _ := strconv.ParseInt(uid, 10, 64)
+	intUid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid X-UID"})
+		return
+	}
 
 	res, err := h.service.GetList(intUid, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	if res.Total == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "no events found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) GetEvent(c *gin.Context) {
@@ -57,12 +66,17 @@ func (h *Handler) GetEvent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
 		return
 	}
-	intUid, _ := strconv.ParseInt(uid, 10, 64)
+	intUid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid X-UID"})
+		return
+	}
 
 	event, err := h.service.GetOne(intUid, &req)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": "event not found"})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"data": event})
 }

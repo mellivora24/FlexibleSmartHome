@@ -16,69 +16,127 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
-	mcu := rg.Group("/mcus")
+	mcus := rg.Group("/mcus")
 	{
-		mcu.POST("/create", h.AssignMCU)
-		mcu.DELETE("/delete/:id", h.DeleteMCU)
-		mcu.PUT("/firmwareUpdate", h.FirmwareUpdate)
-		mcu.GET("/availablePorts/:id", h.AvailablePort)
+		mcus.POST("/", h.AssignMCU)
+		mcus.DELETE("/:id", h.DeleteMCU)
+		mcus.PUT("/:id/firmware", h.FirmwareUpdate)
+		mcus.GET("/:id/available-ports", h.AvailablePort)
 	}
 }
 
 func (h *Handler) AssignMCU(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
 	if uid == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "missing X-UID header",
+		})
 		return
 	}
-	intUid, _ := strconv.ParseInt(uid, 10, 64)
+	intUid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid X-UID",
+		})
+		return
+	}
 
 	var req CreateMCURequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
 	}
+
 	res, err := h.service.CreateMCU(intUid, &req)
-
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": res})
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }
 
 func (h *Handler) FirmwareUpdate(c *gin.Context) {
 	var req FirmwareUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	res, err := h.service.FirmwareUpdate(&req)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": res})
+	res, err := h.service.FirmwareUpdate(&req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }
 
 func (h *Handler) DeleteMCU(c *gin.Context) {
 	mid, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid MCU id",
+		})
+		return
 	}
+
 	if err := h.service.DeleteMCU(mid); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
 	}
-	c.JSON(http.StatusNoContent, gin.H{"data": true})
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    true,
+	})
 }
 
 func (h *Handler) AvailablePort(c *gin.Context) {
 	mid, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid MCU id",
+		})
+		return
 	}
 
 	ports, err := h.service.GetAvailablePorts(mid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": ports})
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    ports,
+	})
 }

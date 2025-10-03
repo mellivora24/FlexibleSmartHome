@@ -3,6 +3,7 @@ package device
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,10 +19,10 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	devices := rg.Group("/devices")
 	{
-		devices.GET("/all", h.ListDevices)
-		devices.POST("/create", h.CreateDevice)
-		devices.PUT("/update", h.UpdateDevice)
-		devices.DELETE("/:id", h.DeleteDevice)
+		devices.GET("/", h.ListDevices)        // GET /devices?uid=...
+		devices.POST("/", h.CreateDevice)      // POST /devices
+		devices.PUT("/:id", h.UpdateDevice)    // PUT /devices/:id
+		devices.DELETE("/:id", h.DeleteDevice) // DELETE /devices/:id
 	}
 }
 
@@ -31,11 +32,19 @@ func (h *Handler) ListDevices(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
 		return
 	}
-	intUid, _ := strconv.ParseInt(uid, 10, 64)
+	intUid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid X-UID"})
+		return
+	}
 
 	res, err := h.service.ListDevices(intUid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if len(res) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "no devices found"})
 		return
 	}
 
@@ -48,7 +57,11 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
 		return
 	}
-	intUid, _ := strconv.ParseInt(uid, 10, 64)
+	intUid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid X-UID"})
+		return
+	}
 
 	var device CreateDeviceRequest
 	if err := c.ShouldBindJSON(&device); err != nil {
@@ -58,10 +71,15 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 
 	res, err := h.service.CreateDevice(intUid, &device)
 	if err != nil {
+		if strings.Contains(err.Error(), "duplicate") {
+			c.JSON(http.StatusConflict, gin.H{"error": "device already exists"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+
+	c.JSON(http.StatusCreated, gin.H{"data": res})
 }
 
 func (h *Handler) UpdateDevice(c *gin.Context) {
@@ -70,31 +88,52 @@ func (h *Handler) UpdateDevice(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
 		return
 	}
-	intUid, _ := strconv.ParseInt(uid, 10, 64)
+	intUid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid X-UID"})
+		return
+	}
 
 	var device UpdateDeviceRequest
 	if err := c.ShouldBindJSON(&device); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	res, err := h.service.UpdateDevice(intUid, &device)
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
 func (h *Handler) DeleteDevice(c *gin.Context) {
-	var device DeviceDB
-	if err := c.ShouldBindJSON(&device); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing device id"})
 		return
 	}
 
-	if err := h.service.DeleteDevice(&device); err != nil {
+	intId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid device id"})
+		return
+	}
+
+	if err := h.service.DeleteDevice(intId); err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": true})
+
+	c.JSON(http.StatusNoContent, nil)
 }

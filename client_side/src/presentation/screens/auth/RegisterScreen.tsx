@@ -2,7 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Image, KeyboardAvoidingView, ScrollView, Text } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, ScrollView, Text } from "react-native";
 
 import { FlexButton } from "@components/FlexButton";
 import { PasswordTextField } from "@components/PasswordTextField";
@@ -11,6 +11,7 @@ import { ICONS, IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./authStyle";
+import { useAuthViewModel } from "./AuthViewModel";
 
 export default function RegisterScreen() {
     const { t } = useTranslation();
@@ -19,17 +20,22 @@ export default function RegisterScreen() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [deviceId, setDeviceId] = useState("");
+
+    const { register } = useAuthViewModel();
+
+    async function handleRegister() {
+        const mid = parseInt(deviceId, 10);
+        try {
+            await register({ mid, name, email, password });
+            router.replace(ROUTES.TABS.DASHBOARD);
+        } catch (error) {
+            Alert.alert("Registration Error", (error as Error).message);
+        }
+    }
 
     function handleLogin() {
         router.replace(ROUTES.AUTH.LOGIN);
-    }
-
-    function handleRegister() {
-        console.log("Registering with", name, email, password);
-        
-        // TODO: Implement registration logic here
-
-        router.replace(ROUTES.AUTH.ONBOARDING);
     }
 
     return (
@@ -75,6 +81,14 @@ export default function RegisterScreen() {
                         icon={ICONS.PASSWORD}
                         placeholder={t("auth.register.passwordPlaceholder")}
                         onChangeText={setPassword}
+                    />
+
+                    <TextField
+                        label={t("auth.register.deviceId")}
+                        icon={ICONS.DEVICE}
+                        placeholder={t("auth.register.deviceIdPlaceholder")}
+                        secureTextEntry={false}
+                        onChangeText={setDeviceId}
                     />
 
                     <Text style={style.text}>

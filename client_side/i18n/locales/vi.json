@@ -31,7 +31,9 @@
       "haveAccount": "Bạn đã có tài khoản? ",
       "loginLink": "Đăng nhập",
       "buttonHide": "Ẩn",
-      "buttonShow": "Hiện"
+      "buttonShow": "Hiện",
+      "deviceId": "ID Thiết Bị",
+      "deviceIdPlaceholder": "Nhập ID thiết bị của bạn..."
     },
     "onboarding": {
       "title": "Hãy tiến hành thiết lập thiết bị của bạn!",

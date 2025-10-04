@@ -4,6 +4,7 @@ export default [
       'import/resolver': {
         alias: {
           map: [
+            ['@env', './'],
             ['@app', './app'],
             ['@src', './src'],
             ['@assets', './assets'],
@@ -15,7 +16,7 @@ export default [
             ['@usecase', './src/domain/usecase'],
 
             ['@presentation', './src/presentation'],
-            ['@i18n', './src/presentation/shared/i18n'],
+            ['@i18n', './i18n'],
             ['@theme', './src/presentation/shared/theme'],
             ['@hooks', './src/presentation/shared/hooks'],
             ['@shared', './src/presentation/shared'],

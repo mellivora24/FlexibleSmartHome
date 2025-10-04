@@ -9,7 +9,7 @@ import { TextField } from "@components/TextField";
 import { ICONS, IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
 import { BACKGROUND } from "@theme/colors";
-import { style } from "./auth";
+import { style } from "./authStyle";
 
 export default function OnboardScreen() {
     const { t } = useTranslation();

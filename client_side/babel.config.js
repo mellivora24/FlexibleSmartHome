@@ -20,7 +20,7 @@ module.exports = function (api) {
             "@usecase/*": "./src/domain/usecase/*",
 
             "@presentation/*": "./src/presentation/*",
-            "@i18n/*": "./src/presentation/shared/i18n/*",
+            "@i18n/*": "./i18n/*",
             "@theme/*": "./src/presentation/shared/theme/*",
             "@hooks/*": "./src/presentation/shared/hooks/*",
             "@shared/*": "./src/presentation/shared/*",
@@ -28,6 +28,17 @@ module.exports = function (api) {
             "@constants/*": "./src/presentation/shared/constants/*",
             "@components/*": "./src/presentation/shared/components/*",
           },
+        },
+      ],
+      [
+        "module:react-native-dotenv",
+        {
+          moduleName: "@env",
+          path: ".env",
+          blocklist: null,
+          allowlist: null,
+          safe: false,
+          allowUndefined: true,
         },
       ],
     ],

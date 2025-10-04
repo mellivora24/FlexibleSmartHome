@@ -51,4 +51,13 @@ export const style = StyleSheet.create({
     maxWidth: 300,
     textAlign: "center",
   },
+  error: {
+    color: '#ff3333',
+    fontSize: 14,
+    fontFamily: "inter-regular",
+    fontWeight: "500",
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+    marginLeft: 42,
+  },
 });

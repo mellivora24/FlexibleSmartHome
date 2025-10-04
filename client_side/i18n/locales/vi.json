@@ -2,7 +2,7 @@
   "welcome": {
     "title": "Flexible Smart Home",
     "subtitle": "Làm cho ngôi nhà của bạn thông minh hơn!",
-    "getStarted": "Khám phá ngay",
+    "getStarted": "Khám phá ngay"
   },
   "auth": {
     "login": {
@@ -40,14 +40,14 @@
       "devicePin": "Mã PIN Thiết Bị",
       "devicePinPlaceholder": "Nhập mã PIN thiết bị của bạn...",
       "button": "Hoàn tất",
-      "tip": "Mẹo: Bạn có thể tìm thấy ID và mã PIN thiết bị trên nhãn dán của thiết bị.",
-    },
+      "tip": "Mẹo: Bạn có thể tìm thấy ID và mã PIN thiết bị trên nhãn dán của thiết bị."
+    }
   },
   "accountWidget": {
     "greeting": {
       "morning": "Chào buổi sáng, ",
       "afternoon": "Chào buổi chiều, ",
-      "evening": "Chào buổi tối, ",
+      "evening": "Chào buổi tối, "
     }
   },
   "dashboard": {
@@ -57,10 +57,10 @@
       "cloudy": "Có mây"
     },
     "temperatureWidget": {
-      "title": "Nhiệt độ phòng",
+      "title": "Nhiệt độ phòng"
     },
     "humidityWidget": {
-      "title": "Độ ẩm phòng",
+      "title": "Độ ẩm phòng"
     },
     "chartWidget": {
       "title": "Biểu đồ nhiệt độ và độ ẩm",
@@ -77,11 +77,11 @@
       "message": "Chưa có thiết bị nào được kết nối."
     },
     "tips": {
-      "tapToControl": "Nhấn để bật/tắt.",
+      "tapToControl": "Nhấn để bật/tắt."
     },
     "status": {
       "high": "Phát hiện",
-      "low": "Không phát hiện",
+      "low": "Không phát hiện"
     }
   },
   "deviceList": {
@@ -131,5 +131,18 @@
       "timeRange": "Thời gian",
       "device": "Thiết bị"
     }
+  },
+  "errors": {
+    "network": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
+    "unauthorized": "Tài khoản hoặc mật khẩu không đúng.",
+    "forbidden": "Bạn không có quyền truy cập tài nguyên này.",
+    "notFound": "Không tìm thấy tài nguyên yêu cầu.",
+    "server": "Lỗi máy chủ. Vui lòng thử lại sau.",
+    "timeout": "Yêu cầu đã hết thời gian chờ. Vui lòng thử lại.",
+    "unknown": "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+    "validation": "Dữ liệu không hợp lệ. Vui lòng kiểm tra và thử lại.",
+    "badRequest": "Yêu cầu không hợp lệ. Vui lòng kiểm tra và thử lại.",
+    "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "missingFields": "Vui lòng nhập đủ thông tin."
   }
 }

@@ -5,29 +5,24 @@
       "@app/*": ["app/*"],
       "@src/*": ["src/*"],
       "@assets/*": ["assets/*"],
-      
+
       "@infra/*": ["src/infra/*"],
-      
       "@domain/*": ["src/domain/*"],
       "@model/*": ["src/domain/model/*"],
       "@usecase/*": ["src/domain/usecase/*"],
-      
+
       "@presentation/*": ["src/presentation/*"],
-      "@i18n/*": ["src/presentation/shared/i18n/*"],
+      "@i18n": ["i18n/index"],
+      "@i18n/*": ["i18n/*"],
+
       "@theme/*": ["src/presentation/shared/theme/*"],
       "@hooks/*": ["src/presentation/shared/hooks/*"],
       "@shared/*": ["src/presentation/shared/*"],
       "@screens/*": ["src/presentation/screens/*"],
       "@constants/*": ["src/presentation/shared/constants/*"],
-      "@components/*": ["src/presentation/shared/components/*"],
+      "@components/*": ["src/presentation/shared/components/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "*.d.ts"
-  ],
+  "include": ["src", "i18n", "app", ".expo/types/**/*.ts", "expo-env.d.ts", "env.d.ts", "app.config.js", "*.ts"],
   "extends": "expo/tsconfig.base"
 }

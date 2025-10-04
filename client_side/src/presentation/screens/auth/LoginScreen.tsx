@@ -2,7 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Image, KeyboardAvoidingView, ScrollView, Text } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, ScrollView, Text } from "react-native";
 
 import { FlexButton } from "@components/FlexButton";
 import { PasswordTextField } from "@components/PasswordTextField";
@@ -10,11 +10,13 @@ import { TextField } from "@components/TextField";
 import { ICONS, IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
 import { BACKGROUND } from "@theme/colors";
-import { style } from "./auth";
+import { style } from "./authStyle";
+import { useAuthViewModel } from "./AuthViewModel";
 
 export default function LoginScreen() {
     const { t } = useTranslation();
     const router = useRouter();
+    const { login, isLoading, error } = useAuthViewModel();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -24,8 +26,22 @@ export default function LoginScreen() {
     }
 
     function handleLogin() {
-        console.log("Logging in with", email, password);
-        // TODO: Implement login logic here
+        if (isLoading) return;
+
+        try {
+            if (!email || !password) {
+                Alert.alert(t("errors.missingFields"));
+                return;
+            }
+
+            login({ email, password }).then((response) => {
+                if (response) {
+                    router.replace(ROUTES.TABS.DASHBOARD);
+                }
+            });
+        } catch (err) {
+            Alert.alert(t("errors.generic"));
+        }
     }
 
     return (
@@ -63,6 +79,7 @@ export default function LoginScreen() {
                         placeholder={t("auth.login.passwordPlaceholder")}
                         onChangeText={setPassword}
                     />
+                    {error && <Text style={style.error}>{error}</Text>}
 
                     <Text style={style.text}>
                         {t("auth.login.noAccount")}

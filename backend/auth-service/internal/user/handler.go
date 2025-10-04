@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -68,7 +67,6 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 	res, err := h.service.CreateUser(&userCreate)
 	if err != nil {
-		fmt.Print(err.Error())
 		if strings.Contains(err.Error(), "record already exists") {
 			c.JSON(http.StatusConflict, gin.H{"error": "user already exists"})
 			return
@@ -120,7 +118,7 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 	res, err := h.service.Login(&userLogin)
 	if err != nil {
-		if strings.Contains(err.Error(), "invalid credentials") {
+		if strings.Contains(err.Error(), "unauthorized") {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
 			return
 		}

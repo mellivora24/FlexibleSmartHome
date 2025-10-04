@@ -9,6 +9,7 @@ import { PasswordTextField } from "@components/PasswordTextField";
 import { TextField } from "@components/TextField";
 import { ICONS, IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
+import { useAuthContext } from "@src/presentation/hooks/useContext";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./authStyle";
 import { useAuthViewModel } from "./AuthViewModel";
@@ -22,13 +23,18 @@ export default function RegisterScreen() {
     const [password, setPassword] = useState("");
     const [deviceId, setDeviceId] = useState("");
 
+    const { login: loginContext } = useAuthContext();
+
     const { register } = useAuthViewModel();
 
     async function handleRegister() {
         const mid = parseInt(deviceId, 10);
         try {
-            await register({ mid, name, email, password });
-            router.replace(ROUTES.TABS.DASHBOARD);
+            const response = await register({ mid, name, email, password });
+            if ("data" in response) {
+                await loginContext(response.data as any);
+                router.replace(ROUTES.TABS.DASHBOARD);
+            }
         } catch (error) {
             Alert.alert("Registration Error", (error as Error).message);
         }

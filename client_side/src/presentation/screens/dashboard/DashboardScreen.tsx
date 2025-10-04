@@ -14,6 +14,8 @@ import { RoomWidget } from './widgets/RoomWidget';
 import { TemperatureWidget } from './widgets/TemperatureWidget';
 import { WeatherOutsideWidget } from './widgets/WeatherOutsideWidget';
 
+import { useAuthContext } from '@src/presentation/hooks/useContext';
+
 interface DashboardScreenProps {
     outsideTemperature?: number;
     outsideWeatherCondition?: string;
@@ -47,6 +49,8 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
     const router = useRouter();
 
+    const { authData, token, logout } = useAuthContext();
+
     return (
         <LinearGradient
             colors={BACKGROUND.GRADIENT as [string, string]}
@@ -56,7 +60,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
         >
             <SafeAreaView style={dashboardStyle.container}>
                 <TopBarWidget
-                    username="Quyet Thanh"
+                    username={authData?.name || "User"}
                     isHavingNotification={false}
                     onAvatarPress={() => router.push('/add-on/account')}
                     onNotificationPress={() => router.push('/add-on/notification')}

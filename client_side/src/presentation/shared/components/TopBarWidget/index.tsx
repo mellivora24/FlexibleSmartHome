@@ -29,12 +29,14 @@ export const TopBarWidget: React.FC<TopBarWidgetProps> = ({
                 avatarUrl={avatarUrl}
                 onAvatarPress={onAvatarPress}
             />
-            <TouchableOpacity onPress={onNotificationPress}>
-                <Image
-                    source={notificationIcon}
-                    style={topBarWidgetStyle.notificationIcon}
-                />
-            </TouchableOpacity>
+            <View>
+                <TouchableOpacity onPress={onNotificationPress}>
+                    <Image
+                        source={notificationIcon}
+                        style={topBarWidgetStyle.notificationIcon}
+                    />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };

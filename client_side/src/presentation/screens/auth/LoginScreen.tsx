@@ -9,6 +9,7 @@ import { PasswordTextField } from "@components/PasswordTextField";
 import { TextField } from "@components/TextField";
 import { ICONS, IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
+import { useAuthContext } from "@src/presentation/hooks/useContext";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./authStyle";
 import { useAuthViewModel } from "./AuthViewModel";
@@ -17,6 +18,7 @@ export default function LoginScreen() {
     const { t } = useTranslation();
     const router = useRouter();
     const { login, isLoading, error } = useAuthViewModel();
+    const { login: loginContext } = useAuthContext();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -25,7 +27,7 @@ export default function LoginScreen() {
         router.replace(ROUTES.AUTH.REGISTER);
     }
 
-    function handleLogin() {
+    async function handleLogin() {
         if (isLoading) return;
 
         try {
@@ -34,12 +36,13 @@ export default function LoginScreen() {
                 return;
             }
 
-            login({ email, password }).then((response) => {
-                if (response) {
-                    router.replace(ROUTES.TABS.DASHBOARD);
-                }
-            });
+            const response = await login({ email, password });
+            if ("data" in response) {
+                await loginContext(response.data as any);
+                router.replace(ROUTES.TABS.DASHBOARD);
+            }
         } catch (err) {
+            console.error(err);
             Alert.alert(t("errors.generic"));
         }
     }

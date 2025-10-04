@@ -81,7 +81,7 @@ func (s *service) CreateUser(req *CreateRequest) (*CreateResponse, error) {
 
 	hashedPwd, err := shared.HashPassword(req.Password)
 	if err != nil {
-		return nil, shared.ErrInternalServer
+		return nil, err
 	}
 
 	userDB := UserDB{
@@ -103,7 +103,7 @@ func (s *service) CreateUser(req *CreateRequest) (*CreateResponse, error) {
 
 	tokenString, err := token.SignedString([]byte(s.config.JWT_SECRET))
 	if err != nil {
-		return nil, shared.ErrInternalServer
+		return nil, err
 	}
 
 	action := ActionDB{

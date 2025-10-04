@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -18,18 +19,17 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	user := rg.Group("/users")
 	{
-		user.GET("/", h.GetAllUsers)
-		user.GET("/:id", h.GetUserByID)
-		user.POST("/", h.CreateUser)
+		user.POST("/login", h.Login)
+		user.POST("/register", h.Register)
+
 		user.PUT("/:id", h.UpdateUser)
 		user.DELETE("/:email", h.DeleteUser)
-		user.POST("/login", h.Login)
 	}
 
-	action := rg.Group("/actions")
-	{
-		action.GET("/list/:uid", h.ListActions)
-	}
+	//action := rg.Group("/actions")
+	//{
+	//	action.GET("/list/:uid", h.ListActions)
+	//}
 
 	verify := rg.Group("/verify")
 	{
@@ -37,30 +37,30 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	}
 }
 
-func (h *Handler) GetAllUsers(c *gin.Context) {
-	res, err := h.service.GetAllUsers()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get users"})
-		return
-	}
-	if len(res) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "no users found"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
-}
+//func (h *Handler) GetAllUsers(c *gin.Context) {
+//	res, err := h.service.GetAllUsers()
+//	if err != nil {
+//		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get users"})
+//		return
+//	}
+//	if len(res) == 0 {
+//		c.JSON(http.StatusNotFound, gin.H{"error": "no users found"})
+//		return
+//	}
+//	c.JSON(http.StatusOK, gin.H{"data": res})
+//}
+//
+//func (h *Handler) GetUserByID(c *gin.Context) {
+//	id := c.Param("id")
+//	res, err := h.service.GetUserByID(id)
+//	if err != nil {
+//		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+//		return
+//	}
+//	c.JSON(http.StatusOK, gin.H{"data": res})
+//}
 
-func (h *Handler) GetUserByID(c *gin.Context) {
-	id := c.Param("id")
-	res, err := h.service.GetUserByID(id)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
-}
-
-func (h *Handler) CreateUser(c *gin.Context) {
+func (h *Handler) Register(c *gin.Context) {
 	var userCreate CreateRequest
 	if err := c.ShouldBindJSON(&userCreate); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -68,7 +68,8 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	}
 	res, err := h.service.CreateUser(&userCreate)
 	if err != nil {
-		if strings.Contains(err.Error(), "duplicate") {
+		fmt.Print(err.Error())
+		if strings.Contains(err.Error(), "record already exists") {
 			c.JSON(http.StatusConflict, gin.H{"error": "user already exists"})
 			return
 		}
@@ -129,18 +130,18 @@ func (h *Handler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": res})
 }
 
-func (h *Handler) ListActions(c *gin.Context) {
-	res, err := h.service.ListActions(c.Param("uid"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	if len(res) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "no actions found"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
-}
+//func (h *Handler) ListActions(c *gin.Context) {
+//	res, err := h.service.ListActions(c.Param("uid"))
+//	if err != nil {
+//		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+//		return
+//	}
+//	if len(res) == 0 {
+//		c.JSON(http.StatusNotFound, gin.H{"error": "no actions found"})
+//		return
+//	}
+//	c.JSON(http.StatusOK, gin.H{"data": res})
+//}
 
 func (h *Handler) VerifyToken(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")

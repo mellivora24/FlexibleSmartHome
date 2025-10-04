@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-export const sensorScreenStyle = StyleSheet.create({
+export const eventScreenStyle = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,

@@ -1,4 +1,4 @@
-import { Device } from "@model/Device";
+import { Device } from "@src/domain/model/Device";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {

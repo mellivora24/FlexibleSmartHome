@@ -4,7 +4,7 @@ export const deviceCardStyle = StyleSheet.create({
     card: {
         padding: 12,
         borderRadius: 10,
-        marginVertical: 8,
+        marginVertical: 4,
         backgroundColor: "#fff",
     },
     deviceName: {

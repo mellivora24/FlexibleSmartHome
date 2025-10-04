@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import { IMAGES } from '@constants/images';
-import '@i18n';
 import { accountWidgetStyle } from './accountWidgetStyle';
 
 interface AccountWidgetProps {

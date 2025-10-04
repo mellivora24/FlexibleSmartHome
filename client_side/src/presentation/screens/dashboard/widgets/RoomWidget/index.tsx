@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 
-import { Device } from '@domain/entities/Device';
+import { Device } from '@domain/model/Device';
 import { dashboardStyle } from '@screens/dashboard/style/dashboardStyle';
 import { DeviceCard } from './components/DeviceCard';
 import { RoomTabBar } from './components/RoomTabBar';

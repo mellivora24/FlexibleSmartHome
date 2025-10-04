@@ -9,13 +9,12 @@ import { searchWidgetStyle } from './searchWidgetStyle';
 
 interface SearchWidgetProps {
     value: string;
+    dropdownItems?: { label: string; value: string }[];
     filterVisible?: boolean;
     searchTypeVisible?: boolean;
     placeholder?: string;
-    filterDefault?: string;
     searchTypeDefault?: string;
     onSearchPress?: () => void;
-    onFilterChange?: () => void;
     onChangeText: (text: string) => void;
     onSearchTypeChange?: (value: string) => void;
 }
@@ -23,36 +22,20 @@ interface SearchWidgetProps {
 export function SearchWidget({
     placeholder = 'Search...',
     value,
+    dropdownItems,
     onChangeText,
     onSearchPress,
-    onFilterChange,
     onSearchTypeChange,
-    filterDefault = 'none',
     searchTypeDefault = 'all',
 }: SearchWidgetProps) {
     const { t } = useTranslation();
-
-    const searchOptions = [
-        { label: t('searchWidget.searchType.all'), value: 'all' },
-        { label: t('searchWidget.searchType.name'), value: 'name' },
-        { label: t('searchWidget.searchType.room'), value: 'room' },
-        { label: t('searchWidget.searchType.value'), value: 'value' },
-        { label: t('searchWidget.searchType.timeRange'), value: 'timeRange' },
-    ];
-
     const [searchTypeOpen, setSearchTypeOpen] = useState(false);
     const [searchTypeValue, setSearchTypeValue] = useState(searchTypeDefault);
-    const [searchTypeItems, setSearchTypeItems] = useState(searchOptions);
+    const [searchTypeItems, setSearchTypeItems] = useState(dropdownItems || []);
 
     function handleSearchPress() {
         if (onSearchPress) {
             onSearchPress();
-        }
-    }
-
-    function handleFilterChange() {
-        if (onFilterChange) {
-            onFilterChange();
         }
     }
 
@@ -75,25 +58,27 @@ export function SearchWidget({
 
     return (
         <View style={searchWidgetStyle.container}>
-            <DropDownPicker
-                open={searchTypeOpen}
-                value={searchTypeValue}
-                items={searchTypeItems}
-                setOpen={setSearchTypeOpen}
-                setItems={setSearchTypeItems}
-                setValue={handleSetSearchTypeValue}
-                style={searchWidgetStyle.dropdown}
-                containerStyle={searchWidgetStyle.dropdownContainer}
-                dropDownContainerStyle={{
-                    zIndex: 1000,
-                    margin: 0,
-                    padding: 0,
-                    borderRadius: 0
-                }}
-                labelProps={{ numberOfLines: 1 }}
-            />
+            {dropdownItems && dropdownItems.length > 0 && (
+                <DropDownPicker
+                    open={searchTypeOpen}
+                    value={searchTypeValue}
+                    items={searchTypeItems}
+                    setOpen={setSearchTypeOpen}
+                    setItems={setSearchTypeItems}
+                    setValue={handleSetSearchTypeValue}
+                    style={searchWidgetStyle.dropdown}
+                    containerStyle={searchWidgetStyle.dropdownContainer}
+                    dropDownContainerStyle={{
+                        zIndex: 1000,
+                        margin: 0,
+                        padding: 0,
+                        borderRadius: 0
+                    }}
+                    labelProps={{ numberOfLines: 1 }}
+                />
+            )}
             <TextInput
-                style={searchWidgetStyle.input}
+                style={dropdownItems !== undefined && dropdownItems.length > 0 ? searchWidgetStyle.inputWithDropdown : searchWidgetStyle.input}
                 placeholder={placeholder}
                 value={value}
                 onChangeText={onChangeText}
@@ -102,7 +87,7 @@ export function SearchWidget({
             <FlexButton
                 // title="Search"
                 icon={ICONS.SEARCH_ICON}
-                onPress={() => console.log('Search button pressed')}
+                onPress={handleSearchPress}
                 style={searchWidgetStyle.button}
             />
         </View>

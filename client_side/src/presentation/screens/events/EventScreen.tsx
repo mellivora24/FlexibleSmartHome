@@ -5,44 +5,43 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { EventTableWidget } from '@components/EventTableWidget';
 import { SearchWidget } from '@components/SearchTableWidget';
-import { SensorDataTableWidget } from '@components/SensorDataTableWidget';
 import { TopBarWidget } from '@components/TopBarWidget';
-import { SensorData } from '@src/domain/model/SensorData';
+import { Event } from '@src/domain/model/Event';
 import { BACKGROUND } from '@theme/colors';
-import { mockSensorData } from 'test/mockData';
-import { sensorScreenStyle } from './sensorScreenStyle';
+import { mockEventList } from 'test/mockData';
+import { eventScreenStyle } from './eventScreenStyle';
 
 type SortDirection = 'asc' | 'desc' | null;
 interface SortState {
-  column: keyof SensorData | null;
-  direction: SortDirection;
+    column: keyof Event | null;
+    direction: SortDirection;
 }
 
-export function SensorScreen() {
+export function EventScreen() {
   const router = useRouter();
   const { t } = useTranslation();
 
+  const [data, setData] = useState<Event[]>([...mockEventList.list]);
   const [sortState, setSortState] = useState<SortState>({
     column: null,
     direction: null,
   });
-  const [data, setData] = useState<SensorData[]>(mockSensorData);
 
   const searchOptions = [
     { label: t('searchWidget.searchType.all'), value: 'all' },
-    { label: t('searchWidget.searchType.name'), value: 'name' },
-    { label: t('searchWidget.searchType.room'), value: 'room' },
+    { label: t('searchWidget.searchType.device'), value: 'name' },
     { label: t('searchWidget.searchType.value'), value: 'value' },
     { label: t('searchWidget.searchType.timeRange'), value: 'timeRange' },
   ];
 
-  const handleSort = (column: keyof SensorData, direction: SortDirection) => {
+  const handleSort = (column: keyof Event, direction: SortDirection) => {
     console.log(`Request sort: ${column} ${direction}`);
     setSortState({ column, direction });
 
     // TODO: Call API to get sorted data
-    setData([...mockSensorData]);
+    setData([...mockEventList.list]);
   };
 
   return (
@@ -52,7 +51,7 @@ export function SensorScreen() {
       end={{ x: 0.8, y: 0 }}
       style={{ flex: 1 }}
     >
-      <SafeAreaView style={sensorScreenStyle.container}>
+      <SafeAreaView style={eventScreenStyle.container}>
         <TopBarWidget
           username="Quyet Thanh"
           isHavingNotification={false}
@@ -60,16 +59,16 @@ export function SensorScreen() {
           onNotificationPress={() => router.push('/add-on/notification')}
         />
 
-        <View style={sensorScreenStyle.body}>
+        <View style={eventScreenStyle.body}>
           <SearchWidget
-            placeholder="Search sensors..."
+            placeholder="Search events..."
             value=""
-            dropdownItems={searchOptions}
             onChangeText={(text) => console.log(text)}
+            dropdownItems={searchOptions}
           />
 
-          <View style={sensorScreenStyle.tableContainer}>
-            <SensorDataTableWidget
+          <View style={eventScreenStyle.tableContainer}>
+            <EventTableWidget
               data={data}
               currentSort={sortState}
               onSort={handleSort}

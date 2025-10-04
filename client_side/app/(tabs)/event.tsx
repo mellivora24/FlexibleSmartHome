@@ -1,10 +1,5 @@
-import React from "react";
-import { Text, View } from "react-native";
+import { EventScreen } from "@screens/events/EventScreen";
 
-export default function EventScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Sensor Screen</Text>
-    </View>
-  );
+export default function Event() {
+  return <EventScreen />;
 }

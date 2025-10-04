@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
 
 import { TopBarWidget } from '@components/TopBarWidget';
-import { Device } from '@model/Device';
+import { Device } from '@src/domain/model/Device';
 import { BACKGROUND } from '@theme/colors';
 import { DeviceCard } from './components/DeviceCard';
 import { deviceScreenStyle } from './deviceStyle';

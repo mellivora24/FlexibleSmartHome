@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TopBarWidget } from '@components/TopBarWidget';
-import { Device } from '@model/Device';
+import { Device } from '@src/domain/model/Device';
 import { BACKGROUND } from '@theme/colors';
 import { dashboardStyle } from './style/dashboardStyle';
 import { ChartWidget } from './widgets/ChartWidget';

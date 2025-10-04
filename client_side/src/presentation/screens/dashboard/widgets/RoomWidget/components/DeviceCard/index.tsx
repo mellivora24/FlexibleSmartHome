@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 import { ICONS, IMAGES } from "@constants/images";
-import { Device, DeviceData } from "@domain/entities/Device";
+import { Device, DeviceData } from "@domain/model/Device";
 import { Gauge } from "./gauge";
 import { CustomSlider } from "./slider";
 import { styles } from "./style";

@@ -129,6 +129,7 @@
       "value": "Giá trị",
       "name": "Cảm biến",
       "timeRange": "Thời gian",
+      "device": "Thiết bị"
     }
   }
 }

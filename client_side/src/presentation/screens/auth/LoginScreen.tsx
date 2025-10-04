@@ -9,7 +9,6 @@ import { PasswordTextField } from "@components/PasswordTextField";
 import { TextField } from "@components/TextField";
 import { ICONS, IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
-import "@i18n";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./auth";
 

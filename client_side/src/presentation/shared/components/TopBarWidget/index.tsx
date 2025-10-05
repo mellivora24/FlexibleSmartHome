@@ -6,9 +6,9 @@ import { AccountWidget } from "../AccountWidget";
 import { topBarWidgetStyle } from "./topBarWidget";
 
 interface TopBarWidgetProps {
-    username: string;
+    username?: string;
     avatarUrl?: string;
-    isHavingNotification: boolean;
+    isHavingNotification?: boolean;
     onAvatarPress?: () => void;
     onNotificationPress?: () => void;
 }

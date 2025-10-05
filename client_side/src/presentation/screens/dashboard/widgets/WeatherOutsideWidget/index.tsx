@@ -8,39 +8,56 @@ import { WeatherLinearGradient, weatherWidgetStyle } from "./weatherWidgetStyle"
 
 interface WeatherOutsideWidgetProps {
     temperature?: number;
-    weatherCondition?: string;
+    weatherCode?: number;
     location?: string;
 }
 
 export const WeatherOutsideWidget: React.FC<WeatherOutsideWidgetProps> = ({
-    temperature = 24,
-    weatherCondition = "sunny",
-    location = "Ha Noi, Viet Nam",
+    temperature,
+    weatherCode,
+    location,
 }) => {
-    let weatherIcon;
-
     const { t } = useTranslation();
-    switch (weatherCondition.toLowerCase()) {
-        case "sunny":
-            weatherCondition = t('dashboard.weatherCondition.sunny')
-            weatherIcon = ICONS.DASHBOARD_SUNNY;
-            break;
-        case "cloudy":
-            weatherCondition = t('dashboard.weatherCondition.cloudy');
-            weatherIcon = ICONS.DASHBOARD_CLOUDY;
-            break;
-        case "rainy":
-            weatherCondition = t('dashboard.weatherCondition.rainy');
-            weatherIcon = ICONS.DASHBOARD_RAINY;
-            break;
-        default:
+
+    let weatherCondition = "";
+    let weatherIcon = ICONS.DASHBOARD_SUNNY;
+
+    if (weatherCode !== undefined) {
+        if ([0].includes(weatherCode)) {
             weatherCondition = t('dashboard.weatherCondition.sunny');
             weatherIcon = ICONS.DASHBOARD_SUNNY;
-            break;
+        } else if ([1, 2, 3].includes(weatherCode)) {
+            weatherCondition = t('dashboard.weatherCondition.partlyCloudy');
+            weatherIcon = ICONS.DASHBOARD_PARTLY_CLOUDY;
+        } else if ([45, 48].includes(weatherCode)) {
+            weatherCondition = t('dashboard.weatherCondition.fog');
+            weatherIcon = ICONS.DASHBOARD_FOG;
+        } else if ([51, 53, 55, 56, 57].includes(weatherCode)) {
+            weatherCondition = t('dashboard.weatherCondition.drizzle');
+            weatherIcon = ICONS.DASHBOARD_DRIZZLE;
+        } else if ([61, 63, 65, 66, 67].includes(weatherCode)) {
+            weatherCondition = t('dashboard.weatherCondition.rain');
+            weatherIcon = ICONS.DASHBOARD_RAINY;
+        } else if ([71, 73, 75, 77].includes(weatherCode)) {
+            weatherCondition = t('dashboard.weatherCondition.snow');
+            weatherIcon = ICONS.DASHBOARD_SNOW;
+        } else if ([80, 81, 82].includes(weatherCode)) {
+            weatherCondition = t('dashboard.weatherCondition.shower');
+            weatherIcon = ICONS.DASHBOARD_RAINY;
+        } else if ([95, 96, 99].includes(weatherCode)) {
+            weatherCondition = t('dashboard.weatherCondition.thunderstorm');
+            weatherIcon = ICONS.DASHBOARD_THUNDER;
+        } else {
+            weatherCondition = t('dashboard.weatherCondition.unknown');
+            weatherIcon = ICONS.DASHBOARD_CLOUDY;
+        }
     }
 
-    const linearColor = temperature >= 25 ? WeatherLinearGradient.hot : WeatherLinearGradient.normal;
-    
+    const linearColor =
+        temperature && temperature >= 25
+            ? WeatherLinearGradient.hot
+            : WeatherLinearGradient.normal;
+
     return (
         <LinearGradient
             colors={linearColor as [string, string]}
@@ -54,10 +71,7 @@ export const WeatherOutsideWidget: React.FC<WeatherOutsideWidgetProps> = ({
                     <Text style={weatherWidgetStyle.conditionText}>{weatherCondition}</Text>
                 </View>
                 <View style={weatherWidgetStyle.weatherIconContainer}>
-                    <Image
-                        source={weatherIcon}
-                        style={weatherWidgetStyle.weatherIcon}
-                    />
+                    <Image source={weatherIcon} style={weatherWidgetStyle.weatherIcon} />
                 </View>
             </View>
 
@@ -70,4 +84,5 @@ export const WeatherOutsideWidget: React.FC<WeatherOutsideWidgetProps> = ({
             </View>
         </LinearGradient>
     );
-}
+};
+// MÃ WMO THAM KHẢO: https://open-meteo.com/en/docs#latitude=10.82&longitude=106.63&hourly=temperature_2m

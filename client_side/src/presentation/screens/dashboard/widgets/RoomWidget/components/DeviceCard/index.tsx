@@ -82,20 +82,20 @@ function renderCardContent({
 }
 
 interface DeviceCardProps {
-    device: Device;
-    onPress?: (device: Device) => void;
-    onValueChange?: (value: number) => void;
+  device: Device;
+  onPress?: (deviceId: number) => void;
+  onValueChange?: (deviceId: number, value: number) => void;
 }
 
 export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onPress, onValueChange }) => {
     const { t } = useTranslation();
 
     const handlePress = () => {
-        if (onPress) onPress(device);
-    }
+    if (onPress) onPress(device.id);
+    };
 
     const handleValueChange = (value: number) => {
-        if (onValueChange) onValueChange(value);
+    if (onValueChange) onValueChange(device.id, value);
     };
 
     return (

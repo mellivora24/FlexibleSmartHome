@@ -12,46 +12,37 @@ interface WeatherOutsideWidgetProps {
     location?: string;
 }
 
+const getWeatherByWMO = (code: number, t: any) => {
+    if (code === undefined || code === null) {
+        return {
+            condition: t("dashboard.weatherCondition.unknown"),
+            icon: ICONS.DASHBOARD_SUNNY,
+        };
+    }
+
+    // Trời nắng
+    if ([0, 1].includes(code))
+        return { condition: t("dashboard.weatherCondition.sunny"), icon: ICONS.DASHBOARD_SUNNY };
+
+    // Nhiều mây / âm u
+    if ([2, 3, 45, 48].includes(code))
+        return { condition: t("dashboard.weatherCondition.cloudy"), icon: ICONS.DASHBOARD_CLOUDY };
+
+    // Mưa / Tuyết / Dông
+    if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80, 81, 82, 85, 86, 95, 96, 99,].includes(code)) {
+        return { condition: t("dashboard.weatherCondition.rainy"), icon: ICONS.DASHBOARD_RAINY };
+    }
+    
+    return { condition: t("dashboard.weatherCondition.unknown"), icon: ICONS.DASHBOARD_SUNNY };
+};
+
 export const WeatherOutsideWidget: React.FC<WeatherOutsideWidgetProps> = ({
     temperature,
     weatherCode,
     location,
 }) => {
     const { t } = useTranslation();
-
-    let weatherCondition = "";
-    let weatherIcon = ICONS.DASHBOARD_SUNNY;
-
-    if (weatherCode !== undefined) {
-        if ([0].includes(weatherCode)) {
-            weatherCondition = t('dashboard.weatherCondition.sunny');
-            weatherIcon = ICONS.DASHBOARD_SUNNY;
-        } else if ([1, 2, 3].includes(weatherCode)) {
-            weatherCondition = t('dashboard.weatherCondition.partlyCloudy');
-            weatherIcon = ICONS.DASHBOARD_PARTLY_CLOUDY;
-        } else if ([45, 48].includes(weatherCode)) {
-            weatherCondition = t('dashboard.weatherCondition.fog');
-            weatherIcon = ICONS.DASHBOARD_FOG;
-        } else if ([51, 53, 55, 56, 57].includes(weatherCode)) {
-            weatherCondition = t('dashboard.weatherCondition.drizzle');
-            weatherIcon = ICONS.DASHBOARD_DRIZZLE;
-        } else if ([61, 63, 65, 66, 67].includes(weatherCode)) {
-            weatherCondition = t('dashboard.weatherCondition.rain');
-            weatherIcon = ICONS.DASHBOARD_RAINY;
-        } else if ([71, 73, 75, 77].includes(weatherCode)) {
-            weatherCondition = t('dashboard.weatherCondition.snow');
-            weatherIcon = ICONS.DASHBOARD_SNOW;
-        } else if ([80, 81, 82].includes(weatherCode)) {
-            weatherCondition = t('dashboard.weatherCondition.shower');
-            weatherIcon = ICONS.DASHBOARD_RAINY;
-        } else if ([95, 96, 99].includes(weatherCode)) {
-            weatherCondition = t('dashboard.weatherCondition.thunderstorm');
-            weatherIcon = ICONS.DASHBOARD_THUNDER;
-        } else {
-            weatherCondition = t('dashboard.weatherCondition.unknown');
-            weatherIcon = ICONS.DASHBOARD_CLOUDY;
-        }
-    }
+    const { condition, icon } = getWeatherByWMO(weatherCode ?? 0, t);
 
     const linearColor =
         temperature && temperature >= 25
@@ -67,11 +58,13 @@ export const WeatherOutsideWidget: React.FC<WeatherOutsideWidgetProps> = ({
         >
             <View style={weatherWidgetStyle.weather}>
                 <View>
-                    <Text style={weatherWidgetStyle.temperatureText}>{temperature}°C</Text>
-                    <Text style={weatherWidgetStyle.conditionText}>{weatherCondition}</Text>
+                    <Text style={weatherWidgetStyle.temperatureText}>
+                        {temperature !== undefined ? `${temperature}°C` : "--"}
+                    </Text>
+                    <Text style={weatherWidgetStyle.conditionText}>{condition}</Text>
                 </View>
                 <View style={weatherWidgetStyle.weatherIconContainer}>
-                    <Image source={weatherIcon} style={weatherWidgetStyle.weatherIcon} />
+                    <Image source={icon} style={weatherWidgetStyle.weatherIcon} />
                 </View>
             </View>
 
@@ -85,4 +78,3 @@ export const WeatherOutsideWidget: React.FC<WeatherOutsideWidgetProps> = ({
         </LinearGradient>
     );
 };
-// MÃ WMO THAM KHẢO: https://open-meteo.com/en/docs#latitude=10.82&longitude=106.63&hourly=temperature_2m

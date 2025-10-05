@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -39,16 +39,6 @@ export const DashboardScreen: React.FC = () => {
     const handleDeviceValueChange = (deviceId: number, newValue: number) => {
         console.log(`Device ${deviceId} changed to ${newValue}`);
     };
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setOutsideTemperature(prev => prev + (Math.random() - 0.5) * 2);
-            setInsideTemperature(prev => prev + (Math.random() - 0.5));
-            setInsideHumidity(prev => prev + (Math.random() - 0.5) * 2);
-        }, 10000);
-
-        return () => clearInterval(interval);
-    }, []);
 
     return (
         <LinearGradient

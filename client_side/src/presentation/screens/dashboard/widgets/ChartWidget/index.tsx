@@ -29,9 +29,9 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({ temperature, humidity 
                     decimalPlaces: 0,
                     propsForDots: { r: "2" },
                     style: { borderRadius: 8 },
-                    backgroundColor: "#f5f5f5",
-                    backgroundGradientTo: "#f5f5f5",
-                    backgroundGradientFrom: "#f5f5f5",
+                    backgroundColor: "#fff",
+                    backgroundGradientTo: "#fff",
+                    backgroundGradientFrom: "#fff",
                     color: (opacity = 1) => `rgba(34, 94, 168, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 }}
@@ -42,7 +42,7 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({ temperature, humidity 
                 withVerticalLabels={true}
                 withHorizontalLabels={true}
                 style={chartWidgetStyle.chartStyle}
-                width={Dimensions.get("window").width - 32 }
+                width={Dimensions.get("window").width + 32}
             />
         </View>
     );

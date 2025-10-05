@@ -4,7 +4,6 @@ export default [
       'import/resolver': {
         alias: {
           map: [
-            ['@env', './'],
             ['@app', './app'],
             ['@src', './src'],
             ['@assets', './assets'],

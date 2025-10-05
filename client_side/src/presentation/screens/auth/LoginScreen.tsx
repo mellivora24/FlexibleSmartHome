@@ -37,9 +37,11 @@ export default function LoginScreen() {
             }
 
             const response = await login({ email, password });
-            if ("data" in response) {
+            if (response && typeof response === "object" && "data" in response) {
                 await loginContext(response.data as any);
                 router.replace(ROUTES.TABS.DASHBOARD);
+            } else {
+                Alert.alert(t("errors.generic"));
             }
         } catch (err) {
             console.error(err);

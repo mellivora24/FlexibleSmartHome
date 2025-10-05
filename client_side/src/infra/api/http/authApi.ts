@@ -7,7 +7,9 @@ export const authApi = {
     login: async (data: LoginRequest) => {
         try {
             const url = `${API_CONFIG.BASE_URL}/auth/users/login`;
-            console.log("Login URL:", url); // Debugging line
+            
+            console.log("Login URL:", url); // Debugging line --- IGNORE ---
+
             const res = await axios.post(url, data);
             return res.data;
         } catch (error) {

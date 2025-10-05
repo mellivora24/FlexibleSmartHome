@@ -1,0 +1,4 @@
+export const APP_CONFIG = {
+    GITHUB_REPO_URL: process.env.EXPO_PUBLIC_GITHUB_URL || "",
+    REPORT_DOCUMENTATION_URL: process.env.EXPO_PUBLIC_DOCUMENTATION_URL || "",
+};

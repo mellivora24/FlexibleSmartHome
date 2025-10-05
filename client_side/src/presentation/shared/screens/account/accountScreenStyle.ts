@@ -3,12 +3,26 @@ import { StyleSheet } from "react-native";
 export const accountScreenStyle = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f5f5',
+        justifyContent: 'center'
     },
-    text: {
-        fontSize: 20,
-        color: '#333',
+    image: {
+        width: 150,
+        height: 150,
+        marginBottom: 20,
+        resizeMode: 'contain',
+    },
+    infoContainer: {
+        marginTop: 20,
+        width: '80%',
+        alignItems: 'center',
+    },
+    firmwareContainer: {
+        maxWidth: 300,
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        justifyContent: 'space-between',
     },
 });

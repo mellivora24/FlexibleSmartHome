@@ -146,5 +146,14 @@
     "badRequest": "Yêu cầu không hợp lệ. Vui lòng kiểm tra và thử lại.",
     "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
     "missingFields": "Vui lòng nhập đủ thông tin."
+  },
+  "account": {
+    "firmwareVersion": "Phiên bản",
+    "updateFirmware": "Cập nhật",
+    "logout": "Đăng xuất",
+    "confirmLogoutTitle": "Đăng xuất",
+    "confirmLogoutMessage": "Bạn có chắc chắn muốn đăng xuất không?",
+    "cancel": "Hủy",
+    "confirm": "Đăng xuất"
   }
 }

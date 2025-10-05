@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import { IMAGES } from '@constants/images';
+import { useAuthContext } from '@src/presentation/hooks/useContext';
 import { accountWidgetStyle } from './accountWidgetStyle';
 
 interface AccountWidgetProps {
@@ -14,6 +15,8 @@ interface AccountWidgetProps {
 export const AccountWidget: React.FC<AccountWidgetProps> = ({username, avatarUrl, onAvatarPress}) => {
     const { t } = useTranslation();
     const timeNow = new Date().getHours();
+
+    const { authData } = useAuthContext();
 
     const iconPath = avatarUrl ? { uri: avatarUrl } : IMAGES.AVATAR_PLACEHOLDER;
     const greeting = 
@@ -31,9 +34,7 @@ export const AccountWidget: React.FC<AccountWidgetProps> = ({username, avatarUrl
             </TouchableOpacity>
             <View style={accountWidgetStyle.textView}>
                 <Text style={accountWidgetStyle.greeting}>{greeting}</Text>
-                {username ? (
-                    <Text style={accountWidgetStyle.username}>{username}</Text>
-                ) : null}
+                <Text style={accountWidgetStyle.username}>{authData?.name || 'Guest User'}</Text>
             </View>
         </View>
     );

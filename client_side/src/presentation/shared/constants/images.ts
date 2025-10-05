@@ -26,6 +26,8 @@ export const ICONS: Record<string, ImageSourcePropType> = {
   CARD_TAP: require("@assets/icons/dashboard_tap_icon.png"),
   SEARCH_ICON: require("@assets/icons/components_search_icon.png"),
   FILTER_ICON: require("@assets/icons/components_filter_icon.png"),
+  FILE_ICON: require("@assets/icons/file_icon.png"),
+  LINK_ICON: require("@assets/icons/link_icon.png"),
 };
 
 export const TAB_ICON = {

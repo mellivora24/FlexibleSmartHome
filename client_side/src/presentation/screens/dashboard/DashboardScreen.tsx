@@ -20,10 +20,6 @@ export const DashboardScreen: React.FC = () => {
     const router = useRouter();
     const { authData } = useAuthContext();
 
-    const [outsideTemperature, setOutsideTemperature] = useState(30);
-    const [outsideLocation, setOutsideLocation] = useState("Hà Nội");
-    const [weatherCode, setWeatherCode] = useState(1);
-
     const [insideHumidity, setInsideHumidity] = useState(60);
     const [insideTemperature, setInsideTemperature] = useState(25);
 
@@ -57,11 +53,7 @@ export const DashboardScreen: React.FC = () => {
                 />
 
                 <View style={dashboardStyle.Section1}>
-                    <WeatherOutsideWidget
-                        temperature={outsideTemperature}
-                        location={outsideLocation}
-                        weatherCode={weatherCode}
-                    />
+                    <WeatherOutsideWidget/>
                     <View style={dashboardStyle.row}>
                         <HumidityWidget humidity={insideHumidity} />
                         <TemperatureWidget temperature={insideTemperature} />

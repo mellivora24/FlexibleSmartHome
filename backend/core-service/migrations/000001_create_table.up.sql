@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS tbl_sensor (
     rid INT,
     name VARCHAR(255),
     type VARCHAR(255),
-    port INT,
+    port INT UNIQUE,
     status BOOLEAN,
     running_time INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS tbl_device (
     rid INT,
     name VARCHAR(255),
     type VARCHAR(255),
-    port INT,
+    port INT UNIQUE,
     status BOOLEAN,
     data JSONB,
     running_time INT DEFAULT 0,
@@ -170,6 +170,35 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_check_port_validity()
+    RETURNS TRIGGER AS $$
+DECLARE
+    available_ports INT[];
+BEGIN
+    SELECT available_port INTO available_ports FROM tbl_mcu WHERE id = NEW.mid;
+
+    IF available_ports IS NULL THEN
+        RAISE EXCEPTION 'MCU with id % does not exist', NEW.mid;
+    END IF;
+
+    IF NOT (NEW.port = ANY(available_ports)) THEN
+        RAISE EXCEPTION 'Port % is not available for MCU %', NEW.port, NEW.mid;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_sensor_check_port
+    BEFORE INSERT OR UPDATE OF port ON tbl_sensor
+    FOR EACH ROW
+EXECUTE FUNCTION fn_check_port_validity();
+
+CREATE TRIGGER trg_device_check_port
+    BEFORE INSERT OR UPDATE OF port ON tbl_device
+    FOR EACH ROW
+EXECUTE FUNCTION fn_check_port_validity();
 
 CREATE TRIGGER trg_device_insert
     AFTER INSERT ON tbl_device

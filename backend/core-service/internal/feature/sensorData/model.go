@@ -30,6 +30,9 @@ type GetListResponse struct {
 
 type GetListRequest struct {
 	SID       int64     `form:"sid"`
+	Name      string    `form:"name"`
+	Value     float64   `form:"value"`
+	Time      time.Time `form:"time" time_format:"2006-01-02 15:04:05"`
 	Page      int       `form:"page"`
 	Limit     int       `form:"limit"`
 	SortBy    string    `form:"sort_by"`

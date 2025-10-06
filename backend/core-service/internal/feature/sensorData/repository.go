@@ -40,6 +40,19 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]SensorDataItem, 
 	if req.SID > 0 {
 		query = query.Where("sd.sid = ?", req.SID)
 	}
+
+	if req.Name != "" {
+		query = query.Where("s.name LIKE ?", "%"+req.Name+"%")
+	}
+
+	if req.Value != 0 {
+		query = query.Where("sd.value = ?", req.Value)
+	}
+
+	if !req.Time.IsZero() {
+		query = query.Where("sd.created_at = ?", req.Time)
+	}
+
 	if !req.StartTime.IsZero() {
 		query = query.Where("sd.created_at >= ?", req.StartTime)
 	}

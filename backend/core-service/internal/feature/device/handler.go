@@ -21,7 +21,7 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	{
 		devices.GET("/", h.ListDevices)
 		devices.POST("/", h.CreateDevice)
-		devices.PUT("/:id", h.UpdateDevice)
+		devices.PUT("/", h.UpdateDevice)
 		devices.DELETE("/:id", h.DeleteDevice)
 	}
 }

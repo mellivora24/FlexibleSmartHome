@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS tbl_events (
 );
 
 -- Model: false
-CREATE TABLE IF NOT EXISTS tbl_sensordata (
+CREATE TABLE IF NOT EXISTS tbl_sensor_data (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
     sid INT,
@@ -111,8 +111,8 @@ CREATE INDEX IF NOT EXISTS idx_sensor_uid ON tbl_sensor(uid);
 CREATE INDEX IF NOT EXISTS idx_device_uid ON tbl_device(uid);
 CREATE INDEX IF NOT EXISTS idx_events_did ON tbl_events(did);
 CREATE INDEX IF NOT EXISTS idx_sensorData_sid ON tbl_sensorData(sid);
-CREATE INDEX IF NOT EXISTS idx_pending_actions_user_mcu ON pending_actions(user_id, mcu_id);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_status ON pending_actions(status);
+CREATE INDEX IF NOT EXISTS idx_pending_actions_user_mcu ON pending_actions(uid, mid);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_created_at ON pending_actions(created_at);
 
 -- Khi thêm device -> xóa port khỏi available_port
@@ -218,8 +218,6 @@ BEGIN
                CASE s.type
                    WHEN 'analog' THEN 1
                    WHEN 'digital' THEN 2
-                   WHEN 'nrf24l01' THEN 5
-                   WHEN 'bluetooth' THEN 7
                    ELSE 0
                    END AS type
         FROM tbl_sensor s
@@ -232,8 +230,6 @@ BEGIN
                CASE d.type
                    WHEN 'pwm' THEN 3
                    WHEN 'digital' THEN 4
-                   WHEN 'nrf24l01' THEN 6
-                   WHEN 'bluetooth' THEN 8
                    ELSE 0
                    END AS type
         FROM tbl_device d

@@ -12,7 +12,7 @@ type SensorDataDB struct {
 }
 
 func (SensorDataDB) TableName() string {
-	return "tbl_sensordata"
+	return "tbl_sensor_data"
 }
 
 type SensorDataItem struct {

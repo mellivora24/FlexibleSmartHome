@@ -23,7 +23,7 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) CreateMCU(uid int64, mcu *CreateMCURequest) (*McuDB, error) {
-	availablePorts := make(pq.Int64Array, 10) // TODO: de xem dung STM32 hay Arduino Nano
+	availablePorts := make(pq.Int64Array, 14)
 	for i := int64(1); i <= 10; i++ {
 		availablePorts[i-1] = i
 	}

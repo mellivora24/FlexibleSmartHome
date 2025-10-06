@@ -24,8 +24,7 @@ type PortInfo struct {
 }
 
 type CreateMCURequest struct {
-	AvailablePort   pq.Int64Array `json:"available_port;type:int[]"`
-	FirmwareVersion string        `json:"firmware_version"`
+	FirmwareVersion string `json:"firmware_version"`
 }
 
 type FirmwareUpdateRequest struct {

@@ -8,15 +8,6 @@ CREATE TABLE IF NOT EXISTS tbl_mcu (
 );
 
 -- Model: true
-CREATE TABLE IF NOT EXISTS tbl_room (
-    id SERIAL PRIMARY KEY,
-    uid INT NOT NULL,
-    name VARCHAR(255),
-    description TEXT,
-    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Model: true
 CREATE TABLE IF NOT EXISTS tbl_sensor (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
@@ -29,8 +20,7 @@ CREATE TABLE IF NOT EXISTS tbl_sensor (
     running_time INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (mid) REFERENCES tbl_mcu(id) ON DELETE CASCADE,
-    FOREIGN KEY (rid) REFERENCES tbl_room(id) ON DELETE CASCADE
+    FOREIGN KEY (mid) REFERENCES tbl_mcu(id) ON DELETE CASCADE
 );
 
 -- Model: true
@@ -47,8 +37,7 @@ CREATE TABLE IF NOT EXISTS tbl_device (
     running_time INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (mid) REFERENCES tbl_mcu(id) ON DELETE CASCADE,
-    FOREIGN KEY (rid) REFERENCES tbl_room(id) ON DELETE CASCADE
+    FOREIGN KEY (mid) REFERENCES tbl_mcu(id) ON DELETE CASCADE
 );
 
 -- Model: true
@@ -207,35 +196,39 @@ CREATE TRIGGER trg_sensor_update
     FOR EACH ROW EXECUTE FUNCTION fn_sensor_update();
 
 CREATE OR REPLACE FUNCTION get_used_ports(mcu_id INT)
-    RETURNS TABLE (
-                      port INT,
-                      type INT
-                  ) AS $$
+    RETURNS TABLE (port INT) AS $$
 BEGIN
     RETURN QUERY
         -- Sensor mapping
-        SELECT s.port,
-               CASE s.type
-                   WHEN 'analog' THEN 1
-                   WHEN 'digital' THEN 2
-                   ELSE 0
-                   END AS type
+        SELECT
+            s.port
         FROM tbl_sensor s
         WHERE s.mid = mcu_id AND s.port IS NOT NULL
 
         UNION ALL
 
         -- Device mapping
-        SELECT d.port,
-               CASE d.type
-                   WHEN 'pwm' THEN 3
-                   WHEN 'digital' THEN 4
-                   ELSE 0
-                   END AS type
+        SELECT
+            d.port
         FROM tbl_device d
         WHERE d.mid = mcu_id AND d.port IS NOT NULL;
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION get_available_ports(mcu_id INT)
+    RETURNS TABLE (port INT) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT unnest(
+           ARRAY(
+                   SELECT unnest(available_port)
+                   EXCEPT
+                   SELECT port FROM get_used_ports(mcu_id)
+           )
+        )
+        FROM tbl_mcu
+        WHERE id = mcu_id;
+    END;
+$$ LANGUAGE plpgsql;
 
 SELECT * FROM tbl_sensordata;

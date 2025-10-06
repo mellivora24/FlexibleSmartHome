@@ -12,7 +12,6 @@ import (
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/mcu"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/notification"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/pendingActions"
-	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/room"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensor"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensorData"
 
@@ -45,7 +44,6 @@ func main() {
 	// Create repo
 	logRepo := l.NewRepository(dbClient)
 	mcuRepo := mcu.NewRepository(dbClient)
-	roomRepo := room.NewRepository(dbClient)
 	eventRepo := event.NewRepository(dbClient)
 	deviceRepo := device.NewRepository(dbClient)
 	sensorRepo := sensor.NewSensorRepository(dbClient)
@@ -56,7 +54,6 @@ func main() {
 	// Init services
 	logService := l.NewService(logRepo)
 	mcuService := mcu.NewService(mcuRepo)
-	roomService := room.NewService(roomRepo)
 	eventService := event.NewService(eventRepo)
 	sensorService := sensor.NewService(sensorRepo)
 	deviceService := device.NewService(deviceRepo)
@@ -79,7 +76,6 @@ func main() {
 	// Handlers
 	logHandler := l.NewHandler(logService)
 	mcuHandler := mcu.NewHandler(mcuService)
-	roomHandler := room.NewHandler(roomService)
 	eventHandler := event.NewHandler(eventService)
 	sensorHandler := sensor.NewHandler(sensorService)
 	deviceHandler := device.NewHandler(deviceService)
@@ -98,7 +94,6 @@ func main() {
 	{
 		logHandler.RegisterRoutes(api)
 		mcuHandler.RegisterRoutes(api)
-		roomHandler.RegisterRoutes(api)
 		eventHandler.RegisterRoutes(api)
 		sensorHandler.RegisterRoutes(api)
 		deviceHandler.RegisterRoutes(api)

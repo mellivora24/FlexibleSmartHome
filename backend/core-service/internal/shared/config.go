@@ -37,16 +37,10 @@ type SERVER_CONFIG struct {
 	WS_PORT   string `mapstructure:"ws_port"`
 	WS_PATH   string `mapstructure:"ws_path"`
 }
-
-type AUTH_CONFIG struct {
-	URL string `mapstructure:"url"`
-}
-
 type APP_CONFIG struct {
-	Database    DB_CONFIG     `mapstructure:"database"`
-	Mosquitto   MQTT_CONFIG   `mapstructure:"mosquitto"`
-	Server      SERVER_CONFIG `mapstructure:"server"`
-	AuthService AUTH_CONFIG   `mapstructure:"auth_service"`
+	Database  DB_CONFIG     `mapstructure:"database"`
+	Mosquitto MQTT_CONFIG   `mapstructure:"mosquitto"`
+	Server    SERVER_CONFIG `mapstructure:"server"`
 }
 
 func LoadConfig() (*APP_CONFIG, error) {

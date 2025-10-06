@@ -1,5 +1,5 @@
 database:
-  host: core_db
+  host: localhost           # TODO: change to core_db when run on docker
   port: 5432
   username: ${CORE_DB_USER}
   password: ${CORE_DB_PASS}
@@ -23,6 +23,3 @@ server:
   base_path: api/v1/core
   ws_port: ":8080"
   ws_path: "/ws"
-
-auth_service:
-  url: http://auth_service:8081

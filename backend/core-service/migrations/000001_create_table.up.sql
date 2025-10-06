@@ -219,14 +219,16 @@ CREATE OR REPLACE FUNCTION get_available_ports(mcu_id INT)
     RETURNS TABLE (port INT) AS $$
 BEGIN
     RETURN QUERY
-        SELECT unnest(
-           ARRAY(
-                   SELECT unnest(available_port)
-                   EXCEPT
-                   SELECT port FROM get_used_ports(mcu_id)
-           )
+        SELECT ap.port
+        FROM (
+                 SELECT unnest(available_port) AS port
+                 FROM tbl_mcu
+                 WHERE id = mcu_id
+             ) AS ap
+        WHERE ap.port NOT IN (
+            SELECT up.port
+            FROM get_used_ports(mcu_id) AS up
         )
-        FROM tbl_mcu
-        WHERE id = mcu_id;
-    END;
+        ORDER BY ap.port;
+END;
 $$ LANGUAGE plpgsql;

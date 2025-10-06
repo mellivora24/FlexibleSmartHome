@@ -10,7 +10,7 @@ type Service interface {
 	CreateMCU(uid int64, mcu *CreateMCURequest) (*McuDB, error)
 	FirmwareUpdate(mcu *FirmwareUpdateRequest) (*McuDB, error)
 	DeleteMCU(id int) error
-	GetAvailablePorts(mid int) ([]PortInfo, error)
+	GetAvailablePorts(mid int) ([]int, error)
 	GetMcuByUID(uid string) (int64, error)
 }
 
@@ -55,7 +55,7 @@ func (s *service) DeleteMCU(id int) error {
 	return s.repo.Delete(int64(id))
 }
 
-func (s *service) GetAvailablePorts(mid int) ([]PortInfo, error) {
+func (s *service) GetAvailablePorts(mid int) ([]int, error) {
 	ports, err := s.repo.AvailablePort(int64(mid))
 	if err != nil {
 		return nil, err

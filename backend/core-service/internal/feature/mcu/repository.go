@@ -8,7 +8,7 @@ type Repository interface {
 	FindByUID(uid string) (int64, error)
 
 	UpdateFirmware(id int64, firmwareVersion string) (*McuDB, error)
-	AvailablePort(mid int64) ([]PortInfo, error)
+	AvailablePort(mid int64) ([]int, error)
 }
 
 type repository struct {
@@ -48,8 +48,8 @@ func (r *repository) Delete(id int64) error {
 	return nil
 }
 
-func (r *repository) AvailablePort(mid int64) ([]PortInfo, error) {
-	var ports []PortInfo
+func (r *repository) AvailablePort(mid int64) ([]int, error) {
+	var ports []int
 	if err := r.DB.
 		Raw("SELECT * FROM get_available_ports(?)", mid).
 		Scan(&ports).Error; err != nil {

@@ -19,8 +19,7 @@ func (McuDB) TableName() string {
 }
 
 type PortInfo struct {
-	Port int    `json:"port"`
-	Type string `json:"type"`
+	Port int `json:"port"`
 }
 
 type CreateMCURequest struct {

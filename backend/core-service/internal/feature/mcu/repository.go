@@ -51,7 +51,7 @@ func (r *repository) Delete(id int64) error {
 func (r *repository) AvailablePort(mid int64) ([]PortInfo, error) {
 	var ports []PortInfo
 	if err := r.DB.
-		Raw("SELECT * FROM get_used_ports(?)", mid).
+		Raw("SELECT * FROM get_available_ports(?)", mid).
 		Scan(&ports).Error; err != nil {
 		return nil, err
 	}

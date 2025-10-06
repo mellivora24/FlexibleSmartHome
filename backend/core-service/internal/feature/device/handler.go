@@ -19,17 +19,20 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	devices := rg.Group("/devices")
 	{
-		devices.GET("/", h.ListDevices)        // GET /devices?uid=...
-		devices.POST("/", h.CreateDevice)      // POST /devices
-		devices.PUT("/:id", h.UpdateDevice)    // PUT /devices/:id
-		devices.DELETE("/:id", h.DeleteDevice) // DELETE /devices/:id
+		devices.GET("/", h.ListDevices)
+		devices.POST("/", h.CreateDevice)
+		devices.PUT("/:id", h.UpdateDevice)
+		devices.DELETE("/:id", h.DeleteDevice)
 	}
 }
 
 func (h *Handler) ListDevices(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
 	if uid == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "missing X-UID header",
+		})
 		return
 	}
 	intUid, err := strconv.ParseInt(uid, 10, 64)
@@ -54,18 +57,27 @@ func (h *Handler) ListDevices(c *gin.Context) {
 func (h *Handler) CreateDevice(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
 	if uid == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "missing X-UID header",
+		})
 		return
 	}
 	intUid, err := strconv.ParseInt(uid, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid X-UID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid X-UID",
+		})
 		return
 	}
 
 	var device CreateDeviceRequest
 	if err := c.ShouldBindJSON(&device); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 

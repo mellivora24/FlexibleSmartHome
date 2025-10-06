@@ -20,7 +20,7 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	{
 		mcus.POST("/", h.AssignMCU)
 		mcus.DELETE("/:id", h.DeleteMCU)
-		mcus.PUT("/:id/firmware", h.FirmwareUpdate)
+		mcus.PUT("/firmware", h.FirmwareUpdate)
 		mcus.GET("/:id/available-ports", h.AvailablePort)
 	}
 }
@@ -73,6 +73,14 @@ func (h *Handler) FirmwareUpdate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"error":   err.Error(),
+		})
+		return
+	}
+
+	if req.FirmwareVersion == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "firmware_version is required",
 		})
 		return
 	}

@@ -32,7 +32,7 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]SensorDataItem, 
 	}
 	offset := (req.Page - 1) * req.Limit
 
-	query := r.DB.Table("tbl_sensordata AS sd").
+	query := r.DB.Table("tbl_sensor_data AS sd").
 		Select("sd.id, s.name AS sensor_name, sd.value, sd.unit, sd.created_at").
 		Joins("JOIN tbl_sensor s ON sd.sid = s.id").
 		Where("sd.uid = ?", uid)
@@ -73,7 +73,7 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]SensorDataItem, 
 
 func (r *repository) GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, error) {
 	var item SensorDataItem
-	query := r.DB.Table("tbl_sensordata AS sd").
+	query := r.DB.Table("tbl_sensor_data AS sd").
 		Select("sd.id, s.name AS sensor_name, sd.value, sd.unit, sd.created_at").
 		Joins("JOIN tbl_sensor s ON sd.sid = s.id").
 		Where("sd.uid = ?", uid)

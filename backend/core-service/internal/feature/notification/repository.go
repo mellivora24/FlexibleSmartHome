@@ -3,7 +3,7 @@ package notification
 import "gorm.io/gorm"
 
 type Repository interface {
-	GetList(uid int64, req GetListRequest) ([]*NotificationDB, int64, error)
+	GetList(uid int64, req *GetListRequest) ([]*NotificationDB, int64, error)
 	CreateNoti(log *NotificationDB) error
 	UpdateNoti(id int64) (*NotificationDB, error)
 }
@@ -16,7 +16,7 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{DB: db}
 }
 
-func (r *repository) GetList(uid int64, req GetListRequest) ([]*NotificationDB, int64, error) {
+func (r *repository) GetList(uid int64, req *GetListRequest) ([]*NotificationDB, int64, error) {
 	var noti []*NotificationDB
 	var total int64
 

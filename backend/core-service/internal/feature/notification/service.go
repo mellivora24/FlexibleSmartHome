@@ -33,7 +33,7 @@ func (s service) Create(uid int64, t string, message string, metadata json.RawMe
 }
 
 func (s service) GetList(uid int64, cond *GetListRequest) (*GetListResponse, error) {
-	notifications, total, err := s.repo.GetList(uid, cond.Page, cond.Limit)
+	notifications, total, err := s.repo.GetList(uid, cond)
 	if err != nil {
 		return nil, err
 	}

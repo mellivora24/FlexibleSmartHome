@@ -99,7 +99,7 @@ CREATE INDEX IF NOT EXISTS idx_log_uid ON tbl_log(uid);
 CREATE INDEX IF NOT EXISTS idx_sensor_uid ON tbl_sensor(uid);
 CREATE INDEX IF NOT EXISTS idx_device_uid ON tbl_device(uid);
 CREATE INDEX IF NOT EXISTS idx_events_did ON tbl_events(did);
-CREATE INDEX IF NOT EXISTS idx_sensorData_sid ON tbl_sensorData(sid);
+CREATE INDEX IF NOT EXISTS idx_sensorData_sid ON tbl_sensor_data(sid);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_status ON pending_actions(status);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_user_mcu ON pending_actions(uid, mid);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_created_at ON pending_actions(created_at);
@@ -230,5 +230,3 @@ BEGIN
         WHERE id = mcu_id;
     END;
 $$ LANGUAGE plpgsql;
-
-SELECT * FROM tbl_sensordata;

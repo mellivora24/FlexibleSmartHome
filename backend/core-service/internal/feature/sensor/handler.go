@@ -20,7 +20,7 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	{
 		sensors.GET("/", h.ListSensors)
 		sensors.POST("/", h.CreateSensor)
-		sensors.PUT("/:id", h.UpdateSensor)
+		sensors.PUT("/", h.UpdateSensor)
 		sensors.DELETE("/:id", h.DeleteSensor)
 	}
 }

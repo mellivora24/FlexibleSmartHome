@@ -18,7 +18,7 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	sensorDataGroup := rg.Group("/sensor-data")
 	{
-		sensorDataGroup.GET("", h.ListSensorData)
+		sensorDataGroup.GET("/", h.ListSensorData)
 		sensorDataGroup.GET("/:id", h.GetOneSensorData)
 	}
 }

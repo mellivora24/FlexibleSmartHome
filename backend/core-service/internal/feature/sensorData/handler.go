@@ -26,45 +26,69 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 func (h *Handler) ListSensorData(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
 	if uid == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "missing X-UID header"})
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "missing X-UID header",
+		})
 		return
 	}
 	intUid, _ := strconv.ParseInt(uid, 10, 64)
 
 	var req GetListRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
 	resp, err := h.service.GetList(intUid, &req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "success", "data": resp})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    resp,
+	})
 }
 
 func (h *Handler) GetOneSensorData(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
 	if uid == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "missing X-UID header"})
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "missing X-UID header",
+		})
 		return
 	}
 	intUid, _ := strconv.ParseInt(uid, 10, 64)
 
 	var req GetOneRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
 	data, err := h.service.GetOne(intUid, &req)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"status": "error", "message": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "success", "data": data})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    data,
+	})
 }

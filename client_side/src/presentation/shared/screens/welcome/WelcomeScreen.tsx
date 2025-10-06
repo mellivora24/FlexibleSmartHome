@@ -1,21 +1,33 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Image, Text } from "react-native";
 
 import { FlexButton } from "@components/FlexButton";
 import { IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
+import { useAuthContext } from "@src/presentation/hooks/useContext";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./style/welcome";
 
 export default function WelcomeScreen() {
     const { t } = useTranslation();
     const router = useRouter();
+    const { authData } = useAuthContext();
+
+    useEffect(() => {
+        if (authData) {
+            router.replace(ROUTES.TABS.DASHBOARD);
+        }
+    }, [authData]);
 
     function handleGetStarted() {
         router.replace(ROUTES.AUTH.LOGIN);
+    }
+
+    if (authData) {
+        return null;
     }
 
     return (

@@ -12,128 +12,67 @@ import { DeviceCard } from './components/DeviceCard';
 import { deviceScreenStyle } from './deviceStyle';
 
 interface DeviceScreenProps {
-  devices?: Device[];
-  loading?: boolean;
+    devices?: Device[];
+    loading?: boolean;
 }
 
 export default function DeviceListScreen({
-  devices = mockDevices,
-  loading = false,
+    devices,
+    loading,
 }: DeviceScreenProps) {
-  const router = useRouter();
-  const { t } = useTranslation();
+    const router = useRouter();
+    const { t } = useTranslation();
 
-  const renderShimmer = () => (
-    <>
-      {[...Array(5)].map((_, idx) => (
-        <ShimmerPlaceholder
-          key={idx}
-          LinearGradient={LinearGradient}
-          visible={false}
-          shimmerColors={['#ebebeb', '#c5c5c5', '#ebebeb']}
-          style={deviceScreenStyle.shimmerItem}
-        />
-      ))}
-    </>
-  );
+    const renderShimmer = () => (
+        <>
+            {[...Array(5)].map((_, idx) => (
+                <ShimmerPlaceholder
+                    key={idx}
+                    LinearGradient={LinearGradient}
+                    visible={false}
+                    shimmerColors={['#ebebeb', '#c5c5c5', '#ebebeb']}
+                    style={deviceScreenStyle.shimmerItem}
+                />
+            ))}
+        </>
+    );
 
-  return (
-    <LinearGradient
-      colors={BACKGROUND.GRADIENT as [string, string]}
-      start={{ x: 0, y: 1 }}
-      end={{ x: 0.8, y: 0 }}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={deviceScreenStyle.container}>
-        <TopBarWidget
-          username="Quyet Thanh"
-          isHavingNotification={false}
-          onAvatarPress={() => router.push('/add-on/account')}
-          onNotificationPress={() => router.push('/add-on/notification')}
-        />
-        <View style={deviceScreenStyle.body}>
-          <ScrollView
-            style={deviceScreenStyle.scrollView}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 16 }}
-          >
-            {loading ? (
-              renderShimmer()
-            ) : devices && devices.length > 0 ? (
-              devices.map((device) => (
-                <DeviceCard key={device.id} device={device} />
-              ))
-            ) : (
-              <View style={deviceScreenStyle.noDeviceContainer}>
-                <Text style={deviceScreenStyle.noDeviceContext}>
-                  {t('deviceList.noDevice')}
-                </Text>
-              </View>
-            )}
-          </ScrollView>
-        </View>
-      </SafeAreaView>
-    </LinearGradient>
-  );
+    return (
+        <LinearGradient
+            colors={BACKGROUND.GRADIENT as [string, string]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 0.8, y: 0 }}
+            style={{ flex: 1 }}
+        >
+            <SafeAreaView style={deviceScreenStyle.container}>
+                <TopBarWidget
+                    username="Quyet Thanh"
+                    isHavingNotification={false}
+                    onAvatarPress={() => router.push('/add-on/account')}
+                    onNotificationPress={() => router.push('/add-on/notification')}
+                />
+                <View style={deviceScreenStyle.body}>
+                    <ScrollView
+                        style={deviceScreenStyle.scrollView}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 16 }}
+                    >
+                        {loading ? (
+                            renderShimmer()
+                        ) : devices && devices.length > 0 ? (
+                            devices.map((device) => (
+                                <DeviceCard key={device.id} device={device} />
+                            ))
+                        ) : (
+                            <View style={deviceScreenStyle.noDeviceContainer}>
+                                <Text style={deviceScreenStyle.noDeviceContext}>
+                                    {t('deviceList.noDevice')}
+                                </Text>
+                            </View>
+                        )}
+                    </ScrollView>
+                </View>
+            </SafeAreaView>
+        </LinearGradient>
+    );
 }
-
-
-const mockDevice: Device = {
-    id: 1,
-    uid: 1,
-    mid: 1,
-    rid: 1,
-    name: "Living Room Light",
-    type: "digitalDevice",
-    port: 3,
-    status: true,
-    Data: { onOff: true },
-    RunningTime: 1200,
-    CreatedAt: new Date(),
-    UpdatedAt: new Date(),
-};
-
-const mockDevices: Device[] = [
-    {
-        id: 1,
-        uid: 1,
-        mid: 1,
-        rid: 1,
-        name: "Living Room Light",
-        type: "digitalDevice",
-        port: 3,
-        status: true,
-        Data: { onOff: true },
-        RunningTime: 1200,
-        CreatedAt: new Date(),
-        UpdatedAt: new Date(),
-    },
-    {
-        id: 2,
-        uid: 1,
-        mid: 1,
-        rid: 2,
-        name: "Bedroom Thermostat",
-        type: "analogDevice",
-        port: 5,
-        status: false,
-        Data: { value: 22.5 },
-        RunningTime: 3600,
-        CreatedAt: new Date(),
-        UpdatedAt: new Date(),
-    },
-    {
-        id: 3,
-        uid: 1,
-        mid: 1,
-        rid: 3,
-        name: "Kitchen Sensor",
-        type: "analogSensor",
-        port: 7,
-        status: true,
-        Data: { value: 75 },
-        RunningTime: 5400,
-        CreatedAt: new Date(),
-        UpdatedAt: new Date(),
-    },
-];

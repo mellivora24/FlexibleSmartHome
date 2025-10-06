@@ -42,7 +42,7 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({ temperature, humidity 
                 withVerticalLabels={true}
                 withHorizontalLabels={true}
                 style={chartWidgetStyle.chartStyle}
-                width={Dimensions.get("window").width + 32}
+                width={Dimensions.get("window").width + 26}
             />
         </View>
     );

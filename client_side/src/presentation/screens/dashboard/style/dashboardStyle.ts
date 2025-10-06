@@ -15,7 +15,7 @@ export const dashboardStyle = StyleSheet.create({
     },
     row: {
         flex: 1,
-        marginLeft: 12,
+        marginLeft: 8,
         flexDirection: 'column',
         justifyContent: 'space-between',
     },

@@ -43,7 +43,7 @@ export const WeatherOutsideWidget: React.FC = () => {
     const { condition, icon } = getWeatherByWMO(weather?.weathercode ?? 0, t);
 
     const linearColor =
-        weather?.temperature && weather?.temperature >= 25
+        weather?.temperature && weather?.temperature >= 30
             ? WeatherLinearGradient.hot
             : WeatherLinearGradient.normal;
 

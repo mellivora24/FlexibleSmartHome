@@ -51,7 +51,10 @@ func (h *Handler) ListDevices(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }
 
 func (h *Handler) CreateDevice(c *gin.Context) {
@@ -87,65 +90,104 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": "device already exists"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": res})
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }
 
 func (h *Handler) UpdateDevice(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
 	if uid == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing X-UID header"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "missing X-UID header",
+		})
 		return
 	}
 	intUid, err := strconv.ParseInt(uid, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid X-UID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid X-UID",
+		})
 		return
 	}
 
 	var device UpdateDeviceRequest
 	if err := c.ShouldBindJSON(&device); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
 	res, err := h.service.UpdateDevice(intUid, &device)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"error":   "device not found",
+			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }
 
 func (h *Handler) DeleteDevice(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing device id"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "missing device id",
+		})
 		return
 	}
 
 	intId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid device id"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid device id",
+		})
 		return
 	}
 
 	if err := h.service.DeleteDevice(intId); err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"error":   "device not found",
+			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	c.JSON(http.StatusNoContent, gin.H{
+		"success": true,
+		"data":    nil,
+	})
 }

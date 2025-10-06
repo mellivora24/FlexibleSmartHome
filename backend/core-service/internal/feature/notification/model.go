@@ -20,8 +20,9 @@ func (NotificationDB) TableName() string {
 }
 
 type GetListRequest struct {
-	Page  int `json:"page"`
-	Limit int `json:"limit"`
+	Page  int    `json:"page"`
+	Limit int    `json:"limit"`
+	Order string `json:"order"`
 }
 
 type GetListResponse struct {

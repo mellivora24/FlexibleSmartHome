@@ -3,7 +3,7 @@ package notification
 import "gorm.io/gorm"
 
 type Repository interface {
-	GetList(uid int64, pageSize int, limit int) ([]*NotificationDB, int64, error)
+	GetList(uid int64, req GetListRequest) ([]*NotificationDB, int64, error)
 	CreateNoti(log *NotificationDB) error
 	UpdateNoti(id int64) (*NotificationDB, error)
 }
@@ -16,26 +16,30 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{DB: db}
 }
 
-func (r *repository) GetList(uid int64, pageSize int, limit int) ([]*NotificationDB, int64, error) {
+func (r *repository) GetList(uid int64, req GetListRequest) ([]*NotificationDB, int64, error) {
 	var noti []*NotificationDB
 	var total int64
 
-	if limit <= 0 {
-		limit = 10
+	if req.Page <= 0 {
+		req.Page = 1
 	}
-	if pageSize <= 0 {
-		pageSize = 1
+	if req.Limit <= 0 {
+		req.Limit = 10
 	}
 
-	offset := (pageSize - 1) * limit
+	offset := (req.Page - 1) * req.Limit
 	query := r.DB.Model(&NotificationDB{}).Where("uid = ?", uid)
 
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	if err := query.Order("created_at DESC").
-		Limit(limit).
+	if req.Order != "asc" {
+		req.Order = "desc"
+	}
+
+	if err := query.Order("created_at " + req.Order).
+		Limit(req.Limit).
 		Offset(offset).
 		Find(&noti).Error; err != nil {
 		return nil, 0, err

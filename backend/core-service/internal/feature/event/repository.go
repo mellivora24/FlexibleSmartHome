@@ -33,11 +33,14 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]*EventResponse, 
 		Joins("JOIN tbl_device d ON e.did = d.id").
 		Where("e.uid = ?", uid)
 
-	if req.Action != "" {
-		query = query.Where("e.action = ?", req.Action)
-	}
 	if req.DID > 0 {
 		query = query.Where("e.did = ?", req.DID)
+	}
+	if req.DeviceName != "" {
+		query = query.Where("d.name LIKE ?", "%"+req.DeviceName+"%")
+	}
+	if req.Action != "" {
+		query = query.Where("e.action = ?", req.Action)
 	}
 	if !req.StartTime.IsZero() {
 		query = query.Where("e.created_at >= ?", req.StartTime)

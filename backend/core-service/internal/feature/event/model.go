@@ -33,14 +33,15 @@ type GetListResponse struct {
 }
 
 type GetListRequest struct {
-	Page      int       `form:"page"`
-	Limit     int       `form:"limit"`
-	SortBy    string    `form:"sort_by"`
-	SortType  string    `form:"sort_type"`
-	Action    string    `form:"action"`
-	DID       int64     `form:"did"`
-	StartTime time.Time `form:"start_time" time_format:"2006-01-02 15:04:05"`
-	EndTime   time.Time `form:"end_time" time_format:"2006-01-02 15:04:05"`
+	DID        int64     `form:"did"`
+	DeviceName string    `form:"device_name"`
+	Action     string    `form:"action"`
+	Page       int       `form:"page"`
+	Limit      int       `form:"limit"`
+	SortBy     string    `form:"sort_by"`
+	SortType   string    `form:"sort_type"`
+	StartTime  time.Time `form:"start_time" time_format:"2006-01-02 15:04:05"`
+	EndTime    time.Time `form:"end_time" time_format:"2006-01-02 15:04:05"`
 }
 
 type GetOneRequest struct {

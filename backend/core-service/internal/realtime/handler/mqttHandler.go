@@ -37,11 +37,11 @@ func (h *MQTTHandler) Init() error {
 		return err
 	}
 
-	if err := h.mqttService.Subscribe("user/+/mcu/+/config/device/request", h.onConfigDeviceRequest); err != nil {
+	if err := h.mqttService.Subscribe("user/+/mcu/+/config/devices/request", h.onConfigDeviceRequest); err != nil {
 		return err
 	}
 
-	if err := h.mqttService.Subscribe("user/+/mcu/+/config/sensor/request", h.onConfigSensorRequest); err != nil {
+	if err := h.mqttService.Subscribe("user/+/mcu/+/config/sensors/request", h.onConfigSensorRequest); err != nil {
 		return err
 	}
 
@@ -139,7 +139,7 @@ func (h *MQTTHandler) onConfigDeviceRequest(client mqtt.Client, msg mqtt.Message
 
 	payload, _ := json.Marshal(responseData)
 
-	responseTopic := "user/" + uid + "/mcu/" + mcuId + "/config/device/response"
+	responseTopic := "user/" + uid + "/mcu/" + mcuId + "/config/devices/response"
 	err = h.mqttService.Publish(responseTopic, payload)
 	if err != nil {
 		log.Printf("[MQTTHandler] Error publishing config response: %v", err)
@@ -170,7 +170,7 @@ func (h *MQTTHandler) onConfigSensorRequest(client mqtt.Client, msg mqtt.Message
 
 	payload, _ := json.Marshal(responseData)
 
-	responseTopic := "user/" + uid + "/mcu/" + mcuId + "/config/sensor/response"
+	responseTopic := "user/" + uid + "/mcu/" + mcuId + "/config/sensors/response"
 	err = h.mqttService.Publish(responseTopic, payload)
 	if err != nil {
 		log.Printf("[MQTTHandler] Error publishing sensor config response: %v", err)

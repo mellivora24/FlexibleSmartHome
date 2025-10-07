@@ -9,7 +9,7 @@ import { PasswordTextField } from "@components/PasswordTextField";
 import { TextField } from "@components/TextField";
 import { ICONS, IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
-import { useAuthContext } from "@src/presentation/hooks/useContext";
+import { useAuthContext } from "@src/presentation/hooks/useAuth";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./authStyle";
 import { useAuthViewModel } from "./AuthViewModel";

@@ -14,7 +14,7 @@ import { TemperatureWidget } from './widgets/TemperatureWidget';
 import { WeatherOutsideWidget } from './widgets/WeatherOutsideWidget';
 
 import { Device } from '@src/domain/model/Device';
-import { useAuthContext } from '@src/presentation/hooks/useContext';
+import { useAuthContext } from '@src/presentation/hooks/useAuth';
 
 export const DashboardScreen: React.FC = () => {
     const router = useRouter();

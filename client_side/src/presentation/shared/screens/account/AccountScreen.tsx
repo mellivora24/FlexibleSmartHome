@@ -8,7 +8,7 @@ import { TextWidget } from '@components/TextWidget';
 import { ICONS, IMAGES } from '@constants/images';
 import { ROUTES } from '@constants/routes';
 import { APP_CONFIG } from '@shared/config/appConfig';
-import { useAuthContext } from '@src/presentation/hooks/useContext';
+import { useAuthContext } from '@src/presentation/hooks/useAuth';
 import { BACKGROUND } from '@theme/colors';
 import { FlexButton } from '../../components/FlexButton';
 import { accountScreenStyle } from './accountScreenStyle';
@@ -46,7 +46,9 @@ export const AccountScreen: React.FC<AccountScreenProps> = () => {
     const processLogout = () => {
         logout();
         router.replace(ROUTES.AUTH.LOGIN);
-    }
+    };
+
+    const devicePinText = authData?.mid ? `Mã thiết bị của bạn: ${authData.mid}` : t('account.noDevice');
 
     return (
         <LinearGradient
@@ -81,6 +83,8 @@ export const AccountScreen: React.FC<AccountScreenProps> = () => {
                         onPress={handleUpdateFirmware}
                     />
                 </View>
+
+                <TextWidget text={devicePinText} icon={ICONS.PIN} style={{ marginTop: 10 }} />
 
                 <FlexButton
                     title={t('account.logout')}

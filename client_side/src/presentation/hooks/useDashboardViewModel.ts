@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Device } from "@domain/model/Device";
 import { WeatherData } from "@domain/model/Weather";
 import { WeatherRepositoryImpl } from "@domain/repo/weatherRepo";
 import { GetWeatherUseCase } from "@domain/usecase/weather/getUsecase";
+import { useFocusEffect } from "expo-router";
 
 const weatherRepository = new WeatherRepositoryImpl();
 const getWeatherUseCase = new GetWeatherUseCase(weatherRepository);
@@ -34,6 +35,14 @@ export const useDashboardViewModel = () => {
         }
     };
 
+    const fetchDevices = async () => {
+        const mockDevices: Device[] = [
+            { id: 0, uid: 1, mid: 1, rid: 0, name: "Living Room Light", type: "digitalDevice", port: 1, status: true, Data: { status: true, value: 1 }, RunningTime: 0, CreatedAt: new Date(), UpdatedAt: new Date() },
+            { id: 8, uid: 1, mid: 1, rid: 1, name: "Bedroom Fan", type: "digitalDevice", port: 2, status: false, Data: { status: false, value: 0 }, RunningTime: 0, CreatedAt: new Date(), UpdatedAt: new Date() }
+        ];
+        setDevices(mockDevices);
+    };
+
     const handleDevicePress = (deviceId: number) => {
         console.log(`Device ${deviceId} pressed`);
     };
@@ -44,7 +53,16 @@ export const useDashboardViewModel = () => {
 
     useEffect(() => {
         fetchWeather(21.0278, 105.8342);
+        fetchDevices();
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchDevices();
+
+            return () => {};
+        }, [])
+    );
 
     return {
         weather,

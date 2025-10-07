@@ -94,9 +94,9 @@ export const styles = StyleSheet.create({
         backgroundColor: '#ccffcc',
     },
     digitalSensorText: {
-        fontSize: 16,
+        fontSize: 8,
         fontWeight: 'bold',
         color: '#333',
-        marginTop: 24,
-    },
+        marginTop: 16,
+    }
 });

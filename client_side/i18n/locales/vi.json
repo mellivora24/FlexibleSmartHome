@@ -122,7 +122,9 @@
       "state": "Trạng thái hiện tại",
       "on": "Bật",
       "off": "Tắt"
-    }
+    },
+    "edit": "Sửa thiết bị",
+    "delete": "Xóa thiết bị"
   },
   "searchWidget": {
     "searchType": {

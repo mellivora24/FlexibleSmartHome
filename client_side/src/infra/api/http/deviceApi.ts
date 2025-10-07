@@ -6,7 +6,6 @@ import { API_CONFIG } from "@infra/config/apiConfig";
 export const deviceApi = {
     getAllDevices: async (): Promise<Device[]> => {
         try {
-            console.log("Fetching devices from API...");
             const response = await axios.get(`http://192.168.1.108:8082/api/v1/core/devices/`, {
                 headers: {
                     "X-UID": 1 // TODO: replace with token
@@ -35,9 +34,11 @@ export const deviceApi = {
                 if (status === 401) {
                     throw new Error("Unauthorized access");
                 } else if (status === 404) {
-                    throw new Error("Devices not found");
+                    console.log("API not found");
+                    return [];
                 } else {
-                    throw new Error("An unexpected error:" + error.message);
+                    console.log("API other error");
+                    return [];
                 }
             }
             throw error; // Re-throw non-Axios errors

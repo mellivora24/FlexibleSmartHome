@@ -9,10 +9,10 @@ import { PasswordTextField } from "@components/PasswordTextField";
 import { TextField } from "@components/TextField";
 import { ICONS, IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
-import { useAuthContext } from "@src/presentation/shared/hooks/useAuth";
+import { useAuthViewModel } from "@hooks/useAuthViewModel";
+import { useAuthContext } from "@src/presentation/hooks/useAppContext";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./authStyle";
-import { useAuthViewModel } from "./AuthViewModel";
 
 export default function LoginScreen() {
     const { t } = useTranslation();

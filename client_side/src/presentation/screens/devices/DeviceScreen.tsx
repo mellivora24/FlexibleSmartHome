@@ -6,22 +6,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
 
 import { TopBarWidget } from '@components/TopBarWidget';
-import { Device } from '@src/domain/model/Device';
+import { useDevicesViewModel } from '@presentation/hooks/useDevicesViewModel';
 import { BACKGROUND } from '@theme/colors';
 import { DeviceCard } from './components/DeviceCard';
 import { deviceScreenStyle } from './deviceStyle';
 
-interface DeviceScreenProps {
-    devices?: Device[];
-    loading?: boolean;
-}
-
-export default function DeviceListScreen({
-    devices,
-    loading,
-}: DeviceScreenProps) {
+export const DeviceScreen: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation();
+    const { devices: vmDevices, loading: vmLoading } = useDevicesViewModel();
 
     const renderShimmer = () => (
         <>
@@ -57,10 +50,10 @@ export default function DeviceListScreen({
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ paddingBottom: 16 }}
                     >
-                        {loading ? (
+                        {vmLoading ? (
                             renderShimmer()
-                        ) : devices && devices.length > 0 ? (
-                            devices.map((device) => (
+                        ) : vmDevices.length > 0 ? (
+                            vmDevices.map((device) => (
                                 <DeviceCard key={device.id} device={device} />
                             ))
                         ) : (

@@ -37,7 +37,7 @@
         "src/presentation/shared/theme/*"
       ],
       "@hooks/*": [
-        "src/presentation/shared/hooks/*"
+        "src/presentation/hooks/*"
       ],
       "@shared/*": [
         "src/presentation/shared/*"

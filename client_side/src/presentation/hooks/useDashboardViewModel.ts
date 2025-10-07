@@ -1,13 +1,18 @@
+import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 
 import { Device } from "@domain/model/Device";
 import { WeatherData } from "@domain/model/Weather";
 import { WeatherRepositoryImpl } from "@domain/repo/weatherRepo";
 import { GetWeatherUseCase } from "@domain/usecase/weather/getUsecase";
-import { useFocusEffect } from "expo-router";
+import { DeviceRepositoryImpl } from "@src/domain/repo/deviceRepo";
+import { GetAllDevices } from "@src/domain/usecase/device/getAllDevices";
 
 const weatherRepository = new WeatherRepositoryImpl();
 const getWeatherUseCase = new GetWeatherUseCase(weatherRepository);
+
+const deviceRepository = new DeviceRepositoryImpl();
+const getAllDevices = new GetAllDevices(deviceRepository);
 
 export const useDashboardViewModel = () => {
 
@@ -19,8 +24,8 @@ export const useDashboardViewModel = () => {
     const [devices, setDevices] = useState<Device[]>([]);
     const [insideHumidity, setInsideHumidity] = useState(60);
     const [insideTemperature, setInsideTemperature] = useState(25);
-    const [humidityHistory, setHumidityHistory] = useState<number[]>([55, 56, 57, 58, 59, 60, 61]);
-    const [temperatureHistory, setTemperatureHistory] = useState<number[]>([22, 23, 24, 25, 26, 27, 28]);
+    const [humidityHistory, setHumidityHistory] = useState<number[]>([0]);
+    const [temperatureHistory, setTemperatureHistory] = useState<number[]>([0]);
 
     const fetchWeather = async (latitude: number, longitude: number) => {
         setLoading(true);
@@ -36,11 +41,18 @@ export const useDashboardViewModel = () => {
     };
 
     const fetchDevices = async () => {
-        const mockDevices: Device[] = [
-            { id: 0, uid: 1, mid: 1, rid: 0, name: "Living Room Light", type: "digitalDevice", port: 1, status: true, Data: { status: true, value: 1 }, RunningTime: 0, CreatedAt: new Date(), UpdatedAt: new Date() },
-            { id: 8, uid: 1, mid: 1, rid: 1, name: "Bedroom Fan", type: "digitalDevice", port: 2, status: false, Data: { status: false, value: 0 }, RunningTime: 0, CreatedAt: new Date(), UpdatedAt: new Date() }
-        ];
-        setDevices(mockDevices);
+        const devices = await getAllDevices.execute();
+        setDevices(devices);
+    };
+
+    const fetchHumidityHistory = async () => {
+        const mockHumidityHistory = [55, 56, 57, 58, 59, 60, 30];
+        setHumidityHistory(mockHumidityHistory);
+    };
+
+    const fetchTemperatureHistory = async () => {
+        const mockTemperatureHistory = [22, 23, 24, 25, 26, 27, 22];
+        setTemperatureHistory(mockTemperatureHistory);
     };
 
     const handleDevicePress = (deviceId: number) => {
@@ -53,12 +65,13 @@ export const useDashboardViewModel = () => {
 
     useEffect(() => {
         fetchWeather(21.0278, 105.8342);
-        fetchDevices();
     }, []);
 
     useFocusEffect(
         useCallback(() => {
             fetchDevices();
+            fetchHumidityHistory();
+            fetchTemperatureHistory();
 
             return () => {};
         }, [])

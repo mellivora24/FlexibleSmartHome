@@ -81,7 +81,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ device }) => {
                         {t("deviceCard.runningTime")}: {(device.RunningTime / 3600).toFixed(1)}h
                     </Text>
                     <Text style={deviceCardStyle.detail}>
-                        {t("deviceCard.lastUpdated")}: {device.UpdatedAt.toLocaleDateString()}
+                        {t("deviceCard.lastUpdated")}: {device.UpdatedAt ? new Date(device.UpdatedAt).toLocaleDateString() : "N/A"}
                     </Text>
 
                     <Text></Text>

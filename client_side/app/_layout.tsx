@@ -2,7 +2,7 @@ import "@i18n";
 
 import { Stack } from "expo-router";
 
-import { AuthProvider } from "@src/presentation/hooks/useContext";
+import { AuthProvider } from "@src/presentation/hooks/useAppContext";
 import { COLORS } from "@theme/colors";
 
 export default function Layout() {

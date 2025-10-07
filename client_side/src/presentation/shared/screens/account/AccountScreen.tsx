@@ -8,7 +8,7 @@ import { TextWidget } from '@components/TextWidget';
 import { ICONS, IMAGES } from '@constants/images';
 import { ROUTES } from '@constants/routes';
 import { APP_CONFIG } from '@shared/config/appConfig';
-import { useAuthContext } from '@src/presentation/hooks/useAuth';
+import { useAuthContext } from '@src/presentation/shared/hooks/useAuth';
 import { BACKGROUND } from '@theme/colors';
 import { FlexButton } from '../../components/FlexButton';
 import { accountScreenStyle } from './accountScreenStyle';

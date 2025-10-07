@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import { IMAGES } from '@constants/images';
-import { useAuthContext } from '@src/presentation/hooks/useAuth';
+import { useAuthContext } from '@src/presentation/shared/hooks/useAuth';
 import { accountWidgetStyle } from './accountWidgetStyle';
 
 interface AccountWidgetProps {

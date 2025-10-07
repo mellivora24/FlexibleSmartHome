@@ -1,40 +1,25 @@
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import React from "react";
+import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { TopBarWidget } from '@components/TopBarWidget';
-import { BACKGROUND } from '@theme/colors';
-import { dashboardStyle } from './style/dashboardStyle';
-import { ChartWidget } from './widgets/ChartWidget';
-import { HumidityWidget } from './widgets/HumidityWidget';
-import { RoomWidget } from './widgets/RoomWidget';
-import { TemperatureWidget } from './widgets/TemperatureWidget';
-import { WeatherOutsideWidget } from './widgets/WeatherOutsideWidget';
+import { TopBarWidget } from "@components/TopBarWidget";
+import { BACKGROUND } from "@theme/colors";
+import { dashboardStyle } from "./style/dashboardStyle";
+import { ChartWidget } from "./widgets/ChartWidget";
+import { HumidityWidget } from "./widgets/HumidityWidget";
+import { RoomWidget } from "./widgets/RoomWidget";
+import { TemperatureWidget } from "./widgets/TemperatureWidget";
+import { WeatherOutsideWidget } from "./widgets/WeatherOutsideWidget";
 
-import { Device } from '@src/domain/model/Device';
-import { useAuthContext } from '@src/presentation/hooks/useAppContext';
+import { useDashboardViewModel } from "@hooks/useDashboardViewModel";
+import { useAuthContext } from "@presentation/hooks/useAppContext";
 
 export const DashboardScreen: React.FC = () => {
     const router = useRouter();
     const { authData } = useAuthContext();
-
-    const [insideHumidity, setInsideHumidity] = useState(60);
-    const [insideTemperature, setInsideTemperature] = useState(25);
-
-    const [temperatureHistory, setTemperatureHistory] = useState<number[]>([22, 23, 24, 25, 26, 27, 28, 29, 30]);
-    const [humidityHistory, setHumidityHistory] = useState<number[]>([55, 56, 57, 58, 59, 60, 61, 62, 63]);
-
-    const [devices, setDevices] = useState<Device[]>([]);
-
-    const handleDevicePress = (deviceId: number) => {
-        console.log(`Device ${deviceId} pressed`);
-    };
-
-    const handleDeviceValueChange = (deviceId: number, newValue: number) => {
-        console.log(`Device ${deviceId} changed to ${newValue}`);
-    };
+    const vm = useDashboardViewModel();
 
     return (
         <LinearGradient
@@ -44,34 +29,33 @@ export const DashboardScreen: React.FC = () => {
             style={{ flex: 1 }}
         >
             <SafeAreaView style={dashboardStyle.container}>
-                {/* Top bar */}
                 <TopBarWidget
                     username={authData?.name || "User"}
                     isHavingNotification={false}
-                    onAvatarPress={() => router.push('/add-on/account')}
-                    onNotificationPress={() => router.push('/add-on/notification')}
+                    onAvatarPress={() => router.push("/add-on/account")}
+                    onNotificationPress={() => router.push("/add-on/notification")}
                 />
 
                 <View style={dashboardStyle.Section1}>
-                    <WeatherOutsideWidget/>
+                    <WeatherOutsideWidget weather={vm.weather} loading={vm.loading} location={vm.location} />
                     <View style={dashboardStyle.row}>
-                        <HumidityWidget humidity={insideHumidity} />
-                        <TemperatureWidget temperature={insideTemperature} />
+                        <HumidityWidget humidity={vm.insideHumidity} />
+                        <TemperatureWidget temperature={vm.insideTemperature} />
                     </View>
                 </View>
 
                 <View style={dashboardStyle.Section2}>
                     <ChartWidget
-                        temperature={temperatureHistory}
-                        humidity={humidityHistory}
+                        temperature={vm.temperatureHistory}
+                        humidity={vm.humidityHistory}
                     />
                 </View>
 
                 <View style={dashboardStyle.Section3}>
                     <RoomWidget
-                        devices={devices}
-                        onDevicePress={handleDevicePress}
-                        onDeviceValueChange={handleDeviceValueChange}
+                        devices={vm.devices}
+                        onDevicePress={vm.handleDevicePress}
+                        onDeviceValueChange={vm.handleDeviceValueChange}
                     />
                 </View>
             </SafeAreaView>

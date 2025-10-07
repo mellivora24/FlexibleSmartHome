@@ -1,11 +1,21 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Image, Text, View } from "react-native";
 
 import { ICONS } from "@constants/images";
-import { useWeatherViewModel } from "./WeatherViewModel";
 import { WeatherLinearGradient, weatherWidgetStyle } from "./weatherWidgetStyle";
+
+type WeatherOutsideWidgetProps = {
+    weather?: {
+        temperature: number;
+        weathercode: number;
+    } | null;
+    location?: string;
+    loading?: boolean;
+    error?: string | null;
+};
+
 
 const getWeatherByWMO = (code: number, t: any) => {
     if (code === undefined || code === null) {
@@ -28,20 +38,13 @@ const getWeatherByWMO = (code: number, t: any) => {
     return { condition: t("dashboard.weatherCondition.unknown"), icon: ICONS.DASHBOARD_SUNNY };
 };
 
-export const WeatherOutsideWidget: React.FC = () => {
+export const WeatherOutsideWidget: React.FC<WeatherOutsideWidgetProps> = ({
+    weather,
+    location,
+    loading,
+}) => {
     const { t } = useTranslation();
-    const { weather, loading, error, fetchWeather } = useWeatherViewModel();
-
-    const location = "Hà Nội, VN";
-    const latitude = 21.028511;
-    const longitude = 105.804817;
-
-    useEffect(() => {
-        fetchWeather(latitude, longitude);
-    }, []);
-
     const { condition, icon } = getWeatherByWMO(weather?.weathercode ?? 0, t);
-
     const linearColor =
         weather?.temperature && weather?.temperature >= 30
             ? WeatherLinearGradient.hot
@@ -77,8 +80,6 @@ export const WeatherOutsideWidget: React.FC = () => {
                         />
                         <Text style={weatherWidgetStyle.locationText}>{location}</Text>
                     </View>
-
-                    {error && <Text style={{ color: "red", marginTop: 4 }}>{error}</Text>}
                 </>
             )}
         </LinearGradient>

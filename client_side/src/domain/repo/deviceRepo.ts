@@ -5,7 +5,7 @@ export interface DeviceRepository {
     getAllDevices(): Promise<Device[]>;
     createDevice(data: Partial<CreateDeviceRequest>): Promise<Device>;
     updateDevice(data: Partial<UpdateDeviceRequest>): Promise<Device>;
-    deleteDevice(id: string): Promise<void>;
+    deleteDevice(id: number): Promise<void>;
 }
 
 export class DeviceRepositoryImpl implements DeviceRepository {
@@ -37,7 +37,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
         }
     }
 
-    async deleteDevice(id: string): Promise<void> {
+    async deleteDevice(id: number): Promise<void> {
         try {
             return await deviceApi.deleteDevice(id);
         } catch (error: any) {

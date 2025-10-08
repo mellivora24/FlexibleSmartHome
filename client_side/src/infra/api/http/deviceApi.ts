@@ -85,9 +85,9 @@ export const deviceApi = {
         }
     },
 
-    deleteDevice: async (id: string): Promise<void> => {
+    deleteDevice: async (id: number): Promise<void> => {
         try {
-            await axios.delete(`${API_CONFIG.BASE_URL}/devices/${id}`);
+            await axios.delete(`${API_CONFIG.BASE_URL}core/devices/${id}`);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;

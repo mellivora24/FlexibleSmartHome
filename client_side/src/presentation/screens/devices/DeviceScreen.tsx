@@ -15,7 +15,7 @@ import { deviceScreenStyle } from './deviceStyle';
 export const DeviceScreen: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation();
-    const { devices: vmDevices, loading: vmLoading } = useDevicesViewModel();
+    const { devices: vmDevices, handleDeleteDevice, loading: vmLoading } = useDevicesViewModel();
 
     const renderShimmer = () => (
         <>
@@ -55,7 +55,12 @@ export const DeviceScreen: React.FC = () => {
                             renderShimmer()
                         ) : vmDevices.length > 0 ? (
                             vmDevices.map((device) => (
-                                <DeviceCard key={device.id} device={device} />
+                                <DeviceCard
+                                    key={device.id}
+                                    device={device}
+                                    onEdit={() => {}}
+                                    onDelete={() => handleDeleteDevice(device.id)}
+                                />
                             ))
                         ) : (
                             <View style={deviceScreenStyle.noDeviceContainer}>

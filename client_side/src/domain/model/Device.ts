@@ -4,7 +4,7 @@ export interface Device {
     mid: number,
     rid: number,
     name: string,
-    type: "digitalDevice" | "analogDevice",
+    type: string | "digitalDevice" | "analogDevice",
     port: number,
     status: boolean,
     Data: DeviceData,

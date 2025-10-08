@@ -191,12 +191,12 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_sensor_check_port
-    BEFORE INSERT OR UPDATE OF port ON tbl_sensor
+    BEFORE INSERT ON tbl_sensor
     FOR EACH ROW
 EXECUTE FUNCTION fn_check_port_validity();
 
 CREATE TRIGGER trg_device_check_port
-    BEFORE INSERT OR UPDATE OF port ON tbl_device
+    BEFORE INSERT ON tbl_device
     FOR EACH ROW
 EXECUTE FUNCTION fn_check_port_validity();
 

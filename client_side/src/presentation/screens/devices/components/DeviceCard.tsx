@@ -182,7 +182,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onEdit, onDelete
                                         {t(`deviceCard.type.type`)}:
                                     </Text>
                                     <Text style={deviceCardStyle.detailValue}>
-                                        {deviceTypeIcon} {t(`deviceCard.type.${device.type}`)}
+                                        {t(`deviceCard.type.${device.type}`)}
                                     </Text>
                                 </View>
 
@@ -191,7 +191,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onEdit, onDelete
                                         {t("deviceCard.room")}:
                                     </Text>
                                     <Text style={deviceCardStyle.detailValue}>
-                                        {roomIcon} {roomName}
+                                        {roomName}
                                     </Text>
                                 </View>
 
@@ -265,6 +265,8 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onEdit, onDelete
                     </Pressable>
                 </Pressable>
             </Modal>
+
+            
         </View>
     );
 };

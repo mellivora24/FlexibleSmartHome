@@ -9,6 +9,7 @@ import { TopBarWidget } from '@components/TopBarWidget';
 import { useDevicesViewModel } from '@presentation/hooks/useDevicesViewModel';
 import { BACKGROUND } from '@theme/colors';
 import { DeviceCard } from './components/DeviceCard';
+import { FloatingActionButton } from './components/FloatButton';
 import { deviceScreenStyle } from './deviceStyle';
 
 export const DeviceScreen: React.FC = () => {
@@ -66,6 +67,8 @@ export const DeviceScreen: React.FC = () => {
                     </ScrollView>
                 </View>
             </SafeAreaView>
+
+            <FloatingActionButton onPress={() => router.push('/add-on/addDevice')} />
         </LinearGradient>
     );
 }

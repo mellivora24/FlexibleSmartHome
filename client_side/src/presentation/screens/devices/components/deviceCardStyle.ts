@@ -75,20 +75,22 @@ export const deviceCardStyle = StyleSheet.create({
     infoItem: {
         flexDirection: "row",
         alignItems: "center",
-        flex: 1,
+        justifyContent: "flex-start",
+        // flex: 1,
     },
 
     infoIcon: {
         fontSize: 16,
         marginRight: 8,
         color: "#E9D5FF", // Light purple
+        // flex: 1,
     },
 
     infoText: {
         color: "#FFFFFF", // White
         fontSize: 13,
         fontWeight: "500",
-        flex: 1,
+        marginRight: 4,
     },
 
     infoDivider: {
@@ -429,5 +431,36 @@ export const deviceCardStyle = StyleSheet.create({
 
     deleteButtonText: {
         color: "#FFFFFF",
+    },
+    fab: {
+        position: "absolute",
+        right: 20,
+        bottom: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: "rgba(168, 85, 247, 0.9)", // Purple glass
+        justifyContent: "center",
+        alignItems: "center",
+        shadowColor: "#A855F7",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
+        elevation: 8,
+        borderWidth: 2,
+        borderColor: "rgba(192, 132, 252, 0.6)",
+    },
+
+    fabIcon: {
+        fontSize: 28,
+        color: "#FFFFFF",
+        fontWeight: "700",
+    },
+
+    fabText: {
+        fontSize: 10,
+        color: "#E9D5FF",
+        marginTop: 2,
+        fontWeight: "600",
     },
 });

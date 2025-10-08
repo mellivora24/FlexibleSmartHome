@@ -1,14 +1,20 @@
 package mcu
 
-import "gorm.io/gorm"
+import (
+	"fmt"
+
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/device"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/pendingActions"
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	Create(mcu *McuDB) (*McuDB, error)
-	Delete(id int64) error
+	Delete(mcuCode int) error
 	FindByUID(uid string) (int64, error)
 
-	UpdateFirmware(id int64, firmwareVersion string) (*McuDB, error)
-	AvailablePort(mid int64) ([]int, error)
+	UpdateFirmware(mcuCode int, firmwareVersion string) (*McuDB, error)
+	AvailablePort(mcuCode int) ([]int, error)
 }
 
 type repository struct {
@@ -26,32 +32,40 @@ func (r *repository) Create(mcu *McuDB) (*McuDB, error) {
 	return mcu, nil
 }
 
-func (r *repository) UpdateFirmware(id int64, firmwareVersion string) (*McuDB, error) {
+func (r *repository) UpdateFirmware(mcuCode int, firmwareVersion string) (*McuDB, error) {
 	mcu := &McuDB{}
 	if err := r.DB.Model(mcu).
-		Where("id = ?", id).
+		Where("mcu_code = ?", mcuCode).
 		Update("firmware_version", firmwareVersion).Error; err != nil {
 		return nil, err
 	}
 
-	if err := r.DB.First(mcu, id).Error; err != nil {
+	if err := r.DB.Where("mcu_code = ?", mcuCode).First(mcu).Error; err != nil {
 		return nil, err
 	}
 
 	return mcu, nil
 }
 
-func (r *repository) Delete(id int64) error {
-	if err := r.DB.Delete(&McuDB{}, id).Error; err != nil {
+func (r *repository) Delete(mcuCode int) error {
+	mcu := &McuDB{}
+	if err := r.DB.Where("mcu_code = ?", mcuCode).First(mcu).Error; err != nil {
+		return fmt.Errorf("MCU code %d not found", mcuCode)
+	}
+
+	r.DB.Where("mid = ?", mcu.ID).Delete(&device.DeviceDB{})
+	r.DB.Where("mid = ?", mcu.ID).Delete(&pendingActions.PendingAction{})
+
+	if err := r.DB.Delete(mcu).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *repository) AvailablePort(mid int64) ([]int, error) {
+func (r *repository) AvailablePort(mcuCode int) ([]int, error) {
 	var ports []int
 	if err := r.DB.
-		Raw("SELECT * FROM get_available_ports(?)", mid).
+		Raw("SELECT * FROM get_available_ports(?)", mcuCode).
 		Scan(&ports).Error; err != nil {
 		return nil, err
 	}

@@ -7,10 +7,10 @@ import (
 )
 
 type Service interface {
-	CreateMCU(uid int64, mcu *CreateMCURequest) (*McuDB, error)
-	FirmwareUpdate(mcu *FirmwareUpdateRequest) (*McuDB, error)
-	DeleteMCU(id int) error
-	GetAvailablePorts(mid int) ([]int, error)
+	CreateMCU(uid int64, mcu *MCURequest) (*McuDB, error)
+	FirmwareUpdate(mcu *MCURequest) (*McuDB, error)
+	DeleteMCU(mcuCode int) error
+	GetAvailablePorts(mcuCode int) ([]int, error)
 	GetMcuByUID(uid string) (int64, error)
 }
 
@@ -22,7 +22,7 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) CreateMCU(uid int64, mcu *CreateMCURequest) (*McuDB, error) {
+func (s *service) CreateMCU(uid int64, mcu *MCURequest) (*McuDB, error) {
 	availablePorts := make(pq.Int64Array, 13)
 	for i := int64(1); i <= 13; i++ {
 		availablePorts[i-1] = i
@@ -30,6 +30,7 @@ func (s *service) CreateMCU(uid int64, mcu *CreateMCURequest) (*McuDB, error) {
 
 	newMcu := &McuDB{
 		UID:             uid,
+		McuCode:         mcu.McuCode,
 		AvailablePort:   availablePorts,
 		FirmwareVersion: mcu.FirmwareVersion,
 		CreatedAt:       time.Now(),
@@ -43,20 +44,20 @@ func (s *service) CreateMCU(uid int64, mcu *CreateMCURequest) (*McuDB, error) {
 	return created, nil
 }
 
-func (s *service) FirmwareUpdate(a *FirmwareUpdateRequest) (*McuDB, error) {
-	updated, err := s.repo.UpdateFirmware(int64(a.ID), a.FirmwareVersion)
+func (s *service) FirmwareUpdate(mcu *MCURequest) (*McuDB, error) {
+	updated, err := s.repo.UpdateFirmware(mcu.McuCode, mcu.FirmwareVersion)
 	if err != nil {
 		return nil, err
 	}
 	return updated, nil
 }
 
-func (s *service) DeleteMCU(id int) error {
-	return s.repo.Delete(int64(id))
+func (s *service) DeleteMCU(mcuCode int) error {
+	return s.repo.Delete(mcuCode)
 }
 
-func (s *service) GetAvailablePorts(mid int) ([]int, error) {
-	ports, err := s.repo.AvailablePort(int64(mid))
+func (s *service) GetAvailablePorts(mcuCode int) ([]int, error) {
+	ports, err := s.repo.AvailablePort(mcuCode)
 	if err != nil {
 		return nil, err
 	}

@@ -9,6 +9,7 @@ import (
 type McuDB struct {
 	ID              int64         `gorm:"column:id;primaryKey;autoIncrement"`
 	UID             int64         `gorm:"column:uid;not null"`
+	McuCode         int           `gorm:"column:mcu_code;unique;not null"`
 	AvailablePort   pq.Int64Array `gorm:"column:available_port;type:int[]"`
 	FirmwareVersion string        `gorm:"column:firmware_version;type:varchar(255)"`
 	CreatedAt       time.Time     `gorm:"column:create_at;default:CURRENT_TIMESTAMP"`
@@ -22,11 +23,7 @@ type PortInfo struct {
 	Port int `json:"port"`
 }
 
-type CreateMCURequest struct {
-	FirmwareVersion string `json:"firmware_version"`
-}
-
-type FirmwareUpdateRequest struct {
-	ID              int    `json:"id"`
+type MCURequest struct {
+	McuCode         int    `json:"mcu_code" binding:"required"`
 	FirmwareVersion string `json:"firmware_version"`
 }

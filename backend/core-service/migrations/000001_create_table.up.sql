@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS tbl_mcu (
     id SERIAL PRIMARY KEY,
     uid INT UNIQUE NOT NULL,
+    mcu_code INT UNIQUE NOT NULL,
     available_port INT[],
     firmware_version VARCHAR(255),
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -153,15 +154,25 @@ CREATE OR REPLACE FUNCTION get_used_ports(mcu_id INT)
     RETURNS TABLE (port INT) AS $$
 BEGIN
     RETURN QUERY
-        SELECT c.port
-        FROM tbl_device c
-        WHERE c.mid = mcu_id AND c.port IS NOT NULL;
+        SELECT d.port
+        FROM tbl_device d
+        WHERE d.mid = mcu_id AND d.port IS NOT NULL;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_available_ports(mcu_id INT)
+CREATE OR REPLACE FUNCTION get_available_ports(mcuCode INT)
     RETURNS TABLE (port INT) AS $$
+DECLARE
+    mcu_id INT;
 BEGIN
+    SELECT id INTO mcu_id
+    FROM tbl_mcu
+    WHERE mcu_code = mcuCode;
+
+    IF mcu_id IS NULL THEN
+        RAISE EXCEPTION 'MCU with code % not found', mcuCode;
+    END IF;
+
     RETURN QUERY
         SELECT ap.port
         FROM (

@@ -3,6 +3,7 @@ package mcu
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,9 +20,9 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	mcus := rg.Group("/mcus")
 	{
 		mcus.POST("/", h.AssignMCU)
-		mcus.DELETE("/:id", h.DeleteMCU)
+		mcus.DELETE("/:mcu_code", h.DeleteMCU)
 		mcus.PUT("/firmware", h.FirmwareUpdate)
-		mcus.GET("/:id/available-ports", h.AvailablePort)
+		mcus.GET("/:mcu_code/available-ports", h.AvailablePort)
 	}
 }
 
@@ -43,7 +44,7 @@ func (h *Handler) AssignMCU(c *gin.Context) {
 		return
 	}
 
-	var req CreateMCURequest
+	var req MCURequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -68,11 +69,19 @@ func (h *Handler) AssignMCU(c *gin.Context) {
 }
 
 func (h *Handler) FirmwareUpdate(c *gin.Context) {
-	var req FirmwareUpdateRequest
+	var req MCURequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"error":   err.Error(),
+		})
+		return
+	}
+
+	if req.McuCode == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "mcu_code is required",
 		})
 		return
 	}
@@ -86,6 +95,15 @@ func (h *Handler) FirmwareUpdate(c *gin.Context) {
 	}
 
 	res, err := h.service.FirmwareUpdate(&req)
+
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -101,7 +119,7 @@ func (h *Handler) FirmwareUpdate(c *gin.Context) {
 }
 
 func (h *Handler) DeleteMCU(c *gin.Context) {
-	mid, err := strconv.Atoi(c.Param("id"))
+	mcuCode, err := strconv.Atoi(c.Param("mcu_code"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -110,7 +128,24 @@ func (h *Handler) DeleteMCU(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteMCU(mid); err != nil {
+	if mcuCode == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "mcu_code is required",
+		})
+		return
+	}
+
+	err = h.service.DeleteMCU(mcuCode)
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"error":   err.Error(),
@@ -125,7 +160,7 @@ func (h *Handler) DeleteMCU(c *gin.Context) {
 }
 
 func (h *Handler) AvailablePort(c *gin.Context) {
-	mid, err := strconv.Atoi(c.Param("id"))
+	mcuCode, err := strconv.Atoi(c.Param("mcu_code"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -134,7 +169,16 @@ func (h *Handler) AvailablePort(c *gin.Context) {
 		return
 	}
 
-	ports, err := h.service.GetAvailablePorts(mid)
+	ports, err := h.service.GetAvailablePorts(mcuCode)
+
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,

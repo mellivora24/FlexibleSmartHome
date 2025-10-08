@@ -8,8 +8,8 @@ import (
 
 type Repository interface {
 	GetList(uid int64) ([]DeviceDB, error)
-	Create(db *DeviceDB) (*DeviceDB, error)
-	Update(db *DeviceDB) (*DeviceDB, error)
+	Create(record *DeviceDB) (*DeviceDB, error)
+	Update(record *DeviceDB) (*DeviceDB, error)
 	UpdateStatusAndData(id int64, status bool, data json.RawMessage) error
 	Delete(id int64) error
 }
@@ -30,43 +30,43 @@ func (r *repository) GetList(uid int64) ([]DeviceDB, error) {
 	return devices, nil
 }
 
-func (r *repository) Create(db *DeviceDB) (*DeviceDB, error) {
-	if err := r.DB.Create(db).Error; err != nil {
+func (r *repository) Create(record *DeviceDB) (*DeviceDB, error) {
+	if err := r.DB.Create(record).Error; err != nil {
 		return nil, err
 	}
-	return db, nil
+	return record, nil
 }
 
-func (r *repository) Update(db *DeviceDB) (*DeviceDB, error) {
+func (r *repository) Update(record *DeviceDB) (*DeviceDB, error) {
 	updates := map[string]interface{}{}
 
-	updates["rid"] = db.RID
-	updates["mid"] = db.MID
-	updates["port"] = db.Port
-	updates["status"] = db.Status
-	updates["running_time"] = db.RunningTime
+	updates["rid"] = record.RID
+	updates["mid"] = record.MID
+	updates["port"] = record.Port
+	updates["status"] = record.Status
+	updates["running_time"] = record.RunningTime
 
-	if db.Name != "" {
-		updates["name"] = db.Name
+	if record.Name != "" {
+		updates["name"] = record.Name
 	}
 
-	if db.Type != "" {
-		updates["type"] = db.Type
+	if record.Type != "" {
+		updates["type"] = record.Type
 	}
 
-	if len(db.Data) > 0 {
-		updates["data"] = db.Data
+	if len(record.Data) > 0 {
+		updates["data"] = record.Data
 	}
 
 	if err := r.DB.Model(&DeviceDB{}).
-		Where("id = ?", db.ID).
+		Where("id = ?", record.ID).
 		Omit("created_at").
 		Updates(updates).Error; err != nil {
 		return nil, err
 	}
 
 	var updated DeviceDB
-	if err := r.DB.First(&updated, db.ID).Error; err != nil {
+	if err := r.DB.First(&updated, record.ID).Error; err != nil {
 		return nil, err
 	}
 	return &updated, nil

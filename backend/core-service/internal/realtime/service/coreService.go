@@ -11,7 +11,6 @@ import (
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/log"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/notification"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/pendingActions"
-	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensor"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensorData"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/model"
 )
@@ -22,14 +21,12 @@ type CoreService interface {
 	CreateEvent(uid string, data model.MQTTMessage) (err error)
 	UpdateDeviceStatus(data model.MQTTMessage) (err error)
 	GetDeviceList(uid string) (devices []device.MQTTGetDeviceData, err error)
-	GetSensorList(uid string) (sensors []sensor.MQTTGetListSensor, err error)
 }
 
 type coreService struct {
 	log           log.Service
 	event         event.Service
 	device        device.Service
-	sensor        sensor.Service
 	sensorData    sensorData.Service
 	notification  notification.Service
 	pendingAction pendingActions.Service
@@ -39,7 +36,6 @@ func NewCoreService(
 	log log.Service,
 	event event.Service,
 	device device.Service,
-	sensor sensor.Service,
 	sensorData sensorData.Service,
 	notification notification.Service,
 	pendingAction pendingActions.Service,
@@ -48,7 +44,6 @@ func NewCoreService(
 		log:           log,
 		event:         event,
 		device:        device,
-		sensor:        sensor,
 		sensorData:    sensorData,
 		notification:  notification,
 		pendingAction: pendingAction,
@@ -182,25 +177,4 @@ func (s *coreService) GetDeviceList(uid string) (devices []device.MQTTGetDeviceD
 	}
 
 	return devices, nil
-}
-
-func (s *coreService) GetSensorList(uid string) (sensors []sensor.MQTTGetListSensor, err error) {
-	intUid, convErr := strconv.ParseInt(uid, 10, 64)
-	if convErr != nil {
-		l.Printf("Error converting uid to int64: %v", convErr)
-		return nil, convErr
-	}
-
-	sensors, err = s.sensor.RealtimeGetListSensors(intUid)
-	if err != nil {
-		l.Printf("[CoreService] Error getting sensor list: %v", err)
-		return nil, err
-	}
-
-	if len(sensors) == 0 {
-		l.Printf("[CoreService] No sensors found for UID=%s", uid)
-		return nil, nil
-	}
-
-	return sensors, nil
 }

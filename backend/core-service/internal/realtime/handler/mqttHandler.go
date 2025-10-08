@@ -37,11 +37,7 @@ func (h *MQTTHandler) Init() error {
 		return err
 	}
 
-	if err := h.mqttService.Subscribe("user/+/mcu/+/config/devices/request", h.onConfigDeviceRequest); err != nil {
-		return err
-	}
-
-	if err := h.mqttService.Subscribe("user/+/mcu/+/config/sensors/request", h.onConfigSensorRequest); err != nil {
+	if err := h.mqttService.Subscribe("user/+/mcu/+/config/request", h.onConfigDeviceRequest); err != nil {
 		return err
 	}
 
@@ -139,41 +135,10 @@ func (h *MQTTHandler) onConfigDeviceRequest(client mqtt.Client, msg mqtt.Message
 
 	payload, _ := json.Marshal(responseData)
 
-	responseTopic := "user/" + uid + "/mcu/" + mcuId + "/config/devices/response"
+	responseTopic := "user/" + uid + "/mcu/" + mcuId + "/config/response"
 	err = h.mqttService.Publish(responseTopic, payload)
 	if err != nil {
 		log.Printf("[MQTTHandler] Error publishing config response: %v", err)
-		return
-	}
-}
-
-func (h *MQTTHandler) onConfigSensorRequest(client mqtt.Client, msg mqtt.Message) {
-	parts := strings.Split(msg.Topic(), "/")
-	if len(parts) < 5 {
-		log.Printf("[MQTTHandler] Invalid topic format: %s", msg.Topic())
-		return
-	}
-
-	uid := parts[1]
-	mcuId := parts[3]
-
-	list, err := h.coreService.GetSensorList(uid)
-	if err != nil {
-		log.Printf("[MQTTHandler] Error getting device list for uid=%s: %v", uid, err)
-		return
-	}
-
-	responseData := model.MQTTMessage{
-		Topic:   "config",
-		Payload: list,
-	}
-
-	payload, _ := json.Marshal(responseData)
-
-	responseTopic := "user/" + uid + "/mcu/" + mcuId + "/config/sensors/response"
-	err = h.mqttService.Publish(responseTopic, payload)
-	if err != nil {
-		log.Printf("[MQTTHandler] Error publishing sensor config response: %v", err)
 		return
 	}
 }

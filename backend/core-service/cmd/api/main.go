@@ -12,7 +12,6 @@ import (
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/mcu"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/notification"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/pendingActions"
-	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensor"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensorData"
 
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/handler"
@@ -46,7 +45,6 @@ func main() {
 	mcuRepo := mcu.NewRepository(dbClient)
 	eventRepo := event.NewRepository(dbClient)
 	deviceRepo := device.NewRepository(dbClient)
-	sensorRepo := sensor.NewSensorRepository(dbClient)
 	sensorDataRepo := sensorData.NewRepository(dbClient)
 	notificationRepo := notification.NewRepository(dbClient)
 	pendingActionsRepo := pendingActions.NewRepository(dbClient)
@@ -55,7 +53,6 @@ func main() {
 	logService := l.NewService(logRepo)
 	mcuService := mcu.NewService(mcuRepo)
 	eventService := event.NewService(eventRepo)
-	sensorService := sensor.NewService(sensorRepo)
 	deviceService := device.NewService(deviceRepo)
 	sensorDataService := sensorData.NewService(sensorDataRepo)
 	notificationService := notification.NewService(notificationRepo)
@@ -65,7 +62,6 @@ func main() {
 		logService,
 		eventService,
 		deviceService,
-		sensorService,
 		sensorDataService,
 		notificationService,
 		pendingActionsService,
@@ -77,7 +73,6 @@ func main() {
 	logHandler := l.NewHandler(logService)
 	mcuHandler := mcu.NewHandler(mcuService)
 	eventHandler := event.NewHandler(eventService)
-	sensorHandler := sensor.NewHandler(sensorService)
 	deviceHandler := device.NewHandler(deviceService)
 	sensorDataHandler := sensorData.NewHandler(sensorDataService)
 	notificationHandler := notification.NewHandler(notificationService)
@@ -95,7 +90,6 @@ func main() {
 		logHandler.RegisterRoutes(api)
 		mcuHandler.RegisterRoutes(api)
 		eventHandler.RegisterRoutes(api)
-		sensorHandler.RegisterRoutes(api)
 		deviceHandler.RegisterRoutes(api)
 		sensorDataHandler.RegisterRoutes(api)
 		notificationHandler.RegisterRoutes(api)

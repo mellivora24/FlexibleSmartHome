@@ -3,7 +3,7 @@ package sensorData
 import "gorm.io/gorm"
 
 type Repository interface {
-	CreateRecord(db *SensorDataDB) error
+	CreateRecord(record *SensorDataDB) error
 	GetList(uid int64, req *GetListRequest) ([]SensorDataItem, int64, error)
 	GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, error)
 }
@@ -16,8 +16,8 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{DB: db}
 }
 
-func (r *repository) CreateRecord(db *SensorDataDB) error {
-	return r.DB.Create(db).Error
+func (r *repository) CreateRecord(record *SensorDataDB) error {
+	return r.DB.Create(record).Error
 }
 
 func (r *repository) GetList(uid int64, req *GetListRequest) ([]SensorDataItem, int64, error) {
@@ -33,8 +33,8 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]SensorDataItem, 
 	offset := (req.Page - 1) * req.Limit
 
 	query := r.DB.Table("tbl_sensor_data AS sd").
-		Select("sd.id, s.name AS sensor_name, sd.value, sd.unit, sd.created_at").
-		Joins("JOIN tbl_sensor s ON sd.sid = s.id").
+		Select("sd.id, d.name AS sensor_name, sd.value, sd.unit, sd.created_at").
+		Joins("JOIN tbl_device d ON sd.sid = d.id").
 		Where("sd.uid = ?", uid)
 
 	if req.SID > 0 {
@@ -42,7 +42,7 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]SensorDataItem, 
 	}
 
 	if req.Name != "" {
-		query = query.Where("s.name LIKE ?", "%"+req.Name+"%")
+		query = query.Where("d.name LIKE ?", "%"+req.Name+"%")
 	}
 
 	if req.Value != 0 {
@@ -87,8 +87,8 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]SensorDataItem, 
 func (r *repository) GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, error) {
 	var item SensorDataItem
 	query := r.DB.Table("tbl_sensor_data AS sd").
-		Select("sd.id, s.name AS sensor_name, sd.value, sd.unit, sd.created_at").
-		Joins("JOIN tbl_sensor s ON sd.sid = s.id").
+		Select("sd.id, d.name AS sensor_name, sd.value, sd.unit, sd.created_at").
+		Joins("JOIN tbl_device d ON sd.sid = d.id").
 		Where("sd.uid = ?", uid)
 
 	if req.ID > 0 {

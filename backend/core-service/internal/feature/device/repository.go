@@ -40,15 +40,11 @@ func (r *repository) Create(db *DeviceDB) (*DeviceDB, error) {
 func (r *repository) Update(db *DeviceDB) (*DeviceDB, error) {
 	updates := map[string]interface{}{}
 
-	if db.RID != 0 {
-		updates["rid"] = db.RID
-	}
-	if db.MID != 0 {
-		updates["mid"] = db.MID
-	}
-	if db.Port != 0 {
-		updates["port"] = db.Port
-	}
+	updates["rid"] = db.RID
+	updates["mid"] = db.MID
+	updates["port"] = db.Port
+	updates["status"] = db.Status
+	updates["running_time"] = db.RunningTime
 
 	if db.Name != "" {
 		updates["name"] = db.Name
@@ -58,13 +54,9 @@ func (r *repository) Update(db *DeviceDB) (*DeviceDB, error) {
 		updates["type"] = db.Type
 	}
 
-	updates["status"] = db.Status
-
 	if len(db.Data) > 0 {
 		updates["data"] = db.Data
 	}
-
-	updates["running_time"] = db.RunningTime
 
 	if err := r.DB.Model(&DeviceDB{}).
 		Where("id = ?", db.ID).

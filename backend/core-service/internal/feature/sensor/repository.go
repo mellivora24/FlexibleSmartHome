@@ -34,10 +34,25 @@ func (r *repository) Create(db *SensorDB) (*SensorDB, error) {
 }
 
 func (r *repository) Update(db *SensorDB) (*SensorDB, error) {
+	updates := map[string]interface{}{}
+
+	updates["rid"] = db.RID
+	updates["mid"] = db.MID
+	updates["port"] = db.Port
+	updates["running_time"] = db.RunningTime
+
+	if db.Name != "" {
+		updates["name"] = db.Name
+	}
+
+	if db.Type != "" {
+		updates["type"] = db.Type
+	}
+
 	if err := r.DB.Model(&SensorDB{}).
 		Where("id = ?", db.ID).
 		Omit("created_at").
-		Updates(db).Error; err != nil {
+		Updates(updates).Error; err != nil {
 		return nil, err
 	}
 

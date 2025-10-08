@@ -46,8 +46,13 @@ export const deviceApi = {
     },
 
     createDevice: async (device: Partial<CreateDeviceRequest>): Promise<Device> => {
+        console.log("Creating device with data (running at api layer):", device);
         try {
-            const res = await axios.post(`${API_CONFIG.BASE_URL}/devices/`, device);
+            const res = await axios.post(`http://192.168.1.108:8082/api/v1/core/devices/`, device, {
+                headers: {
+                    "X-UID": 1 // TODO: replace with token
+                },
+            });
             return res.data;
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -66,19 +71,23 @@ export const deviceApi = {
 
     updateDevice: async (device: Partial<Device>): Promise<Device> => {
         try {
-            const res = await axios.put(`${API_CONFIG.BASE_URL}/devices/`, device);
+            const res = await axios.put(`${API_CONFIG.BASE_URL}/devices/`, device, {
+                headers: {
+                    "X-UID": 1 // TODO: replace with token
+                },
+            });
             return res.data;
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;
                 if (status === 400) {
-                    throw new Error("Invalid device data");
+                    console.log("Invalid device data");
                 } else if (status === 401) {
-                    throw new Error("Unauthorized access");
+                    console.log("Unauthorized access");
                 } else if (status === 404) {
-                    throw new Error("Device not found");
+                    console.log("Device not found");
                 } else {
-                    throw new Error("An unexpected error occurred");
+                    console.log("An unexpected error occurred: ", error.message);
                 }
             }
             throw error;
@@ -87,7 +96,7 @@ export const deviceApi = {
 
     deleteDevice: async (id: number): Promise<void> => {
         try {
-            await axios.delete(`${API_CONFIG.BASE_URL}core/devices/${id}`);
+            await axios.delete(`${API_CONFIG.BASE_URL}/devices/${id}`);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;

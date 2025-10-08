@@ -25,12 +25,8 @@ export interface CreateDeviceRequest {
 
 export interface UpdateDeviceRequest {
     "id": number,
-    "mid"?: number,
     "rid"?: number,
-    "name"?: string,
-    "type"?: string,
     "port"?: number,
-    "status"?: boolean,
-    "Data"?: DeviceData,
-    "RunningTime"?: number,
+    "type"?: string,
+    "name"?: string,
 }

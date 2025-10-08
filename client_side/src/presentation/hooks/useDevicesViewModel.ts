@@ -1,17 +1,20 @@
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 
-import { Device } from "@domain/model/Device";
+import { Device, UpdateDeviceRequest } from "@domain/model/Device";
 import { DeviceRepositoryImpl } from "@domain/repo/deviceRepo";
 import { DeleteDevice } from "@src/domain/usecase/device/deleteDevice";
 import { GetAllDevices } from "@src/domain/usecase/device/getAllDevices";
-
+import { UpdateDevice } from "@src/domain/usecase/device/updateDevice";
 
 const deviceRepository = new DeviceRepositoryImpl();
 const deleteDevice = new DeleteDevice(deviceRepository);
 const getAllDevices = new GetAllDevices(deviceRepository);
+const updateDevice = new UpdateDevice(deviceRepository);
 
 export const useDevicesViewModel = () => {
+    const router = useRouter();
+
     const [devices, setDevices] = useState<Device[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -22,6 +25,15 @@ export const useDevicesViewModel = () => {
             fetchDevices();
         } catch (err) {
             setError("Failed to delete device");
+        }
+    }, []);
+
+    const handleEditDevice = useCallback(async (deviceUpdate: UpdateDeviceRequest) => {
+        try {
+            await updateDevice.execute(deviceUpdate);
+            fetchDevices();
+        } catch (err) {
+            setError("Failed to edit device");
         }
     }, []);
 
@@ -44,5 +56,5 @@ export const useDevicesViewModel = () => {
         }, [fetchDevices])
     );
 
-    return { devices, handleDeleteDevice, loading, error };
+    return { devices, handleDeleteDevice, handleEditDevice, loading, error };
 };

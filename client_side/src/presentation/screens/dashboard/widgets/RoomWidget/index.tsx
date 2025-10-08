@@ -21,7 +21,7 @@ export const RoomWidget: React.FC<RoomWidgetProps> = ({ devices, onDevicePress, 
     setActiveRoomIndex(index);
   };
 
-  const filteredDevices = devices.filter((device) => device.rid === activeRoomIndex + 1);
+  const filteredDevices = devices.filter((device) => device.rid === activeRoomIndex);
 
   return (
     <View style={{ flex: 1 }}>

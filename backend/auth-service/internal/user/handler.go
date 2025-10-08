@@ -62,37 +62,55 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 func (h *Handler) Register(c *gin.Context) {
 	var userCreate CreateRequest
 	if err := c.ShouldBindJSON(&userCreate); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	res, err := h.service.CreateUser(&userCreate)
 	if err != nil {
 		if strings.Contains(err.Error(), "record already exists") {
-			c.JSON(http.StatusConflict, gin.H{"error": "user already exists"})
+			c.JSON(http.StatusConflict, gin.H{"success": false, "error": "user_already_exists"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't create user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "internal_server_error"})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"data": res})
+
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
-	var userUpdate UpdateRequest
-	if err := c.ShouldBindJSON(&userUpdate); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req UpdateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
-	res, err := h.service.UpdateUser(&userUpdate)
+
+	res, err := h.service.UpdateUser(&req)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"error":   "user not found",
+			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }
 
 func (h *Handler) DeleteUser(c *gin.Context) {
@@ -101,35 +119,41 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 	res, err := h.service.DeleteUser(&userDelete)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			c.JSON(http.StatusNotFound, gin.H{"success": false, "error": "user_not_found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "internal_server_error"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }
 
 func (h *Handler) Login(c *gin.Context) {
 	var userLogin LoginRequest
 	if err := c.ShouldBindJSON(&userLogin); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	res, err := h.service.Login(&userLogin)
 	if err != nil {
 		if strings.Contains(err.Error(), "unauthorized") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
+			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "invalid_credentials"})
 			return
 		}
 		if strings.Contains(err.Error(), "record not found") {
-			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			c.JSON(http.StatusNotFound, gin.H{"success": false, "error": "user_not_found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "internal_server_error"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }
 
 //func (h *Handler) ListActions(c *gin.Context) {
@@ -148,13 +172,13 @@ func (h *Handler) Login(c *gin.Context) {
 func (h *Handler) VerifyToken(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Authorization header required"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "authorization_header_required"})
 		return
 	}
 
 	parts := strings.SplitN(authHeader, " ", 2)
 	if len(parts) != 2 || parts[0] != "Bearer" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Authorization header format"})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "invalid_authorization_header"})
 		return
 	}
 	token := parts[1]
@@ -162,12 +186,15 @@ func (h *Handler) VerifyToken(c *gin.Context) {
 	res, err := h.service.VerifyToken(token)
 	if err != nil {
 		if strings.Contains(err.Error(), "expired") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "token expired"})
+			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "token_expired"})
 			return
 		}
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": "invalid_token"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": res})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    res,
+	})
 }

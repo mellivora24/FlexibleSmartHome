@@ -13,7 +13,7 @@ type Repository interface {
 	FindByID(id int64) (*UserDB, error)
 	FindByEmail(email string) (*UserDB, error)
 	Create(user *UserDB) (*UserDB, error)
-	Update(user *UserDB) (*UserDB, error)
+	UpdateUser(req *UpdateRequest) (*UserDB, error)
 	Delete(email string) error
 
 	CreateAction(action *ActionDB) (*ActionDB, error)
@@ -79,29 +79,33 @@ func (r *repository) Create(user *UserDB) (*UserDB, error) {
 	return user, nil
 }
 
-func (r *repository) Update(user *UserDB) (*UserDB, error) {
-	if user == nil {
-		return nil, shared.ErrInvalidInput
+func (r *repository) UpdateUser(req *UpdateRequest) (*UserDB, error) {
+	var user UserDB
+	if err := r.DB.First(&user, req.ID).Error; err != nil {
+		return nil, fmt.Errorf("user not found")
 	}
 
-	err := r.DB.Model(&UserDB{}).
-		Where("id = ?", user.ID).
-		Updates(map[string]interface{}{
-			"mid":   user.MID,
-			"name":  user.Name,
-			"email": user.Email,
-		}).Error
+	updateData := map[string]interface{}{}
 
-	if err != nil {
-		return nil, shared.ErrInternalServer
+	if req.Name != nil {
+		updateData["name"] = *&req.Name
+	}
+	if req.Email != nil {
+		updateData["email"] = *&req.Email
+	}
+	if req.McuCode != nil {
+		updateData["mcu_code"] = *req.McuCode
 	}
 
-	var updated UserDB
-	if err := r.DB.First(&updated, user.ID).Error; err != nil {
-		return nil, shared.ErrInternalServer
+	if len(updateData) == 0 {
+		return &user, nil
 	}
 
-	return &updated, nil
+	if err := r.DB.Model(&user).Updates(updateData).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func (r *repository) Delete(email string) error {

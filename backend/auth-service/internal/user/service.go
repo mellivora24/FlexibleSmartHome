@@ -15,11 +15,8 @@ type Service interface {
 	CreateUser(req *CreateRequest) (*CreateResponse, error)
 	UpdateUser(req *UpdateRequest) (*UpdateResponse, error)
 	DeleteUser(req *DeleteRequest) (*DeleteResponse, error)
-
 	Login(req *LoginRequest) (*LoginResponse, error)
-
 	ListActions(req string) ([]ListActionsResponse, error)
-
 	VerifyToken(token string) (*VerifyTokenResponse, error)
 }
 
@@ -50,12 +47,15 @@ func (s *service) GetAllUsers() ([]GetResponse, error) {
 			CreatedAt: user.CreatedAt,
 		}
 	}
-
 	return res, nil
 }
 
 func (s *service) GetUserByID(id string) (*GetResponse, error) {
 	uid, err := shared.StringToInt64(id)
+	if err != nil {
+		return nil, shared.ErrInvalidInput
+	}
+
 	user, err := s.repo.FindByID(uid)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,6 @@ func (s *service) GetUserByID(id string) (*GetResponse, error) {
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 	}
-
 	return res, nil
 }
 
@@ -75,7 +74,7 @@ func (s *service) CreateUser(req *CreateRequest) (*CreateResponse, error) {
 	if req == nil {
 		return nil, shared.ErrInvalidInput
 	}
-	if req.Name == "" || req.Email == "" || req.Password == "" || req.MID == 0 {
+	if req.Name == "" || req.Email == "" || req.Password == "" || req.McuCode == 0 {
 		return nil, shared.ErrInvalidInput
 	}
 
@@ -85,7 +84,7 @@ func (s *service) CreateUser(req *CreateRequest) (*CreateResponse, error) {
 	}
 
 	userDB := UserDB{
-		MID:          req.MID,
+		McuCode:      req.McuCode,
 		Name:         req.Name,
 		Email:        req.Email,
 		HashPassword: hashedPwd,
@@ -96,9 +95,10 @@ func (s *service) CreateUser(req *CreateRequest) (*CreateResponse, error) {
 		return nil, err
 	}
 
+	// JWT với mcu_code
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": created.ID,
-		"mid":     created.MID,
+		"user_id":  created.ID,
+		"mcu_code": created.McuCode,
 	})
 
 	tokenString, err := token.SignedString([]byte(s.config.JWT_SECRET))
@@ -112,11 +112,11 @@ func (s *service) CreateUser(req *CreateRequest) (*CreateResponse, error) {
 		Data: json.RawMessage([]byte(fmt.Sprintf("User %s created", created.Email))),
 	}
 
-	_, err = s.repo.CreateAction(&action)
+	_, _ = s.repo.CreateAction(&action)
 
 	res := &CreateResponse{
 		ID:        created.ID,
-		MID:       created.MID,
+		McuCode:   created.McuCode,
 		Name:      created.Name,
 		Email:     created.Email,
 		Token:     tokenString,
@@ -127,39 +127,26 @@ func (s *service) CreateUser(req *CreateRequest) (*CreateResponse, error) {
 }
 
 func (s *service) UpdateUser(req *UpdateRequest) (*UpdateResponse, error) {
-	if req == nil {
-		return nil, shared.ErrInvalidInput
-	}
-	if req.ID == 0 {
-		return nil, shared.ErrInvalidInput
-	}
-
-	userDB := UserDB{
-		ID:    req.ID,
-		MID:   req.MID,
-		Name:  req.Name,
-		Email: req.Email,
-	}
-
-	updated, err := s.repo.Update(&userDB)
+	user, err := s.repo.UpdateUser(req)
 	if err != nil {
 		return nil, err
 	}
 
 	res := &UpdateResponse{
-		ID:    updated.ID,
-		MID:   updated.MID,
-		Name:  updated.Name,
-		Email: updated.Email,
+		ID:      user.ID,
+		McuCode: user.McuCode,
+		Name:    user.Name,
+		Email:   user.Email,
 	}
-
 	return res, nil
 }
 
 func (s *service) DeleteUser(req *DeleteRequest) (*DeleteResponse, error) {
-	email := req.Email
-	err := s.repo.Delete(email)
+	if req == nil || req.Email == "" {
+		return nil, shared.ErrInvalidInput
+	}
 
+	err := s.repo.Delete(req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +154,6 @@ func (s *service) DeleteUser(req *DeleteRequest) (*DeleteResponse, error) {
 	res := &DeleteResponse{
 		MSG: "deleted successfully",
 	}
-
 	return res, nil
 }
 
@@ -186,9 +172,10 @@ func (s *service) Login(req *LoginRequest) (*LoginResponse, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.ID,
-		"mid":     user.MID,
+		"user_id":  user.ID,
+		"mcu_code": user.McuCode,
 	})
+
 	tokenString, err := token.SignedString([]byte(s.config.JWT_SECRET))
 	if err != nil {
 		return nil, shared.ErrInternalServer
@@ -201,17 +188,14 @@ func (s *service) Login(req *LoginRequest) (*LoginResponse, error) {
 		CreatedAt: time.Now(),
 	}
 
-	_, err = s.repo.CreateAction(&action)
-	if err != nil {
-		return nil, err
-	}
+	_, _ = s.repo.CreateAction(&action)
 
 	res := &LoginResponse{
-		ID:    user.ID,
-		MID:   user.MID,
-		Name:  user.Name,
-		Email: user.Email,
-		Token: tokenString,
+		ID:      user.ID,
+		McuCode: user.McuCode,
+		Name:    user.Name,
+		Email:   user.Email,
+		Token:   tokenString,
 	}
 
 	return res, nil
@@ -224,7 +208,6 @@ func (s *service) ListActions(req string) ([]ListActionsResponse, error) {
 	}
 
 	actions, err := s.repo.FindActionsByUID(uid)
-
 	if err != nil {
 		return nil, err
 	}
@@ -269,22 +252,21 @@ func (s *service) VerifyToken(tokenString string) (*VerifyTokenResponse, error) 
 	if !ok {
 		return &tokenInvalid, nil
 	}
-	mid, _ := claims["mid"].(float64)
+	mcuCode, _ := claims["mcu_code"].(float64)
 
 	user, err := s.repo.FindByID(int64(userID))
 	if err != nil || user == nil {
 		return &tokenInvalid, nil
 	}
 
-	if mid <= 0 {
+	if mcuCode <= 0 {
 		return &tokenInvalid, nil
 	}
 
 	res := &VerifyTokenResponse{
 		UID:     user.ID,
-		MID:     int64(mid),
+		McuCode: int(mcuCode),
 		IsValid: true,
 	}
-
 	return res, nil
 }

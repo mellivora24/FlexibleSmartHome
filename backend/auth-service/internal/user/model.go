@@ -7,11 +7,11 @@ import (
 
 type UserDB struct {
 	ID           int64     `gorm:"column:id;primaryKey;autoIncrement"`
-	MID          int64     `gorm:"column:mid;not null"`
+	McuCode      int       `gorm:"column:mcu_code;not null"`
 	Name         string    `gorm:"column:name;size:100;not null"`
 	Email        string    `gorm:"column:email;size:255;unique;not null"`
 	HashPassword string    `gorm:"column:hash_password;not null"`
-	CreatedAt    time.Time `gorm:"column:create_at;autoCreateTime"`
+	CreatedAt    time.Time `gorm:"column:created_at;autoCreateTime"`
 }
 
 func (UserDB) TableName() string {
@@ -23,7 +23,7 @@ type ActionDB struct {
 	UID       int64           `gorm:"column:uid;not null"`
 	Type      string          `gorm:"column:type;size:100;not null"`
 	Data      json.RawMessage `gorm:"column:data;type:jsonb"`
-	CreatedAt time.Time       `gorm:"column:create_at;autoCreateTime"`
+	CreatedAt time.Time       `gorm:"column:created_at;autoCreateTime"`
 
 	User UserDB `gorm:"foreignKey:UID;references:ID;constraint:OnDelete:CASCADE"`
 }
@@ -34,14 +34,14 @@ func (ActionDB) TableName() string {
 
 type User struct {
 	ID        int64     `json:"id"`
-	MID       int64     `json:"mid"`
+	McuCode   int       `json:"mcu_code"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
 type CreateRequest struct {
-	MID      int64  `json:"mid"`
+	McuCode  int    `json:"mcu_code"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -49,7 +49,7 @@ type CreateRequest struct {
 
 type CreateResponse struct {
 	ID        int64     `json:"id"`
-	MID       int64     `json:"mid"`
+	McuCode   int       `json:"mcu_code"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
 	Token     string    `json:"token"`
@@ -62,25 +62,25 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	ID    int64  `json:"id"`
-	MID   int64  `json:"mid"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Token string `json:"token"`
+	ID      int64  `json:"id"`
+	McuCode int    `json:"mcu_code"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	Token   string `json:"token"`
 }
 
 type UpdateRequest struct {
-	ID    int64  `json:"id"`
-	MID   int64  `json:"mid"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	ID      int64   `json:"id"`
+	Name    *string `json:"name"`
+	Email   *string `json:"email"`
+	McuCode *int64  `json:"mcu_code"`
 }
 
 type UpdateResponse struct {
-	ID    int64  `json:"id"`
-	MID   int64  `json:"mid"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	ID      int64  `json:"id"`
+	McuCode int    `json:"mcu_code"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
 }
 
 type GetRequest struct {
@@ -117,8 +117,8 @@ type ActionCreate struct {
 }
 
 type ActionCreateResponse struct {
-	ID       int64     `json:"id"`
-	CreateAt time.Time `json:"create_at"`
+	ID        int64     `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type ListActionsRequest struct {
@@ -135,6 +135,6 @@ type ListActionsResponse struct {
 
 type VerifyTokenResponse struct {
 	UID     int64 `json:"uid"`
-	MID     int64 `json:"mid"`
+	McuCode int   `json:"mcu_code"`
 	IsValid bool  `json:"valid"`
 }

@@ -16,8 +16,8 @@ const GRADIENT = ["#412180", "#2B275D", "#030912"];
 
 interface DeviceCardProps {
     device: Device;
-    onEdit?: (device: Device) => void;  // Callback khi bấm nút Sửa
-    onDelete?: (device: Device) => void; // Callback khi bấm nút Xóa
+    onEdit?: (device: Device) => void;
+    onDelete?: (device: Device) => void;
 }
 
 export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onEdit, onDelete }) => {

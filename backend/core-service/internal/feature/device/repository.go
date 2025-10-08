@@ -38,10 +38,38 @@ func (r *repository) Create(db *DeviceDB) (*DeviceDB, error) {
 }
 
 func (r *repository) Update(db *DeviceDB) (*DeviceDB, error) {
+	updates := map[string]interface{}{}
+
+	if db.RID != 0 {
+		updates["rid"] = db.RID
+	}
+	if db.MID != 0 {
+		updates["mid"] = db.MID
+	}
+	if db.Port != 0 {
+		updates["port"] = db.Port
+	}
+
+	if db.Name != "" {
+		updates["name"] = db.Name
+	}
+
+	if db.Type != "" {
+		updates["type"] = db.Type
+	}
+
+	updates["status"] = db.Status
+
+	if len(db.Data) > 0 {
+		updates["data"] = db.Data
+	}
+
+	updates["running_time"] = db.RunningTime
+
 	if err := r.DB.Model(&DeviceDB{}).
 		Where("id = ?", db.ID).
 		Omit("created_at").
-		Updates(db).Error; err != nil {
+		Updates(updates).Error; err != nil {
 		return nil, err
 	}
 

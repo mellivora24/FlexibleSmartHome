@@ -26,3 +26,4 @@ DROP TABLE IF EXISTS tbl_mcu CASCADE;
 
 SELECT id FROM tbl_sensor;
 
+SELECT * FROM tbl_device;

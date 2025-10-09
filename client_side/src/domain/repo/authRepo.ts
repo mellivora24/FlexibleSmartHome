@@ -9,6 +9,7 @@ import { authApi } from "@src/infra/api/http/authApi";
 export interface AuthRepository {
     login(data: LoginRequest): Promise<LoginResponse>;
     register(data: RegisterRequest): Promise<RegisterResponse>;
+    verifyToken(token: string): Promise<void>;
 }
 
 export class AuthRepositoryImpl implements AuthRepository {
@@ -23,6 +24,14 @@ export class AuthRepositoryImpl implements AuthRepository {
     async register(data: RegisterRequest): Promise<RegisterResponse> {
         try {
             return await authApi.register(data);
+        } catch (error: any) {
+            throw error;
+        }
+    }
+
+    async verifyToken(token: string): Promise<void> {
+        try {
+            return await authApi.verifyToken(token);
         } catch (error: any) {
             throw error;
         }

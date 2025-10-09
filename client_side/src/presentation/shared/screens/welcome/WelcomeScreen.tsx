@@ -7,26 +7,36 @@ import { Image, Text } from "react-native";
 import { FlexButton } from "@components/FlexButton";
 import { IMAGES } from "@constants/images";
 import { ROUTES } from "@constants/routes";
-import { useAuthContext } from "@src/presentation/hooks/useAppContext";
+import { useAuthToken } from "@src/presentation/hooks/useAppContext";
+import { verifyToken } from "@src/presentation/hooks/useAuthViewModel";
 import { BACKGROUND } from "@theme/colors";
 import { style } from "./style/welcome";
 
 export default function WelcomeScreen() {
     const { t } = useTranslation();
     const router = useRouter();
-    const { authData } = useAuthContext();
+    const token = useAuthToken();
 
     useEffect(() => {
-        if (authData) {
-            router.replace(ROUTES.TABS.DASHBOARD);
+        if (token) {
+            try {
+                verifyToken(token).then(() => {
+                    router.replace(ROUTES.TABS.DASHBOARD);
+                }).catch(() => {
+                    router.replace(ROUTES.AUTH.LOGIN);
+                });
+            } catch (error) {
+                console.error("Token verification failed:", error);
+                router.replace(ROUTES.AUTH.LOGIN);
+            }
         }
-    }, [authData]);
+    }, [token]);
 
     function handleGetStarted() {
         router.replace(ROUTES.AUTH.LOGIN);
     }
 
-    if (authData) {
+    if (token) {
         return null;
     }
 

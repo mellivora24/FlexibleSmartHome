@@ -21,16 +21,16 @@ export default function RegisterScreen() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [deviceId, setDeviceId] = useState("");
+    const [mcuCode, setmcuCode] = useState("");
 
     const { login: loginContext } = useAuthContext();
 
     const { register } = useAuthViewModel();
 
     async function handleRegister() {
-        const mid = parseInt(deviceId, 10);
+        const IntMcuCode = parseInt(mcuCode, 10);
         try {
-            const response = await register({ mid, name, email, password });
+            const response = await register({ mid: IntMcuCode, name, email, password });
             if ("data" in response) {
                 await loginContext(response.data as any);
                 router.replace(ROUTES.TABS.DASHBOARD);
@@ -90,11 +90,11 @@ export default function RegisterScreen() {
                     />
 
                     <TextField
-                        label={t("auth.register.deviceId")}
+                        label={t("auth.register.mcuCode")}
                         icon={ICONS.DEVICE}
-                        placeholder={t("auth.register.deviceIdPlaceholder")}
+                        placeholder={t("auth.register.mcuCodePlaceholder")}
                         secureTextEntry={false}
-                        onChangeText={setDeviceId}
+                        onChangeText={setmcuCode}
                     />
 
                     <Text style={style.text}>

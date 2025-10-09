@@ -9,10 +9,12 @@ import {
 import { AuthRepositoryImpl } from "@domain/repo/authRepo";
 import { LoginUseCase } from "@domain/usecase/auth/loginUsecase";
 import { RegisterUseCase } from "@domain/usecase/auth/registerUsecase";
+import { VerifyToken } from "@domain/usecase/auth/verifyToken";
 
 const authRepo = new AuthRepositoryImpl();
 const loginUseCase = new LoginUseCase(authRepo);
 const registerUseCase = new RegisterUseCase(authRepo);
+const verifyTokenUseCase = new VerifyToken(authRepo);
 
 export function useAuthViewModel() {
     const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +54,12 @@ export function useAuthViewModel() {
         isLoading,
         error,
         login,
-        register
+        register,
     };
 }
+
+export const verifyToken = async (token: string): Promise<void> => {
+    const authRepo = new AuthRepositoryImpl();
+    const verifyTokenUseCase = new VerifyToken(authRepo);
+    return verifyTokenUseCase.execute(token);
+};

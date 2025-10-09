@@ -164,20 +164,20 @@ func (h *MQTTHandler) onNotify(client mqtt.Client, msg mqtt.Message) {
 		return
 	}
 
-	err := h.coreService.CreateNotification(uid, mcuCode, alert.Title, alert.Message)
-	if err != nil {
-		log.Printf("[MQTTHandler] Error creating alert for user %s: %v", uid, err)
-		return
-	}
-
 	wsMessage := model.WSMessage{
 		Topic:   "alert",
 		Payload: alert,
 	}
 
-	err = h.wsService.BroadcastToUser(uid, wsMessage)
+	err := h.wsService.BroadcastToUser(uid, wsMessage)
 	if err != nil {
 		log.Printf("[MQTTHandler] Error broadcasting alert to user %s: %v", uid, err)
+		return
+	}
+
+	err = h.coreService.CreateNotification(uid, mcuCode, alert.Title, alert.Message)
+	if err != nil {
+		log.Printf("[MQTTHandler] Error creating alert for user %s: %v", uid, err)
 		return
 	}
 }

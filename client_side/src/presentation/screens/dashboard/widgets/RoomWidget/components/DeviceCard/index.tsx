@@ -40,7 +40,7 @@ function renderCardContent({
             {/* Body */}
             <View style={styles.section_body}>
                 {type === "analogDevice" && <CustomSlider onValueChange={onValueChange} />}
-                {type === "analogSensor" && <Gauge value={data.value ?? 0} size={150} />}
+                {(type === "analogSensor" || type === "temperatureSensor" || type === "humiditySensor") && <Gauge value={data.value ?? 0} size={150} />}
                 {type === "digitalDevice" && <View style={ data.status ? styles.digitalSensorLow : styles.digitalSensorHigh } />}
                 {type === "digitalSensor" && (
                     <View style={styles.digitalSensor}>
@@ -65,19 +65,15 @@ function renderCardContent({
 
 interface DeviceCardProps {
   device: Device;
-  onPress?: (deviceId: number) => void;
-  onValueChange?: (deviceId: number, value: number) => void;
 }
 
-export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onPress, onValueChange }) => {
+export const DeviceCard: React.FC<DeviceCardProps> = ({ device }) => {
     const { t } = useTranslation();
 
     const handlePress = () => {
-    if (onPress) onPress(device.id);
     };
 
     const handleValueChange = (value: number) => {
-    if (onValueChange) onValueChange(device.id, value);
     };
 
     return (

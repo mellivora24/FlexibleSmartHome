@@ -10,7 +10,7 @@ interface TemperatureWidgetProps {
 }
 
 export const TemperatureWidget: React.FC<TemperatureWidgetProps> = ({
-    temperature = 22,
+    temperature,
 }) => {
     const { t } = useTranslation();
 
@@ -24,7 +24,7 @@ export const TemperatureWidget: React.FC<TemperatureWidgetProps> = ({
             style={temperatureWidgetStyle.container}
         >   
             <Text style={temperatureWidgetStyle.temperatureTitle}>{t('dashboard.temperatureWidget.title')}</Text>
-            <Text style={temperatureWidgetStyle.temperatureValue}>{temperature}°C</Text>
+            <Text style={temperatureWidgetStyle.temperatureValue}>{temperature ? `${temperature}` : '--'}°C</Text>
         </LinearGradient>
     );
 };

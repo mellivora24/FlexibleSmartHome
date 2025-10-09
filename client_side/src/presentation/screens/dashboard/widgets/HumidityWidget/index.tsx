@@ -24,7 +24,7 @@ export const HumidityWidget: React.FC<HumidityWidgetProps> = ({
             style={humidityWidgetStyle.container}
         >
             <Text style={humidityWidgetStyle.humidityTitle}>{t('dashboard.humidityWidget.title')}</Text>
-            <Text style={humidityWidgetStyle.humidityValue}>{humidity}%</Text>
+            <Text style={humidityWidgetStyle.humidityValue}>{humidity ? `${humidity}` : '--'}%</Text>
         </LinearGradient>
     );
 };

@@ -9,11 +9,9 @@ import { RoomTabBar } from './components/RoomTabBar';
 
 interface RoomWidgetProps {
   devices: Device[];
-  onDevicePress?: (deviceId: number) => void;
-  onDeviceValueChange?: (deviceId: number, value: number) => void;
 }
 
-export const RoomWidget: React.FC<RoomWidgetProps> = ({ devices, onDevicePress, onDeviceValueChange }) => {
+export const RoomWidget: React.FC<RoomWidgetProps> = ({ devices }) => {
   const { t } = useTranslation();
   const [activeRoomIndex, setActiveRoomIndex] = useState(0);
 
@@ -40,8 +38,6 @@ export const RoomWidget: React.FC<RoomWidgetProps> = ({ devices, onDevicePress, 
             filteredDevices.map((device) => (
               <DeviceCard
                 key={device.id} device={device}
-                onPress={() => onDevicePress && onDevicePress(device.id)}
-                onValueChange={(value) => onDeviceValueChange && onDeviceValueChange(device.id, value)}
               />
             ))
           ) : (

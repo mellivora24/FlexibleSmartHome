@@ -54,8 +54,6 @@ export const DashboardScreen: React.FC = () => {
                 <View style={dashboardStyle.Section3}>
                     <RoomWidget
                         devices={vm.devices}
-                        onDevicePress={vm.handleDevicePress}
-                        onDeviceValueChange={vm.handleDeviceValueChange}
                     />
                 </View>
             </SafeAreaView>

@@ -13,6 +13,7 @@ import {
 import { DEVICE_TYPES, DEVICE_TYPE_LIST } from "@constants/deviceType";
 import { ROOM_LIST } from "@constants/rooms";
 import { UpdateDeviceRequest } from '@src/domain/model/Device';
+import { useAuthContext } from '@src/presentation/hooks/useAppContext';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { modalStyle } from "./ModalStyle";
 
@@ -43,7 +44,6 @@ export const ModalComponent: React.FC<ModalProps> = ({
     port,
     type,
     name,
-    Data,
     status,
     RoomName,
     UpdatedAt,
@@ -53,8 +53,9 @@ export const ModalComponent: React.FC<ModalProps> = ({
     onClose
 }) => {
     const { t } = useTranslation();
+    const { authData } = useAuthContext();
+    
     const [isEditing, setIsEditing] = useState(false);
-
     const [nameState, setNameState] = useState(name || "");
     const [portState, setPortState] = useState<number | null>(port || null);
     const [ridState, setRidState] = useState<number | null>(rid || null);
@@ -104,10 +105,12 @@ export const ModalComponent: React.FC<ModalProps> = ({
     const handleSaveEdit = () => {
         const deviceUpdate: UpdateDeviceRequest = {
             id: id || 0,
+            mid: authData?.mid || 0,
             rid: ridState,
             port: portState,
             type: typeState,
-            name: nameState
+            name: nameState,
+            status: true
         };
 
         console.log("Saving device edit:", deviceUpdate);
@@ -367,26 +370,7 @@ export const ModalComponent: React.FC<ModalProps> = ({
                                 )}
                             </View>
 
-                            {/* Last Data Section */}
-                            {isEditing ? (
-                                <View style={{ minWidth: "93.5%" }}></View>
-                            ) : (
-                                <View style={[modalStyle.dataSection, { minWidth: "93.5%" }]}>
-                                    <Text style={modalStyle.dataSectionTitle}>
-                                        {t("deviceCard.lastData")}
-                                    </Text>
-                                    <View style={modalStyle.dataGrid}>
-                                        {Data && Object.entries(Data).map(([key, value]) => (
-                                            <View key={key} style={modalStyle.dataCard}>
-                                                <Text style={modalStyle.dataKey}>{key}</Text>
-                                                <Text style={modalStyle.dataValue}>
-                                                    {value?.toString() || 'N/A'}
-                                                </Text>
-                                            </View>
-                                        ))}
-                                    </View>
-                                </View>
-                            )}
+                            <View style={{ minWidth: "93.5%" }}></View>
 
                             {isEditing && (
                                 <>

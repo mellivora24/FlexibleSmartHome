@@ -111,7 +111,9 @@
       "analogSensor": "Cảm biến analog",
       "digitalSensor": "Cảm biến kỹ thuật số",
       "analogDevice": "Thiết bị analog",
-      "digitalDevice": "Thiết bị kỹ thuật số"
+      "digitalDevice": "Thiết bị kỹ thuật số",
+      "temperatureSensor": "Cảm biến nhiệt độ",
+      "humiditySensor": "Cảm biến độ ẩm"
     },
     "status": {
       "status": "Trạng thái",
@@ -126,7 +128,14 @@
     "view": "Xem",
     "edit": "Sửa",
     "delete": "Xóa",
-    "saveChanges": "Lưu thay đổi"
+    "saveChanges": "Lưu thay đổi",
+    "name": "Tên thiết bị",
+    "namePlaceholder": "Nhập tên thiết bị...",
+    "addDevice": "Thêm thiết bị",
+    "selectRoom": "Chọn phòng",
+    "selectPort": "Chọn cổng",
+    "confirmDeleteTitle": "Xóa thiết bị",
+    "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa thiết bị này không?"
   },
   "searchWidget": {
     "searchType": {

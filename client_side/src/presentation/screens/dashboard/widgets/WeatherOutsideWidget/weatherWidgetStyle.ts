@@ -5,6 +5,7 @@ export const weatherWidgetStyle = StyleSheet.create({
         padding: 10,
         width: '50%',
         borderRadius: 14,
+        minHeight: 118
     },
     weather: {
         flexDirection: 'row',

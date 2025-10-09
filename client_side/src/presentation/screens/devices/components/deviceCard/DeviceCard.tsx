@@ -9,8 +9,8 @@ import {
 
 import { useDeviceCard } from '@hooks/useDeviceCard';
 import { Device, UpdateDeviceRequest } from "@src/domain/model/Device";
+import { ModalComponent } from '../editModal/Modal';
 import { deviceCardStyle } from "./deviceCardStyle";
-import { ModalComponent } from './Modal';
 
 interface DeviceCardProps {
     device: Device;

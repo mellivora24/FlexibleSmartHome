@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { API_CONFIG } from '@infra/config/apiConfig';
-import { LoginRequest, RegisterRequest } from '@src/domain/model/Auth';
+import { LoginRequest, RegisterRequest } from '@model/Auth';
 
 export const authApi = {
     login: async (data: LoginRequest) => {

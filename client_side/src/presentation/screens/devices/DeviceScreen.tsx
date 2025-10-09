@@ -7,15 +7,27 @@ import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
 
 import { TopBarWidget } from '@components/TopBarWidget';
 import { useDevicesViewModel } from '@presentation/hooks/useDevicesViewModel';
+import { useAuthContext } from '@src/presentation/hooks/useAppContext';
 import { BACKGROUND } from '@theme/colors';
-import { DeviceCard } from './components/DeviceCard';
+import { AddModalComponent } from './components/addModal/AddModal';
+import { DeviceCard } from './components/deviceCard/DeviceCard';
 import { FloatingActionButton } from './components/FloatButton';
 import { deviceScreenStyle } from './deviceStyle';
 
 export const DeviceScreen: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation();
-    const { devices: vmDevices, handleDeleteDevice, handleEditDevice, loading: vmLoading } = useDevicesViewModel();
+    const {
+        loading: vmLoading,
+        devices: vmDevices,
+        openModal: vmOpenModal,
+        setOpenModalState: setVmOpenModal,
+        handleEditDevice,
+        handleDeleteDevice,
+        handleCreateDevice,
+    } = useDevicesViewModel();
+
+    const { authData } = useAuthContext();
 
     const renderShimmer = () => (
         <>
@@ -71,9 +83,18 @@ export const DeviceScreen: React.FC = () => {
                         )}
                     </ScrollView>
                 </View>
+
+                { vmOpenModal && (
+                    <AddModalComponent
+                        visible={vmOpenModal}
+                        onClose={() => setVmOpenModal(false)}
+                        onSave={handleCreateDevice}
+                        availablePorts={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]}
+                    />
+                )}
             </SafeAreaView>
 
-            <FloatingActionButton onPress={() => router.push('/add-on/addDevice')} />
+            <FloatingActionButton onPress={() => setVmOpenModal(true)} />
         </LinearGradient>
     );
 }

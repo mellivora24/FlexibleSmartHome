@@ -1,37 +1,40 @@
 package proxy
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/mellivora24/flexiblesmarthome/gateway/internal/auth"
 )
 
 type CoreProxy struct {
 	coreServiceURL   string
 	coreServiceWSURL string
 	httpClient       *http.Client
+	authService      auth.Service
 }
 
-func NewCoreProxy(coreServiceURL string, coreServiceWSURL string) *CoreProxy {
+func NewCoreProxy(coreServiceURL, coreServiceWSURL string, authService auth.Service) *CoreProxy {
 	return &CoreProxy{
 		coreServiceURL:   coreServiceURL,
 		coreServiceWSURL: coreServiceWSURL,
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
+		authService: authService,
 	}
 }
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
-		return true // TODO: kiểm soát origin
+		return true // TODO: Implement proper origin checking in production
 	},
 }
 
@@ -102,16 +105,6 @@ func (p *CoreProxy) ProxyRequest(c *gin.Context) {
 }
 
 func (p *CoreProxy) ProxyWebSocket(c *gin.Context) {
-	uid, _ := c.Get("user_id")
-	mcuCode, _ := c.Get("mcu_code")
-
-	targetURL := fmt.Sprintf("%s/ws?uid=%v&mcu_code=%v", p.coreServiceWSURL, uid, mcuCode)
-	if c.Request.URL.RawQuery != "" {
-		targetURL += "&" + c.Request.URL.RawQuery
-	}
-
-	fmt.Println("Connecting to core WebSocket at:", targetURL)
-
 	clientConn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		http.Error(c.Writer, "Failed to upgrade client connection", http.StatusBadRequest)
@@ -119,46 +112,63 @@ func (p *CoreProxy) ProxyWebSocket(c *gin.Context) {
 	}
 	defer clientConn.Close()
 
-	u, _ := url.Parse(targetURL)
-	coreConn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	_, msg, err := clientConn.ReadMessage()
 	if err != nil {
-		_ = clientConn.WriteMessage(websocket.CloseMessage,
+		clientConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "Missing auth message"))
+		return
+	}
+
+	var authMsg struct {
+		Type  string `json:"type"`
+		Token string `json:"token"`
+	}
+
+	if err := json.Unmarshal(msg, &authMsg); err != nil || authMsg.Type != "auth" || authMsg.Token == "" {
+		clientConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "Invalid auth format"))
+		return
+	}
+
+	// Delete token in test using postman
+	token := authMsg.Token
+	if strings.HasPrefix(token, "Bearer ") {
+		token = strings.TrimPrefix(token, "Bearer ")
+	}
+
+	authResp, err := p.authService.VerifyToken(token)
+	if err != nil {
+		clientConn.WriteMessage(websocket.CloseMessage,
+			websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "Unauthorized"))
+		return
+	}
+
+	fmt.Println("Authenticated user:", authResp.UID, " MCU:", authResp.MCUCode)
+
+	targetURL := fmt.Sprintf("%s/ws?uid=%v&mcu_code=%v", p.coreServiceWSURL, authResp.UID, authResp.MCUCode)
+	coreConn, _, err := websocket.DefaultDialer.Dial(targetURL, nil)
+	if err != nil {
+		clientConn.WriteMessage(websocket.CloseMessage,
 			websocket.FormatCloseMessage(websocket.CloseInternalServerErr, "Failed to connect core service"))
 		return
 	}
 	defer coreConn.Close()
 
 	errc := make(chan error, 2)
-
-	go func() {
+	forward := func(src, dst *websocket.Conn) {
 		for {
-			mt, msg, err := clientConn.ReadMessage()
+			mt, msg, err := src.ReadMessage()
 			if err != nil {
 				errc <- err
 				return
 			}
-			err = coreConn.WriteMessage(mt, msg)
-			if err != nil {
+			if err := dst.WriteMessage(mt, msg); err != nil {
 				errc <- err
 				return
 			}
 		}
-	}()
+	}
 
-	go func() {
-		for {
-			mt, msg, err := coreConn.ReadMessage()
-			if err != nil {
-				errc <- err
-				return
-			}
-			err = clientConn.WriteMessage(mt, msg)
-			if err != nil {
-				errc <- err
-				return
-			}
-		}
-	}()
+	go forward(clientConn, coreConn)
+	go forward(coreConn, clientConn)
 
 	<-errc
 }

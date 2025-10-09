@@ -19,7 +19,7 @@ func main() {
 
 	authToken := auth.NewService(cfg.AuthService.VerifyPath)
 	authProxy := proxy.NewAuthProxy(cfg.AuthService.BasePath)
-	coreProxy := proxy.NewCoreProxy(cfg.CoreService.URL, cfg.CoreService.WS_URL)
+	coreProxy := proxy.NewCoreProxy(cfg.CoreService.URL, cfg.CoreService.WS_URL, authToken)
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
@@ -53,13 +53,13 @@ func main() {
 			})
 		})
 
-		api.GET("/ws", coreProxy.ProxyWebSocket)
-
 		coreGroup := api.Group("/core")
 		{
 			coreGroup.Any("/*path", coreProxy.ProxyRequest)
 		}
 	}
+
+	api.GET("/ws", coreProxy.ProxyWebSocket)
 
 	serverAddr := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
 	log.Printf("Gateway server starting on %s", serverAddr)

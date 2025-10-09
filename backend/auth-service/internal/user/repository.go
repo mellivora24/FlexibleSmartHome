@@ -88,10 +88,10 @@ func (r *repository) UpdateUser(req *UpdateRequest) (*UserDB, error) {
 	updateData := map[string]interface{}{}
 
 	if req.Name != nil {
-		updateData["name"] = *&req.Name
+		updateData["name"] = &req.Name
 	}
 	if req.Email != nil {
-		updateData["email"] = *&req.Email
+		updateData["email"] = &req.Email
 	}
 	if req.McuCode != nil {
 		updateData["mcu_code"] = *req.McuCode

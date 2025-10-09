@@ -19,13 +19,13 @@ func (EventDB) TableName() string {
 }
 
 type EventResponse struct {
-	ID         int64           `json:"id"`
-	UID        int64           `json:"uid"`
-	DID        int64           `json:"did"`
-	DeviceName string          `json:"device_name"`
-	Action     string          `json:"action"`
-	Payload    json.RawMessage `json:"payload"`
-	CreatedAt  time.Time       `json:"created_at"`
+	ID         int64     `json:"id" gorm:"column:id"`
+	UID        int64     `json:"uid" gorm:"column:uid"`
+	DID        int64     `json:"did" gorm:"column:did"`
+	DeviceName string    `json:"deviceName" gorm:"column:device_name"`
+	Action     string    `json:"action" gorm:"column:action"`
+	Payload    string    `json:"payload" gorm:"column:payload"`
+	CreatedAt  time.Time `json:"createdAt" gorm:"column:created_at"`
 }
 
 type GetListResponse struct {

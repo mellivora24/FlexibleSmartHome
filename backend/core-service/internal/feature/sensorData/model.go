@@ -16,12 +16,12 @@ func (SensorDataDB) TableName() string {
 }
 
 type SensorDataItem struct {
-	ID         int64     `json:"id"`
-	DID        int64     `json:"did"`
-	SensorName string    `json:"sensorName"`
-	Value      float64   `json:"value"`
-	Unit       string    `json:"unit"`
-	CreatedAt  time.Time `json:"createdAt"`
+	ID         int64     `json:"id" gorm:"column:id"`
+	DID        int64     `json:"did" gorm:"column:did"`
+	SensorName string    `json:"sensorName" gorm:"column:sensor_name"`
+	Value      float64   `json:"value" gorm:"column:value"`
+	Unit       string    `json:"unit" gorm:"column:unit"`
+	CreatedAt  time.Time `json:"createdAt" gorm:"column:created_at"`
 }
 
 type GetListResponse struct {

@@ -1,18 +1,17 @@
 package notification
 
 import (
-	"encoding/json"
 	"time"
 )
 
 type NotificationDB struct {
-	ID        int64           `gorm:"column:id;primaryKey;autoIncrement"`
-	UID       int64           `gorm:"column:uid;not null"`
-	Type      string          `gorm:"column:type;not null"`
-	Message   string          `gorm:"column:message;not null"`
-	Metadata  json.RawMessage `gorm:"column:metadata;not null"`
-	IsRead    bool            `gorm:"column:is_read;default:false;not null"`
-	CreatedAt time.Time       `gorm:"column:created_at;default:CURRENT_TIMESTAMP;not null"`
+	ID        int64     `gorm:"column:id;primaryKey;autoIncrement"`
+	UID       int64     `gorm:"column:uid;not null"`
+	McuCode   int64     `gorm:"column:mcu_code;not null"`
+	Title     string    `gorm:"column:title;not null"`
+	Message   string    `gorm:"column:message;not null"`
+	IsRead    bool      `gorm:"column:is_read;default:false;not null"`
+	CreatedAt time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP;not null"`
 }
 
 func (NotificationDB) TableName() string {

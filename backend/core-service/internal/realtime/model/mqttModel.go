@@ -22,3 +22,8 @@ type MQTTFirmwareVersion struct {
 	FirmwareVersion string `json:"firmware_version"`
 	UpdateAt        string `json:"update_at"`
 }
+
+type MQTTAlert struct {
+	Title   string `json:"title"`
+	Message string `json:"message"`
+}

@@ -1,12 +1,11 @@
 package notification
 
 import (
-	"encoding/json"
 	"time"
 )
 
 type Service interface {
-	Create(uid int64, t string, message string, metadata json.RawMessage) error
+	Create(uid int64, mcuCode int64, title string, message string) error
 	GetList(uid int64, cond *GetListRequest) (*GetListResponse, error)
 	Update(id int) (*NotificationDB, error)
 }
@@ -19,12 +18,12 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s service) Create(uid int64, t string, message string, metadata json.RawMessage) error {
+func (s service) Create(uid int64, mcuCode int64, title string, message string) error {
 	noti := &NotificationDB{
 		UID:       uid,
-		Type:      t,
+		McuCode:   mcuCode,
+		Title:     title,
 		Message:   message,
-		Metadata:  metadata,
 		IsRead:    false,
 		CreatedAt: time.Now(),
 	}

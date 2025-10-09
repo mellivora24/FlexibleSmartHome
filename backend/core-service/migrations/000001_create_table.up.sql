@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS tbl_device (
     running_time INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (mid) REFERENCES tbl_mcu(id) ON DELETE CASCADE
+    FOREIGN KEY (mid) REFERENCES tbl_mcu (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tbl_events (
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS tbl_events (
     action VARCHAR(255),
     payload JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (did) REFERENCES tbl_device(id) ON DELETE CASCADE
+    FOREIGN KEY (did) REFERENCES tbl_device (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tbl_sensor_data (
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS tbl_sensor_data (
     value FLOAT,
     unit VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (did) REFERENCES tbl_device(id) ON DELETE CASCADE
+    FOREIGN KEY (did) REFERENCES tbl_device (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tbl_log (
@@ -56,9 +56,9 @@ CREATE TABLE IF NOT EXISTS tbl_log (
 CREATE TABLE IF NOT EXISTS tbl_notification (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
-    type VARCHAR(100),
-    message TEXT,
-    metadata JSONB,
+    mcu_code INT NOT NULL,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -71,18 +71,25 @@ CREATE TABLE IF NOT EXISTS pending_actions (
     status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (uid) REFERENCES tbl_mcu(uid) ON DELETE CASCADE,
-    FOREIGN KEY (mid) REFERENCES tbl_mcu(id) ON DELETE CASCADE
+    FOREIGN KEY (uid) REFERENCES tbl_mcu (uid) ON DELETE CASCADE,
+    FOREIGN KEY (mid) REFERENCES tbl_mcu (id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_log_uid ON tbl_log(uid);
-CREATE INDEX IF NOT EXISTS idx_device_uid ON tbl_device(uid);
-CREATE INDEX IF NOT EXISTS idx_device_mid ON tbl_device(mid);
-CREATE INDEX IF NOT EXISTS idx_events_cid ON tbl_events(did);
-CREATE INDEX IF NOT EXISTS idx_sensorData_cid ON tbl_sensor_data(did);
-CREATE INDEX IF NOT EXISTS idx_pending_actions_status ON pending_actions(status);
-CREATE INDEX IF NOT EXISTS idx_pending_actions_user_mcu ON pending_actions(uid, mid);
-CREATE INDEX IF NOT EXISTS idx_pending_actions_created_at ON pending_actions(created_at);
+CREATE INDEX IF NOT EXISTS idx_log_uid ON tbl_log (uid);
+
+CREATE INDEX IF NOT EXISTS idx_device_uid ON tbl_device (uid);
+
+CREATE INDEX IF NOT EXISTS idx_device_mid ON tbl_device (mid);
+
+CREATE INDEX IF NOT EXISTS idx_events_cid ON tbl_events (did);
+
+CREATE INDEX IF NOT EXISTS idx_sensorData_cid ON tbl_sensor_data (did);
+
+CREATE INDEX IF NOT EXISTS idx_pending_actions_status ON pending_actions (status);
+
+CREATE INDEX IF NOT EXISTS idx_pending_actions_user_mcu ON pending_actions (uid, mid);
+
+CREATE INDEX IF NOT EXISTS idx_pending_actions_created_at ON pending_actions (created_at);
 
 CREATE OR REPLACE FUNCTION fn_device_insert()
     RETURNS TRIGGER AS $$

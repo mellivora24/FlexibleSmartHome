@@ -29,15 +29,19 @@ func (h *MQTTHandler) Init() error {
 		return err
 	}
 
-	if err := h.mqttService.Subscribe(h.mqttService.GetDataTopic(), h.onSensorData); err != nil {
+	if err := h.mqttService.Subscribe("user/+/mcu/+/data", h.onSensorData); err != nil {
 		return err
 	}
 
-	if err := h.mqttService.Subscribe(h.mqttService.GetControlResponseTopic(), h.onControlResp); err != nil {
+	if err := h.mqttService.Subscribe("user/+/mcu/+/control/response", h.onControlResp); err != nil {
 		return err
 	}
 
 	if err := h.mqttService.Subscribe("user/+/mcu/+/config/request", h.onConfigDeviceRequest); err != nil {
+		return err
+	}
+
+	if err := h.mqttService.Subscribe("user/+/mcu/+/alert", h.onNotify); err != nil {
 		return err
 	}
 
@@ -143,10 +147,53 @@ func (h *MQTTHandler) onConfigDeviceRequest(client mqtt.Client, msg mqtt.Message
 	}
 }
 
+func (h *MQTTHandler) onNotify(client mqtt.Client, msg mqtt.Message) {
+	uid := extractUIDFromTopic(msg.Topic())
+	mcuCode := extractMCUCodeFromTopic(msg.Topic())
+
+	var message model.MQTTMessage
+	if err := json.Unmarshal(msg.Payload(), &message); err != nil {
+		log.Printf("Error decoding payload: %v", err)
+		return
+	}
+
+	var alert model.MQTTAlert
+	alertBytes, _ := json.Marshal(message.Payload)
+	if err := json.Unmarshal(alertBytes, &alert); err != nil {
+		log.Printf("Error decoding alert payload: %v", err)
+		return
+	}
+
+	err := h.coreService.CreateNotification(uid, mcuCode, alert.Title, alert.Message)
+	if err != nil {
+		log.Printf("[MQTTHandler] Error creating alert for user %s: %v", uid, err)
+		return
+	}
+
+	wsMessage := model.WSMessage{
+		Topic:   "alert",
+		Payload: alert,
+	}
+
+	err = h.wsService.BroadcastToUser(uid, wsMessage)
+	if err != nil {
+		log.Printf("[MQTTHandler] Error broadcasting alert to user %s: %v", uid, err)
+		return
+	}
+}
+
 func extractUIDFromTopic(topic string) string {
 	parts := strings.Split(topic, "/")
 	if len(parts) >= 2 {
 		return parts[1]
+	}
+	return ""
+}
+
+func extractMCUCodeFromTopic(topic string) string {
+	parts := strings.Split(topic, "/")
+	if len(parts) >= 4 {
+		return parts[3]
 	}
 	return ""
 }

@@ -21,6 +21,7 @@ type CoreService interface {
 	CreateEvent(uid string, data model.MQTTMessage) (err error)
 	UpdateDeviceStatus(data model.MQTTMessage) (err error)
 	GetDeviceList(uid string, mcuCode string) (devices []device.MQTTGetDeviceData, err error)
+	CreateNotification(uid string, mcuCode string, title string, message string) (err error)
 }
 
 type coreService struct {
@@ -182,4 +183,26 @@ func (s *coreService) GetDeviceList(uid string, mcuCode string) (devices []devic
 	}
 
 	return devices, nil
+}
+
+func (s *coreService) CreateNotification(uid string, mcuCode string, title string, message string) (err error) {
+	intUid, convErr := strconv.ParseInt(uid, 10, 64)
+	if convErr != nil {
+		l.Printf("Error converting uid to int64: %v", convErr)
+		return convErr
+	}
+
+	intMcuCode, convErr := strconv.ParseInt(mcuCode, 10, 64)
+	if convErr != nil {
+		l.Printf("Error converting mcuCode to int64: %v", convErr)
+		return convErr
+	}
+
+	err = s.notification.Create(intUid, intMcuCode, title, message)
+	if err != nil {
+		l.Printf("[CoreService] Error creating notification: %v", err)
+		return err
+	}
+
+	return nil
 }

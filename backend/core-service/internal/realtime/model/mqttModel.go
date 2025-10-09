@@ -6,7 +6,7 @@ type MQTTMessage struct {
 }
 
 type MQTTSensorData struct {
-	SID   int64   `json:"sid"`
+	DID   int64   `json:"did"`
 	Value float64 `json:"value"`
 	Unit  string  `json:"unit"`
 }

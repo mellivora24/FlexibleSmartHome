@@ -1,3 +1,4 @@
+-- Active: 1759524272308@@127.0.0.1@5434@core_db
 CREATE TABLE IF NOT EXISTS tbl_mcu (
     id SERIAL PRIMARY KEY,
     uid INT UNIQUE NOT NULL,
@@ -26,21 +27,21 @@ CREATE TABLE IF NOT EXISTS tbl_device (
 CREATE TABLE IF NOT EXISTS tbl_events (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
-    cid INT,
+    did INT,
     action VARCHAR(255),
     payload JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cid) REFERENCES tbl_device(id) ON DELETE CASCADE
+    FOREIGN KEY (did) REFERENCES tbl_device(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tbl_sensor_data (
     id SERIAL PRIMARY KEY,
     uid INT NOT NULL,
-    cid INT,
+    did INT,
     value FLOAT,
     unit VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cid) REFERENCES tbl_device(id) ON DELETE CASCADE
+    FOREIGN KEY (did) REFERENCES tbl_device(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tbl_log (
@@ -77,8 +78,8 @@ CREATE TABLE IF NOT EXISTS pending_actions (
 CREATE INDEX IF NOT EXISTS idx_log_uid ON tbl_log(uid);
 CREATE INDEX IF NOT EXISTS idx_device_uid ON tbl_device(uid);
 CREATE INDEX IF NOT EXISTS idx_device_mid ON tbl_device(mid);
-CREATE INDEX IF NOT EXISTS idx_events_cid ON tbl_events(cid);
-CREATE INDEX IF NOT EXISTS idx_sensorData_cid ON tbl_sensor_data(cid);
+CREATE INDEX IF NOT EXISTS idx_events_cid ON tbl_events(did);
+CREATE INDEX IF NOT EXISTS idx_sensorData_cid ON tbl_sensor_data(did);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_status ON pending_actions(status);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_user_mcu ON pending_actions(uid, mid);
 CREATE INDEX IF NOT EXISTS idx_pending_actions_created_at ON pending_actions(created_at);

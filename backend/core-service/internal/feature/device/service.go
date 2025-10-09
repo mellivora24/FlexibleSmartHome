@@ -6,12 +6,12 @@ import (
 )
 
 type Service interface {
-	ListDevices(uid int64) ([]DeviceDB, error)
-	CreateDevice(uid int64, device *CreateDeviceRequest) (*DeviceDB, error)
-	UpdateDevice(uid int64, device *UpdateDeviceRequest) (*DeviceDB, error)
+	ListDevices(uid int64, mcuCode int64) ([]DeviceDB, error)
+	CreateDevice(uid int64, mcuCode int64, device *CreateDeviceRequest) (*DeviceDB, error)
+	UpdateDevice(device *UpdateDeviceRequest) (*DeviceDB, error)
 	UpdateDeviceStatusAndData(id int64, status bool, data json.RawMessage) error
 	DeleteDevice(id int64) error
-	RealtimeGetList(uid int64) ([]MQTTGetDeviceData, error)
+	RealtimeGetList(uid int64, mcuCode int64) ([]MQTTGetDeviceData, error)
 }
 
 type service struct {
@@ -22,18 +22,23 @@ func NewService(repository Repository) Service {
 	return &service{repo: repository}
 }
 
-func (s *service) ListDevices(uid int64) ([]DeviceDB, error) {
-	devices, err := s.repo.GetList(uid)
+func (s *service) ListDevices(uid int64, mcuCode int64) ([]DeviceDB, error) {
+	devices, err := s.repo.GetList(uid, mcuCode)
 	if err != nil {
 		return nil, err
 	}
 	return devices, nil
 }
 
-func (s *service) CreateDevice(uid int64, device *CreateDeviceRequest) (*DeviceDB, error) {
+func (s *service) CreateDevice(uid int64, mcuCode int64, device *CreateDeviceRequest) (*DeviceDB, error) {
+	mid, err := s.repo.GetMCUByCode(mcuCode)
+	if err != nil {
+		return nil, err
+	}
+
 	d := &DeviceDB{
 		UID:         uid,
-		MID:         device.MID,
+		MID:         mid,
 		RID:         device.RID,
 		Name:        device.Name,
 		Type:        device.Type,
@@ -46,22 +51,17 @@ func (s *service) CreateDevice(uid int64, device *CreateDeviceRequest) (*DeviceD
 	return s.repo.Create(d)
 }
 
-func (s *service) UpdateDevice(uid int64, device *UpdateDeviceRequest) (*DeviceDB, error) {
+func (s *service) UpdateDevice(device *UpdateDeviceRequest) (*DeviceDB, error) {
 	if device.ID == 0 {
 		return nil, errors.New("missing device ID")
 	}
 
 	db := &DeviceDB{
-		ID:          device.ID,
-		UID:         uid,
-		MID:         device.MID,
-		RID:         device.RID,
-		Name:        device.Name,
-		Type:        device.Type,
-		Port:        device.Port,
-		Status:      device.Status,
-		Data:        device.Data,
-		RunningTime: device.RunningTime,
+		ID:   device.ID,
+		RID:  device.RID,
+		Name: device.Name,
+		Type: device.Type,
+		Port: device.Port,
 	}
 
 	return s.repo.Update(db)
@@ -78,8 +78,8 @@ func (s *service) DeleteDevice(id int64) error {
 	return nil
 }
 
-func (s *service) RealtimeGetList(uid int64) ([]MQTTGetDeviceData, error) {
-	devices, err := s.repo.GetList(uid)
+func (s *service) RealtimeGetList(uid int64, mcuCode int64) ([]MQTTGetDeviceData, error) {
+	devices, err := s.repo.GetList(uid, mcuCode)
 	if err != nil {
 		return nil, err
 	}

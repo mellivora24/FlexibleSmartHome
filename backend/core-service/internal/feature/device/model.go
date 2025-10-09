@@ -20,23 +20,11 @@ type DeviceDB struct {
 	UpdatedAt   time.Time       `gorm:"column:updated_at;autoUpdateTime"`
 }
 
-type DeviceData struct {
-	Type  string `json:"type"`
-	Value string `json:"value"`
-	IsPWM bool   `json:"is_pwm"`
-	PWM   int    `json:"pwm"`
-}
-
 func (DeviceDB) TableName() string {
 	return "tbl_device"
 }
 
-type ListDeviceRequest struct {
-	UID int `json:"uid"`
-}
-
 type CreateDeviceRequest struct {
-	MID  int64  `json:"mid"`
 	RID  int64  `json:"rid"`
 	Name string `json:"name"`
 	Type string `json:"type"`
@@ -44,15 +32,11 @@ type CreateDeviceRequest struct {
 }
 
 type UpdateDeviceRequest struct {
-	ID          int64           `json:"id"`
-	MID         int64           `json:"mid,omitempty"`
-	RID         int64           `json:"rid,omitempty"`
-	Name        string          `json:"name,omitempty"`
-	Type        string          `json:"type,omitempty"`
-	Port        int             `json:"port,omitempty"`
-	Status      bool            `json:"status,omitempty"`
-	Data        json.RawMessage `json:"data,omitempty"`
-	RunningTime int             `json:"running_time,omitempty"`
+	ID   int64  `json:"id"`
+	RID  int64  `json:"rid,omitempty"`
+	Name string `json:"name,omitempty"`
+	Type string `json:"type,omitempty"`
+	Port int    `json:"port,omitempty"`
 }
 
 type MQTTGetDeviceData struct {

@@ -1,7 +1,7 @@
 package sensorData
 
 type Service interface {
-	Create(uid, sid int64, value float64, unit string) error
+	Create(uid, did int64, value float64, unit string) error
 	GetList(uid int64, req *GetListRequest) (*GetListResponse, error)
 	GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, error)
 }
@@ -14,10 +14,10 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s service) Create(uid, sid int64, value float64, unit string) error {
+func (s service) Create(uid, did int64, value float64, unit string) error {
 	record := &SensorDataDB{
 		UID:   uid,
-		SID:   sid,
+		DID:   did,
 		Value: value,
 		Unit:  unit,
 	}

@@ -1,7 +1,7 @@
 package auth
 
 type VerifyTokenResponse struct {
-	UID     int64 `json:"uid"`
-	MID     int64 `json:"mid"`
-	IsValid bool  `json:"valid"`
+	UID     int  `json:"uid"`
+	MCUCode int  `json:"mcu_code"`
+	IsValid bool `json:"valid"`
 }

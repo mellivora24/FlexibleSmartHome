@@ -55,17 +55,18 @@ func (s *service) VerifyToken(token string) (*VerifyTokenResponse, error) {
 		return nil, shared.ErrUnauthorized
 	}
 
-	var authResp struct {
-		Data VerifyTokenResponse `json:"data"`
+	var respBody struct {
+		Data    VerifyTokenResponse `json:"data"`
+		Success bool                `json:"success"`
 	}
 
-	if err := json.Unmarshal(body, &authResp); err != nil {
+	if err := json.Unmarshal(body, &respBody); err != nil {
 		return nil, fmt.Errorf("failed to parse auth response: %w", err)
 	}
 
-	if !authResp.Data.IsValid {
+	if !respBody.Data.IsValid {
 		return nil, shared.ErrUnauthorized
 	}
 
-	return &authResp.Data, nil
+	return &respBody.Data, nil
 }

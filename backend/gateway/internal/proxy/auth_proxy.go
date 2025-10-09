@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -46,10 +45,6 @@ func (p *AuthProxy) ProxyRequest(c *gin.Context) {
 		for _, vv := range v {
 			req.Header.Add(k, vv)
 		}
-	}
-
-	if uid, exists := c.Get("user_id"); exists {
-		req.Header.Set("X-User-ID", fmt.Sprintf("%v", uid))
 	}
 
 	resp, err := p.httpClient.Do(req)

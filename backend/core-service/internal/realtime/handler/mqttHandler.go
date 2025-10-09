@@ -122,7 +122,7 @@ func (h *MQTTHandler) onConfigDeviceRequest(client mqtt.Client, msg mqtt.Message
 	uid := parts[1]
 	mcuId := parts[3]
 
-	list, err := h.coreService.GetDeviceList(uid)
+	list, err := h.coreService.GetDeviceList(uid, mcuId)
 	if err != nil {
 		log.Printf("[MQTTHandler] Error getting device list for uid=%s: %v", uid, err)
 		return

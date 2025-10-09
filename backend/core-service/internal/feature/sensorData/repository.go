@@ -34,11 +34,11 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]SensorDataItem, 
 
 	query := r.DB.Table("tbl_sensor_data AS sd").
 		Select("sd.id, d.name AS sensor_name, sd.value, sd.unit, sd.created_at").
-		Joins("JOIN tbl_device d ON sd.sid = d.id").
+		Joins("JOIN tbl_device d ON sd.did = d.id").
 		Where("sd.uid = ?", uid)
 
-	if req.SID > 0 {
-		query = query.Where("sd.sid = ?", req.SID)
+	if req.DID > 0 {
+		query = query.Where("sd.did = ?", req.DID)
 	}
 
 	if req.Name != "" {
@@ -88,14 +88,14 @@ func (r *repository) GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, err
 	var item SensorDataItem
 	query := r.DB.Table("tbl_sensor_data AS sd").
 		Select("sd.id, d.name AS sensor_name, sd.value, sd.unit, sd.created_at").
-		Joins("JOIN tbl_device d ON sd.sid = d.id").
+		Joins("JOIN tbl_device d ON sd.did = d.id").
 		Where("sd.uid = ?", uid)
 
 	if req.ID > 0 {
 		query = query.Where("sd.id = ?", req.ID)
 	}
-	if req.SID > 0 {
-		query = query.Where("sd.sid = ?", req.SID)
+	if req.DID > 0 {
+		query = query.Where("sd.did = ?", req.DID)
 	}
 	if req.Value != 0 {
 		query = query.Where("sd.value = ?", req.Value)

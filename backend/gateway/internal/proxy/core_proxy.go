@@ -36,6 +36,20 @@ var upgrader = websocket.Upgrader{
 }
 
 func (p *CoreProxy) ProxyRequest(c *gin.Context) {
+	isAuth, exists := c.Get("is_authenticated")
+	if !exists || isAuth != true {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	userID, uidExists := c.Get("user_id")
+	mcuCode, mcuExists := c.Get("mcu_code")
+
+	if !uidExists || !mcuExists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing authentication context"})
+		return
+	}
+
 	path := strings.TrimPrefix(c.Request.URL.Path, "/api/v1/core")
 	if path == "" {
 		path = "/"
@@ -58,12 +72,8 @@ func (p *CoreProxy) ProxyRequest(c *gin.Context) {
 		}
 	}
 
-	if userID, exists := c.Get("user_id"); exists {
-		req.Header.Set("X-User-ID", fmt.Sprintf("%v", userID))
-	}
-	if mid, exists := c.Get("mid"); exists {
-		req.Header.Set("X-MID", fmt.Sprintf("%v", mid))
-	}
+	req.Header.Set("X-UID", fmt.Sprintf("%v", userID))
+	req.Header.Set("X-MCU", fmt.Sprintf("%v", mcuCode))
 
 	resp, err := p.httpClient.Do(req)
 	if err != nil {
@@ -71,9 +81,8 @@ func (p *CoreProxy) ProxyRequest(c *gin.Context) {
 		return
 	}
 	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Print("Failed to close response body")
+		if cerr := Body.Close(); cerr != nil {
+			log.Printf("Failed to close response body: %v", cerr)
 		}
 	}(resp.Body)
 
@@ -82,8 +91,6 @@ func (p *CoreProxy) ProxyRequest(c *gin.Context) {
 			c.Header(key, value)
 		}
 	}
-
-	c.Status(resp.StatusCode)
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -96,9 +103,9 @@ func (p *CoreProxy) ProxyRequest(c *gin.Context) {
 
 func (p *CoreProxy) ProxyWebSocket(c *gin.Context) {
 	uid, _ := c.Get("user_id")
-	mid, _ := c.Get("mid")
+	mcuCode, _ := c.Get("mcu_code")
 
-	targetURL := fmt.Sprintf("%s/ws?uid=%v&mid=%v", p.coreServiceWSURL, uid, mid)
+	targetURL := fmt.Sprintf("%s/ws?uid=%v&mcu_code=%v", p.coreServiceWSURL, uid, mcuCode)
 	if c.Request.URL.RawQuery != "" {
 		targetURL += "&" + c.Request.URL.RawQuery
 	}

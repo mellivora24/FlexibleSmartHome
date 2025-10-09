@@ -13,9 +13,9 @@ import (
 func WSHandler(wsService service.WebSocketService, mqttService service.MQTTService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		uid := r.URL.Query().Get("uid")
-		mid := r.URL.Query().Get("mid")
+		mcuCode := r.URL.Query().Get("mcu_code")
 
-		if uid == "" || mid == "" {
+		if uid == "" || mcuCode == "" || uid == "0" || mcuCode == "0" {
 			http.Error(w, "Missing uid or mid parameter", http.StatusBadRequest)
 			return
 		}
@@ -26,7 +26,7 @@ func WSHandler(wsService service.WebSocketService, mqttService service.MQTTServi
 			return
 		}
 
-		client := wsService.AddClient(uid, mid, conn)
+		client := wsService.AddClient(uid, mcuCode, conn)
 
 		welcomeMessage := model.WSMessage{
 			Topic:   "connect",

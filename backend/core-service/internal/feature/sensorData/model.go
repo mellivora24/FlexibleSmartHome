@@ -5,7 +5,7 @@ import "time"
 type SensorDataDB struct {
 	ID        int64     `gorm:"column:id;primaryKey;autoIncrement"`
 	UID       int64     `gorm:"column:uid;not null"`
-	SID       int64     `gorm:"column:sid;not null"`
+	DID       int64     `gorm:"column:did;not null"`
 	Value     float64   `gorm:"column:value;not null"`
 	Unit      string    `gorm:"column:unit;not null"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
@@ -29,7 +29,7 @@ type GetListResponse struct {
 }
 
 type GetListRequest struct {
-	SID       int64     `form:"sid"`
+	DID       int64     `form:"did"`
 	Name      string    `form:"name"`
 	Value     float64   `form:"value"`
 	Time      time.Time `form:"time" time_format:"2006-01-02 15:04:05"`
@@ -43,7 +43,7 @@ type GetListRequest struct {
 
 type GetOneRequest struct {
 	ID     int64     `form:"id"`
-	SID    int64     `form:"sid"`
+	DID    int64     `form:"did"`
 	Value  float64   `form:"value"`
 	AtTime time.Time `form:"at_time" time_format:"2006-01-02 15:04:05"`
 }

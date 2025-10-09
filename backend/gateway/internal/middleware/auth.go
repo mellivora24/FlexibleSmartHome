@@ -39,7 +39,7 @@ func AuthMiddleware(authService auth.Service) gin.HandlerFunc {
 		}
 
 		c.Set("user_id", authResp.UID)
-		c.Set("mid", authResp.MID)
+		c.Set("mcu_code", authResp.MCUCode)
 		c.Set("is_authenticated", true)
 
 		c.Next()

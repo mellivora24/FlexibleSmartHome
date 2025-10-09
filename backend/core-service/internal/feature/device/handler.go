@@ -28,20 +28,27 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 
 func (h *Handler) ListDevices(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
-	if uid == "" {
+	mcuCode := c.GetHeader("X-MCU")
+	if uid == "" || mcuCode == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"error":   "missing X-UID header",
+			"error":   "missing X-UID or X-MCU in header",
 		})
 		return
 	}
+
 	intUid, err := strconv.ParseInt(uid, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid X-UID"})
 		return
 	}
+	intMcuCode, err := strconv.ParseInt(mcuCode, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid X-MCU"})
+		return
+	}
 
-	res, err := h.service.ListDevices(intUid)
+	res, err := h.service.ListDevices(intUid, intMcuCode)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -59,7 +66,8 @@ func (h *Handler) ListDevices(c *gin.Context) {
 
 func (h *Handler) CreateDevice(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
-	if uid == "" {
+	mcuCode := c.GetHeader("X-MCU")
+	if uid == "" || mcuCode == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"error":   "missing X-UID header",
@@ -75,6 +83,15 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 		return
 	}
 
+	intMcuCode, err := strconv.ParseInt(mcuCode, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid X-MCU",
+		})
+		return
+	}
+
 	var device CreateDeviceRequest
 	if err := c.ShouldBindJSON(&device); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -84,7 +101,7 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 		return
 	}
 
-	res, err := h.service.CreateDevice(intUid, &device)
+	res, err := h.service.CreateDevice(intUid, intMcuCode, &device)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate") {
 			c.JSON(http.StatusConflict, gin.H{"error": "device already exists"})
@@ -105,18 +122,11 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 
 func (h *Handler) UpdateDevice(c *gin.Context) {
 	uid := c.GetHeader("X-UID")
-	if uid == "" {
+	mcuCode := c.GetHeader("X-MCU")
+	if uid == "" || mcuCode == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"error":   "missing X-UID header",
-		})
-		return
-	}
-	intUid, err := strconv.ParseInt(uid, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"error":   "invalid X-UID",
+			"error":   "missing X-UID or X-MCU in header",
 		})
 		return
 	}
@@ -130,7 +140,7 @@ func (h *Handler) UpdateDevice(c *gin.Context) {
 		return
 	}
 
-	res, err := h.service.UpdateDevice(intUid, &device)
+	res, err := h.service.UpdateDevice(&device)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			c.JSON(http.StatusNotFound, gin.H{

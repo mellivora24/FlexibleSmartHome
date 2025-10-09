@@ -2,16 +2,19 @@ package device
 
 import (
 	"encoding/json"
+	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type Repository interface {
-	GetList(uid int64) ([]DeviceDB, error)
+	GetList(uid int64, mcuCode int64) ([]DeviceDB, error)
 	Create(record *DeviceDB) (*DeviceDB, error)
 	Update(record *DeviceDB) (*DeviceDB, error)
 	UpdateStatusAndData(id int64, status bool, data json.RawMessage) error
 	Delete(id int64) error
+	GetMCUByCode(mcuCode int64) (int64, error)
 }
 
 type repository struct {
@@ -22,11 +25,20 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{DB: db}
 }
 
-func (r *repository) GetList(uid int64) ([]DeviceDB, error) {
+func (r *repository) GetList(uid int64, mcuCode int64) ([]DeviceDB, error) {
 	var devices []DeviceDB
-	if err := r.DB.Where("uid = ?", uid).Find(&devices).Error; err != nil {
+
+	err := r.DB.
+		Table("tbl_device AS d").
+		Select("d.*").
+		Joins("JOIN tbl_mcu AS m ON d.mid = m.id").
+		Where("d.uid = ? AND m.mcu_code = ?", uid, mcuCode).
+		Find(&devices).Error
+
+	if err != nil {
 		return nil, err
 	}
+
 	return devices, nil
 }
 
@@ -41,10 +53,8 @@ func (r *repository) Update(record *DeviceDB) (*DeviceDB, error) {
 	updates := map[string]interface{}{}
 
 	updates["rid"] = record.RID
-	updates["mid"] = record.MID
 	updates["port"] = record.Port
-	updates["status"] = record.Status
-	updates["running_time"] = record.RunningTime
+	updates["updated_at"] = time.Now()
 
 	if record.Name != "" {
 		updates["name"] = record.Name
@@ -52,10 +62,6 @@ func (r *repository) Update(record *DeviceDB) (*DeviceDB, error) {
 
 	if record.Type != "" {
 		updates["type"] = record.Type
-	}
-
-	if len(record.Data) > 0 {
-		updates["data"] = record.Data
 	}
 
 	if err := r.DB.Model(&DeviceDB{}).
@@ -89,4 +95,21 @@ func (r *repository) UpdateStatusAndData(id int64, status bool, data json.RawMes
 		return err
 	}
 	return nil
+}
+
+func (r *repository) GetMCUByCode(mcuCode int64) (int64, error) {
+	var mcuId int64
+	err := r.DB.
+		Raw("SELECT id FROM tbl_mcu WHERE mcu_code = ? LIMIT 1", mcuCode).
+		Scan(&mcuId).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	if mcuId == 0 {
+		return 0, fmt.Errorf("MCU with code %d not found", mcuCode)
+	}
+
+	return mcuId, nil
 }

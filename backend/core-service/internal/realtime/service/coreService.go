@@ -20,7 +20,7 @@ type CoreService interface {
 	CreateSensorData(uid string, data model.MQTTMessage) (err error)
 	CreateEvent(uid string, data model.MQTTMessage) (err error)
 	UpdateDeviceStatus(data model.MQTTMessage) (err error)
-	GetDeviceList(uid string) (devices []device.MQTTGetDeviceData, err error)
+	GetDeviceList(uid string, mcuCode string) (devices []device.MQTTGetDeviceData, err error)
 }
 
 type coreService struct {
@@ -89,20 +89,20 @@ func (s *coreService) CreateSensorData(uid string, data model.MQTTMessage) (err 
 
 	payloadMap := data.Payload.(map[string]interface{})
 
-	var sid int64
-	if v, ok := payloadMap["sid"].(float64); ok {
-		sid = int64(v)
+	var did int64
+	if v, ok := payloadMap["did"].(float64); ok {
+		did = int64(v)
 	}
 	unit, _ := payloadMap["unit"].(string)
 	value, _ := payloadMap["value"].(float64)
 
-	err = s.sensorData.Create(intUid, sid, value, unit)
+	err = s.sensorData.Create(intUid, did, value, unit)
 	if err != nil {
 		l.Printf("[CoreService] Error creating sensor data: %v", err)
 		return
 	}
 
-	l.Printf("[CoreService] Sensor data created for UID=%d SID=%s VALUE=%f UNIT=%s", intUid, sid, value, unit)
+	l.Printf("[CoreService] Sensor data created for UID=%d DID=%d VALUE=%f UNIT=%s", intUid, did, value, unit)
 	return nil
 }
 
@@ -158,14 +158,20 @@ func (s *coreService) UpdateDeviceStatus(data model.MQTTMessage) (err error) {
 	return nil
 }
 
-func (s *coreService) GetDeviceList(uid string) (devices []device.MQTTGetDeviceData, err error) {
+func (s *coreService) GetDeviceList(uid string, mcuCode string) (devices []device.MQTTGetDeviceData, err error) {
 	intUid, convErr := strconv.ParseInt(uid, 10, 64)
 	if convErr != nil {
 		l.Printf("Error converting uid to int64: %v", convErr)
 		return nil, convErr
 	}
 
-	devices, err = s.device.RealtimeGetList(intUid)
+	intMcuCode, convErr := strconv.ParseInt(mcuCode, 10, 64)
+	if convErr != nil {
+		l.Printf("Error converting mcuCode to int64: %v", convErr)
+		return nil, convErr
+	}
+
+	devices, err = s.device.RealtimeGetList(intUid, intMcuCode)
 	if err != nil {
 		l.Printf("[CoreService] Error getting device list: %v", err)
 		return nil, err

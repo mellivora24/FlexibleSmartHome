@@ -10,7 +10,6 @@ DROP FUNCTION IF EXISTS fn_sensor_delete();
 DROP FUNCTION IF EXISTS fn_sensor_update();
 DROP FUNCTION IF EXISTS get_used_ports(INT);
 DROP FUNCTION IF EXISTS get_available_ports(INT);
-DROP FUNCTION IF EXISTS fn_check_port_validity();
 
 DROP TABLE IF EXISTS tbl_sensor_data CASCADE;
 DROP TABLE IF EXISTS tbl_events CASCADE;
@@ -21,6 +20,7 @@ DROP TABLE IF EXISTS tbl_log CASCADE;
 DROP TABLE IF EXISTS pending_actions CASCADE;
 DROP TABLE IF EXISTS tbl_mcu CASCADE;
 
+DROP FUNCTION IF EXISTS fn_check_port_validity();
 DROP SEQUENCE tbl_log_id_seq;
 DROP SEQUENCE tbl_notification_id_seq;
 DROP SEQUENCE tbl_device_id_seq;

@@ -101,5 +101,23 @@ func (r *repository) GetOne(uid int64, req *GetOneRequest) (*EventResponse, erro
 }
 
 func (r *repository) CreateEvent(event *EventDB) error {
+	var deviceType string
+
+	err := r.DB.Table("tbl_device").
+		Select("type").
+		Where("id = ?", event.DID).
+		Scan(&deviceType).Error
+
+	if err != nil {
+		return err
+	}
+	if deviceType == "" {
+		return nil
+	}
+
+	if deviceType != "analogDevice" && deviceType != "digitalDevice" {
+		return nil
+	}
+
 	return r.DB.Create(event).Error
 }

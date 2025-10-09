@@ -17,6 +17,25 @@ func NewRepository(db *gorm.DB) Repository {
 }
 
 func (r *repository) CreateRecord(record *SensorDataDB) error {
+	var deviceType string
+
+	err := r.DB.Table("tbl_device").
+		Select("type").
+		Where("id = ?", record.DID).
+		Scan(&deviceType).Error
+
+	if err != nil {
+		return err
+	}
+
+	if deviceType == "" {
+		return nil
+	}
+
+	if deviceType != "analogSensor" && deviceType != "digitalSensor" {
+		return nil
+	}
+
 	return r.DB.Create(record).Error
 }
 

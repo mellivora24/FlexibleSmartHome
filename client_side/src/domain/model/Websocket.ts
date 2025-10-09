@@ -1,4 +1,5 @@
-type WSMessage = {
+export type WSMessage = {
     topic: string;
     payload: any;
 };
+

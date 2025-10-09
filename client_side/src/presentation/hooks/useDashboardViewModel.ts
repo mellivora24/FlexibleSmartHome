@@ -9,11 +9,10 @@ import { SensorDataRepositoryImpl } from "@domain/repo/sensorDataRepo";
 import { WeatherRepositoryImpl } from "@domain/repo/weatherRepo";
 import { GetListSensorDataByDID } from "@domain/usecase/sensorData/getListSensorDataByDID";
 import { GetWeatherUseCase } from "@domain/usecase/weather/getUsecase";
+import { WSMessage } from "@model/Websocket";
 import { DeviceRepositoryImpl } from "@src/domain/repo/deviceRepo";
 import { GetAllDevices } from "@src/domain/usecase/device/getAllDevices";
-import { addSocketListener, initSocket, removeSocketListener } from "@src/infra/api/websocket/socketClient";
-
-type WSMessage = { topic: string; payload: any };
+import { addSocketListener, initSocket } from "@src/infra/api/websocket/socketClient";
 
 const weatherRepo = new WeatherRepositoryImpl();
 const getWeather = new GetWeatherUseCase(weatherRepo);
@@ -87,46 +86,48 @@ export const useDashboardViewModel = (token: string) => {
 
         initSocket(token);
 
-        const handleWS = (msg: WSMessage) => {
-            if (msg.topic === "sensor_data") {
-                const { did, value } = msg.payload;
-                const device = devices.find(d => d.id === did);
+        const handleSensorData = (msg: WSMessage) => {
+            const { did, value } = msg.payload;
+            const device = devices.find(d => d.id === did);
 
-                if (!device) return;
+            if (!device) return;
 
-                if (device.type === "humiditySensor") {
-                    setInsideHumidity(value);
-                }
+            if (device.type === "humiditySensor") {
+                setInsideHumidity(value);
+            }
 
-                if (device.type === "temperatureSensor") {
-                    setInsideTemperature(value);
-                }
-            } else if (msg.topic === "alert") {
-                const pattern = [0, 100, 200, 500];
-                Vibration.vibrate(pattern, true);
-
-                Alert.alert(
-                    t("common.alert"),
-                    msg.payload.message,
-                    [
-                        {
-                            text: t("common.ok"),
-                            onPress: () => Vibration.cancel(),
-                        },
-                    ],
-                    { cancelable: false }
-                );
+            if (device.type === "temperatureSensor") {
+                setInsideTemperature(value);
             }
         };
 
-        addSocketListener(handleWS);
+        const handleAlert = (msg: WSMessage) => {
+            const pattern = [0, 100, 200, 500];
+            Vibration.vibrate(pattern, true);
+
+            Alert.alert(
+                t("common.alert"),
+                msg.payload.message,
+                [
+                    {
+                        text: t("common.ok"),
+                        onPress: () => Vibration.cancel(),
+                    },
+                ],
+                { cancelable: false }
+            );
+        };
+
+        const unsubscribeSensor = addSocketListener(handleSensorData, "sensor_data");
+        const unsubscribeAlert = addSocketListener(handleAlert, "alert");
+        
         fetchWeather();
 
         return () => {
-            removeSocketListener(handleWS);
-            console.log("WebSocket listener removed");
+            unsubscribeSensor();
+            unsubscribeAlert();
         };
-    }, [devices, token, fetchWeather]);
+    }, [devices, token, fetchWeather, t]);
 
     useFocusEffect(
         useCallback(() => {

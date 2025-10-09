@@ -21,6 +21,7 @@ func (EventDB) TableName() string {
 type EventResponse struct {
 	ID         int64           `json:"id"`
 	UID        int64           `json:"uid"`
+	DID        int64           `json:"did"`
 	DeviceName string          `json:"device_name"`
 	Action     string          `json:"action"`
 	Payload    json.RawMessage `json:"payload"`

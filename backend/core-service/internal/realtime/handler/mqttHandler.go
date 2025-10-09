@@ -120,9 +120,9 @@ func (h *MQTTHandler) onConfigDeviceRequest(client mqtt.Client, msg mqtt.Message
 	}
 
 	uid := parts[1]
-	mcuId := parts[3]
+	mcuCode := parts[3]
 
-	list, err := h.coreService.GetDeviceList(uid, mcuId)
+	list, err := h.coreService.GetDeviceList(uid, mcuCode)
 	if err != nil {
 		log.Printf("[MQTTHandler] Error getting device list for uid=%s: %v", uid, err)
 		return
@@ -135,7 +135,7 @@ func (h *MQTTHandler) onConfigDeviceRequest(client mqtt.Client, msg mqtt.Message
 
 	payload, _ := json.Marshal(responseData)
 
-	responseTopic := "user/" + uid + "/mcu/" + mcuId + "/config/response"
+	responseTopic := "user/" + uid + "/mcu/" + mcuCode + "/config/response"
 	err = h.mqttService.Publish(responseTopic, payload)
 	if err != nil {
 		log.Printf("[MQTTHandler] Error publishing config response: %v", err)

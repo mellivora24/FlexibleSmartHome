@@ -17,6 +17,7 @@ func (SensorDataDB) TableName() string {
 
 type SensorDataItem struct {
 	ID         int64     `json:"id"`
+	DID        int64     `json:"did"`
 	SensorName string    `json:"sensorName"`
 	Value      float64   `json:"value"`
 	Unit       string    `json:"unit"`

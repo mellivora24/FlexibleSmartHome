@@ -20,9 +20,9 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-    mid: number;
     name: string;
     email: string;
+    mcu_code: number;
     password: string;
 }
 

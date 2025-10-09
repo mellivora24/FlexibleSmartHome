@@ -4,7 +4,7 @@ import { DeviceRepository } from "@src/domain/repo/deviceRepo";
 export class GetAllDevices {
     constructor(private deviceRepo: DeviceRepository) {}
 
-    async execute(): Promise<Device[]> {
-        return this.deviceRepo.getAllDevices();
+    async execute(token: string): Promise<Device[]> {
+        return this.deviceRepo.getAllDevices(token);
     }
 }

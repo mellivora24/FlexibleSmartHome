@@ -4,7 +4,7 @@ export interface Device {
     mid: number,
     rid: number,
     name: string,
-    type: string | "digitalDevice" | "analogDevice",
+    type: string | "digitalDevice" | "analogDevice" | "digitalSensor" | "analogSensor",
     port: number,
     status: boolean,
     Data: DeviceData,
@@ -13,7 +13,7 @@ export interface Device {
     UpdatedAt: Date,
 }
 
-export type DeviceData = { status?: boolean, value?: number };
+export type DeviceData = { status?: boolean, value?: number, unit?: string };
 
 export interface CreateDeviceRequest {
     "mid": number,
@@ -25,8 +25,10 @@ export interface CreateDeviceRequest {
 
 export interface UpdateDeviceRequest {
     "id": number,
+    "mid"?: number,
     "rid"?: number,
     "port"?: number,
     "type"?: string,
     "name"?: string,
+    "status"?: boolean
 }

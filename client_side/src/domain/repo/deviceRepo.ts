@@ -2,16 +2,16 @@ import { CreateDeviceRequest, Device, UpdateDeviceRequest } from "@domain/model/
 import { deviceApi } from "@src/infra/api/http/deviceApi";
 
 export interface DeviceRepository {
-    getAllDevices(): Promise<Device[]>;
+    getAllDevices(token: string): Promise<Device[]>;
     createDevice(data: Partial<CreateDeviceRequest>): Promise<Device>;
     updateDevice(data: Partial<UpdateDeviceRequest>): Promise<Device>;
     deleteDevice(id: number): Promise<void>;
 }
 
 export class DeviceRepositoryImpl implements DeviceRepository {
-    async getAllDevices(): Promise<Device[]> {
+    async getAllDevices(token: string): Promise<Device[]> {
         try {
-            const res = await deviceApi.getAllDevices();
+            const res = await deviceApi.getAllDevices(token);
             if (Array.isArray(res)) return res;
             if (res && Array.isArray(res)) return res;
 

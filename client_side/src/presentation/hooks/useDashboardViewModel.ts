@@ -14,8 +14,7 @@ const getWeatherUseCase = new GetWeatherUseCase(weatherRepository);
 const deviceRepository = new DeviceRepositoryImpl();
 const getAllDevices = new GetAllDevices(deviceRepository);
 
-export const useDashboardViewModel = () => {
-
+export const useDashboardViewModel = (token: string) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -41,7 +40,7 @@ export const useDashboardViewModel = () => {
     };
 
     const fetchDevices = async () => {
-        const devices = await getAllDevices.execute();
+        const devices = await getAllDevices.execute(token);
         setDevices(devices);
     };
 
@@ -74,7 +73,7 @@ export const useDashboardViewModel = () => {
             fetchTemperatureHistory();
 
             return () => {};
-        }, [])
+        }, [token])
     );
 
     return {

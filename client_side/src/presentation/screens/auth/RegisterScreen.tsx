@@ -30,7 +30,7 @@ export default function RegisterScreen() {
     async function handleRegister() {
         const IntMcuCode = parseInt(mcuCode, 10);
         try {
-            const response = await register({ mid: IntMcuCode, name, email, password });
+            const response = await register({ mcu_code: IntMcuCode, name, email, password });
             if ("data" in response) {
                 await loginContext(response.data as any);
                 router.replace(ROUTES.TABS.DASHBOARD);

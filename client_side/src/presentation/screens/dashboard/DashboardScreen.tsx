@@ -18,8 +18,8 @@ import { useAuthContext } from "@presentation/hooks/useAppContext";
 
 export const DashboardScreen: React.FC = () => {
     const router = useRouter();
-    const { authData } = useAuthContext();
-    const vm = useDashboardViewModel();
+    const { authData, token } = useAuthContext();
+    const vm = useDashboardViewModel(token);
 
     return (
         <LinearGradient

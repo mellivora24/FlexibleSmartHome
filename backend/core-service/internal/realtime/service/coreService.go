@@ -102,7 +102,6 @@ func (s *coreService) CreateSensorData(uid string, data model.MQTTMessage) (err 
 		return
 	}
 
-	l.Printf("[CoreService] Sensor data created for UID=%d DID=%d VALUE=%f UNIT=%s", intUid, did, value, unit)
 	return nil
 }
 

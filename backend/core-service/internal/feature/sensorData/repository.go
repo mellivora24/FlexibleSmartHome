@@ -1,6 +1,11 @@
 package sensorData
 
-import "gorm.io/gorm"
+import (
+	"encoding/json"
+	"fmt"
+
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	CreateRecord(record *SensorDataDB) error
@@ -24,22 +29,44 @@ func (r *repository) CreateRecord(record *SensorDataDB) error {
 		Select("type").
 		Where("id = ?", record.DID).
 		Scan(&deviceType).Error
-
 	if err != nil {
 		return err
 	}
 
 	if deviceType == "" {
-		return nil
+		return fmt.Errorf("device ID %d is not found", record.DID)
 	}
 
 	if deviceType != "analogSensor" && deviceType != "digitalSensor" && deviceType != "temperatureSensor" && deviceType != "humiditySensor" {
-		return nil
+		return fmt.Errorf("device ID %d is not a sensor", record.DID)
 	}
 
-	return r.DB.Create(record).Error
-}
+	if err := r.DB.Create(record).Error; err != nil {
+		return err
+	}
 
+	fmt.Printf("Created sensor data record: %+v\n", record)
+
+	dataUpdate := map[string]interface{}{
+		"status": true,
+		"value":  record.Value,
+		"unit":   record.Unit,
+	}
+
+	dataJSON, err := json.Marshal(dataUpdate)
+	if err != nil {
+		return err
+	}
+
+	err = r.DB.Table("tbl_device").
+		Where("id = ?", record.DID).
+		Update("data", dataJSON).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 func (r *repository) GetList(uid int64, req *GetListRequest) ([]SensorDataItem, int64, error) {
 	var data []SensorDataItem
 	var total int64

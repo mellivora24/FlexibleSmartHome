@@ -9,6 +9,9 @@ import { GetListSensorDataByDID } from "@domain/usecase/sensorData/getListSensor
 import { GetWeatherUseCase } from "@domain/usecase/weather/getUsecase";
 import { DeviceRepositoryImpl } from "@src/domain/repo/deviceRepo";
 import { GetAllDevices } from "@src/domain/usecase/device/getAllDevices";
+import { addSocketListener, initSocket, removeSocketListener } from "@src/infra/api/websocket/socketClient";
+
+type WSMessage = { topic: string; payload: any };
 
 const weatherRepo = new WeatherRepositoryImpl();
 const getWeather = new GetWeatherUseCase(weatherRepo);
@@ -48,31 +51,67 @@ export const useDashboardViewModel = (token: string) => {
             setDevices(deviceList);
 
             if (deviceList.length > 0) {
-                const humiDeviceID = deviceList.find(d => d.type == "humiditySensor")?.id;
-                const tempDeviceID = deviceList.find(d => d.type == "temperatureSensor")?.id;
+                const humiDeviceID = deviceList.find(d => d.type === "humiditySensor")?.id;
+                const tempDeviceID = deviceList.find(d => d.type === "temperatureSensor")?.id;
 
                 const humidityData = await getSensorData.execute(humiDeviceID, 10, token);
                 const temperatureData = await getSensorData.execute(tempDeviceID, 10, token);
 
                 if (humidityData.success && humidityData.data.length > 0) {
-                    setHumidityHistory(humidityData.data.map(item => item.value).reverse());
+                    const values = humidityData.data.map(item => item.value).reverse();
+                    setHumidityHistory(values);
+                    setInsideHumidity(values.at(-1) ?? null);
                 }
 
                 if (temperatureData.success && temperatureData.data.length > 0) {
-                    setTemperatureHistory(temperatureData.data.map(item => item.value).reverse());
+                    const values = temperatureData.data.map(item => item.value).reverse();
+                    setTemperatureHistory(values);
+                    setInsideTemperature(values.at(-1) ?? null);
                 }
             }
         } catch (err: any) {
             setError(err.message ?? "Failed to fetch devices or sensors");
-            console.error("Error fetching devices or sensors:", err);
         } finally {
             setLoading(false);
         }
     }, [token]);
 
     useEffect(() => {
+        fetchDevicesAndSensors();
+    }, [fetchDevicesAndSensors]);
+
+    useEffect(() => {
+        if (devices.length === 0) return;
+
+        initSocket(token);
+
+        const handleWS = (msg: WSMessage) => {
+            if (msg.topic === "sensor_data") {
+                const { did, value } = msg.payload;
+                const device = devices.find(d => d.id === did);
+
+                if (!device) return;
+
+                if (device.type === "humiditySensor") {
+                    setInsideHumidity(value);
+                    setHumidityHistory(prev => [...prev.slice(-9), value]);
+                }
+
+                if (device.type === "temperatureSensor") {
+                    setInsideTemperature(value);
+                    setTemperatureHistory(prev => [...prev.slice(-9), value]);
+                }
+            }
+        };
+
+        addSocketListener(handleWS);
         fetchWeather();
-    }, [fetchWeather]);
+
+        return () => {
+            removeSocketListener(handleWS);
+            console.log("WebSocket listener removed");
+        };
+    }, [devices, token, fetchWeather]);
 
     useFocusEffect(
         useCallback(() => {
@@ -85,7 +124,6 @@ export const useDashboardViewModel = (token: string) => {
         error,
         location,
         weather,
-
         devices,
         insideHumidity,
         insideTemperature,

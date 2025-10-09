@@ -40,7 +40,7 @@ function renderCardContent({
             {/* Body */}
             <View style={styles.section_body}>
                 {type === "analogDevice" && <CustomSlider onValueChange={onValueChange} />}
-                {(type === "analogSensor" || type === "temperatureSensor" || type === "humiditySensor") && <Gauge value={data.value ?? 0} size={150} />}
+                {type === "analogSensor"&& <Gauge value={data.value ?? 0} size={150} />}
                 {type === "digitalDevice" && <View style={ data.status ? styles.digitalSensorLow : styles.digitalSensorHigh } />}
                 {type === "digitalSensor" && (
                     <View style={styles.digitalSensor}>

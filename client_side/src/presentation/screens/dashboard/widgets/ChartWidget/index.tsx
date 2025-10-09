@@ -14,6 +14,11 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({ temperature, humidity 
     const { t } = useTranslation();
     const labels = temperature.map((_, i) => i.toString());
 
+    if (humidity.length === 0 && temperature.length === 0) {
+        humidity.push(0);
+        temperature.push(0);
+    }
+
     return (
         <View style={chartWidgetStyle.container}>
             <LineChart

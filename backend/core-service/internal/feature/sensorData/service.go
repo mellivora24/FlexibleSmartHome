@@ -4,6 +4,7 @@ type Service interface {
 	Create(uid, did int64, value float64, unit string) error
 	GetList(uid int64, req *GetListRequest) (*GetListResponse, error)
 	GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, error)
+	GetListByDID(did int64, limit int) ([]SensorDataDB, error)
 }
 
 type service struct {
@@ -37,4 +38,8 @@ func (s service) GetList(uid int64, req *GetListRequest) (*GetListResponse, erro
 
 func (s service) GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, error) {
 	return s.repo.GetOne(uid, req)
+}
+
+func (s service) GetListByDID(did int64, limit int) ([]SensorDataDB, error) {
+	return s.repo.GetListByDID(did, limit)
 }

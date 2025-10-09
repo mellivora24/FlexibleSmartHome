@@ -79,9 +79,16 @@ func (r *repository) Update(record *DeviceDB) (*DeviceDB, error) {
 }
 
 func (r *repository) Delete(id int64) error {
-	if err := r.DB.Where("id = ?", id).Delete(&DeviceDB{}).Error; err != nil {
-		return err
+	result := r.DB.Where("id = ?", id).Delete(&DeviceDB{})
+
+	if result.Error != nil {
+		return result.Error
 	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("device with id %d not found", id)
+	}
+
 	return nil
 }
 

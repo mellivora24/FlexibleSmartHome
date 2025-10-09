@@ -20,6 +20,7 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	{
 		sensorDataGroup.GET("/", h.ListSensorData)
 		sensorDataGroup.GET("/:id", h.GetOneSensorData)
+		sensorDataGroup.GET("/list/:did", h.GetListByDID)
 	}
 }
 
@@ -90,5 +91,38 @@ func (h *Handler) GetOneSensorData(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data":    data,
+	})
+}
+
+func (h *Handler) GetListByDID(c *gin.Context) {
+	didStr := c.Param("did")
+	limitStr := c.Query("limit")
+
+	did, err := strconv.ParseInt(didStr, 10, 64)
+	if err != nil || did <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid device ID",
+		})
+		return
+	}
+
+	limit, err := strconv.ParseInt(limitStr, 10, 64)
+	if err != nil || limit <= 0 {
+		limit = 10
+	}
+
+	records, err := h.service.GetListByDID(did, int(limit))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    records,
 	})
 }

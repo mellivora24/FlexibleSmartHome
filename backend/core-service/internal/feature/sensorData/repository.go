@@ -6,6 +6,7 @@ type Repository interface {
 	CreateRecord(record *SensorDataDB) error
 	GetList(uid int64, req *GetListRequest) ([]SensorDataItem, int64, error)
 	GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, error)
+	GetListByDID(did int64, limit int) ([]SensorDataDB, error)
 }
 
 type repository struct {
@@ -32,7 +33,7 @@ func (r *repository) CreateRecord(record *SensorDataDB) error {
 		return nil
 	}
 
-	if deviceType != "analogSensor" && deviceType != "digitalSensor" {
+	if deviceType != "analogSensor" && deviceType != "digitalSensor" && deviceType != "temperatureSensor" && deviceType != "humiditySensor" {
 		return nil
 	}
 
@@ -127,4 +128,19 @@ func (r *repository) GetOne(uid int64, req *GetOneRequest) (*SensorDataItem, err
 		return nil, err
 	}
 	return &item, nil
+}
+
+func (r *repository) GetListByDID(did int64, limit int) ([]SensorDataDB, error) {
+	var records []SensorDataDB
+
+	query := r.DB.Table("tbl_sensor_data").
+		Where("did = ?", did).
+		Order("created_at ASC").
+		Limit(limit)
+
+	if err := query.Find(&records).Error; err != nil {
+		return nil, err
+	}
+
+	return records, nil
 }

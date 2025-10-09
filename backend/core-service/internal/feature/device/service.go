@@ -36,6 +36,12 @@ func (s *service) CreateDevice(uid int64, mcuCode int64, device *CreateDeviceReq
 		return nil, err
 	}
 
+	if device.Type != "analogSensor" && device.Type != "digitalSensor" &&
+		device.Type != "temperatureSensor" && device.Type != "humiditySensor" &&
+		device.Type != "analogDevice" && device.Type != "digitalDevice" {
+		return nil, errors.New("invalid device type")
+	}
+
 	d := &DeviceDB{
 		UID:         uid,
 		MID:         mid,

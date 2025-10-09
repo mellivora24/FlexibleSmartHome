@@ -1,8 +1,9 @@
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+
 import { LoginResponse, RegisterResponse } from "@domain/model/Auth";
 import {
     closeSocket,
-    getSocket,
-    initSocket
+    getSocket
 } from "@infra/api/websocket/socketClient";
 import {
     clearAuthData,
@@ -11,37 +12,29 @@ import {
     saveToken,
     saveUserInfo,
 } from "@infra/storage/authStorage";
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+
 
 type AuthData = LoginResponse | RegisterResponse;
 
 interface AuthContextType {
     authData: AuthData | null;
     token: string | null;
-    isConnected: boolean;
-    socket: WebSocket | null;
     setUser: (data: AuthData) => void;
     login: (data: AuthData) => Promise<void>;
     logout: () => Promise<void>;
-    sendMessage: (topic: string, payload: any) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
     authData: null,
     token: null,
-    isConnected: false,
-    socket: null,
     setUser: () => { },
     login: async () => { },
     logout: async () => { },
-    sendMessage: () => { },
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [authData, setAuthData] = useState<AuthData | null>(null);
     const [token, setToken] = useState<string | null>(null);
-    const [socket, setSocket] = useState<WebSocket | null>(null);
-    const [isConnected, setIsConnected] = useState(false);
 
     useEffect(() => {
         const loadAuthData = async () => {
@@ -54,23 +47,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
         loadAuthData();
     }, []);
-
-    useEffect(() => {
-        if (token) {
-            const ws = initSocket(token);
-            setSocket(ws);
-
-            ws.onopen = () => setIsConnected(true);
-            ws.onclose = () => setIsConnected(false);
-            ws.onerror = () => setIsConnected(false);
-
-            return () => {
-                closeSocket();
-                setIsConnected(false);
-                setSocket(null);
-            };
-        }
-    }, [token]);
 
     const setUser = (data: AuthData) => {
         setAuthData(data);
@@ -89,7 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAuthData(null);
         setToken(null);
         closeSocket();
-        setSocket(null);
     };
 
     const sendMessage = (topic: string, payload: any) => {
@@ -105,14 +80,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         () => ({
             authData,
             token,
-            socket,
-            isConnected,
             setUser,
             login,
             logout,
             sendMessage,
         }),
-        [authData, token, socket, isConnected]
+        [authData, token]
     );
 
     return React.createElement(AuthContext.Provider, { value }, children);
@@ -125,7 +98,3 @@ export const useAuthToken = () => {
     return token;
 };
 
-export const useSocket = () => {
-    const { socket, isConnected, sendMessage } = useContext(AuthContext);
-    return { socket, isConnected, sendMessage };
-};

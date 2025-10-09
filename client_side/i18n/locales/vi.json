@@ -168,5 +168,11 @@
     "confirmLogoutMessage": "Bạn có chắc chắn muốn đăng xuất không?",
     "cancel": "Hủy",
     "confirm": "Đăng xuất"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Hủy",
+    "loading": "Đang tải...",
+    "alert": "Cảnh báo"
   }
 }

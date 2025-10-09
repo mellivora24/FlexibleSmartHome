@@ -1,5 +1,7 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Alert, Vibration } from "react-native";
 
 import { Device } from "@domain/model/Device";
 import { WeatherData } from "@domain/model/Weather";
@@ -23,6 +25,8 @@ const sensorRepo = new SensorDataRepositoryImpl();
 const getSensorData = new GetListSensorDataByDID(sensorRepo);
 
 export const useDashboardViewModel = (token: string) => {
+    const { t } = useTranslation();
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -60,13 +64,11 @@ export const useDashboardViewModel = (token: string) => {
                 if (humidityData.success && humidityData.data.length > 0) {
                     const values = humidityData.data.map(item => item.value).reverse();
                     setHumidityHistory(values);
-                    setInsideHumidity(values.at(-1) ?? null);
                 }
 
                 if (temperatureData.success && temperatureData.data.length > 0) {
                     const values = temperatureData.data.map(item => item.value).reverse();
                     setTemperatureHistory(values);
-                    setInsideTemperature(values.at(-1) ?? null);
                 }
             }
         } catch (err: any) {
@@ -94,13 +96,26 @@ export const useDashboardViewModel = (token: string) => {
 
                 if (device.type === "humiditySensor") {
                     setInsideHumidity(value);
-                    setHumidityHistory(prev => [...prev.slice(-9), value]);
                 }
 
                 if (device.type === "temperatureSensor") {
                     setInsideTemperature(value);
-                    setTemperatureHistory(prev => [...prev.slice(-9), value]);
                 }
+            } else if (msg.topic === "alert") {
+                const pattern = [0, 100, 200, 500];
+                Vibration.vibrate(pattern, true);
+
+                Alert.alert(
+                    t("common.alert"),
+                    msg.payload.message,
+                    [
+                        {
+                            text: t("common.ok"),
+                            onPress: () => Vibration.cancel(),
+                        },
+                    ],
+                    { cancelable: false }
+                );
             }
         };
 

@@ -73,7 +73,7 @@ services:
     env_file:
       - .env
     ports:
-      - "127.0.0.1:1883:1883"
+      - "1883:1883"
     volumes:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/mqtt_init.sh:/mqtt_init.sh

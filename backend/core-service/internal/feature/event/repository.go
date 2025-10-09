@@ -29,7 +29,7 @@ func (r *repository) GetList(uid int64, req *GetListRequest) ([]*EventResponse, 
 	offset := (req.Page - 1) * req.Limit
 
 	query := r.DB.Table("tbl_events AS e").
-		Select("e.id, e.uid, d.name AS device_name, e.action, e.payload, e.created_at").
+		Select("e.id, e.uid, e.did, d.name AS device_name, e.action, e.payload, e.created_at").
 		Joins("JOIN tbl_device d ON e.did = d.id").
 		Where("e.uid = ?", uid)
 
@@ -77,7 +77,7 @@ func (r *repository) GetOne(uid int64, req *GetOneRequest) (*EventResponse, erro
 	var event EventResponse
 
 	query := r.DB.Table("tbl_events AS e").
-		Select("e.id, e.uid, d.name AS device_name, e.action, e.payload, e.created_at").
+		Select("e.id, e.uid, e.did, d.name AS device_name, e.action, e.payload, e.created_at").
 		Joins("JOIN tbl_device d ON e.did = d.id").
 		Where("e.uid = ?", uid)
 

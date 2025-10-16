@@ -125,14 +125,26 @@ func (s *coreService) CreateEvent(uid string, data model.MQTTMessage) (err error
 	}
 
 	value, _ := payloadMap["value"].(float64)
-	status, _ := payloadMap["status"].(string)
 	command, _ := payloadMap["command"].(string)
 
-	jsonRaw := json.RawMessage(fmt.Sprintf(`{"value":%v,"status":"%s"}`, value, status))
+	jsonRaw := json.RawMessage(fmt.Sprintf(`{"value":%v}`, value))
 
 	err = s.event.Create(intUid, did, command, jsonRaw)
 	if err != nil {
 		l.Printf("[CoreService] Error creating event: %v", err)
+		return err
+	}
+
+	var status bool
+	if command == "on" {
+		status = true
+	} else {
+		status = false
+	}
+
+	err = s.device.UpdateDeviceStatusAndData(did, status, jsonRaw)
+	if err != nil {
+		l.Printf("[CoreService] Error updating device status: %v", err)
 		return err
 	}
 

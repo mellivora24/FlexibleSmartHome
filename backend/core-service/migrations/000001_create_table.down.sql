@@ -32,3 +32,5 @@ DROP SEQUENCE pending_actions_id_seq;
 SELECT * FROM tbl_mcu WHERE uid = 1;
 DELETE FROM tbl_mcu WHERE uid = 1;
 
+SELECT * FROM tbl_events;
+SELECT * FROM tbl_device;

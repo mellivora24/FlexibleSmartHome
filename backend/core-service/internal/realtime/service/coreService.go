@@ -5,6 +5,7 @@ import (
 	"fmt"
 	l "log"
 	"strconv"
+	"strings"
 
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/device"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/event"
@@ -19,7 +20,6 @@ type CoreService interface {
 	CreatePendingAction(uid string, mid string, data model.WSMessage) (err error)
 	CreateSensorData(uid string, data model.MQTTMessage) (err error)
 	CreateEvent(uid string, data model.MQTTMessage) (err error)
-	UpdateDeviceStatus(data model.MQTTMessage) (err error)
 	GetDeviceList(uid string, mcuCode string) (devices []device.MQTTGetDeviceData, err error)
 	CreateNotification(uid string, mcuCode string, title string, message string) (err error)
 }
@@ -127,7 +127,14 @@ func (s *coreService) CreateEvent(uid string, data model.MQTTMessage) (err error
 	value, _ := payloadMap["value"].(float64)
 	command, _ := payloadMap["command"].(string)
 
-	jsonRaw := json.RawMessage(fmt.Sprintf(`{"value":%v}`, value))
+	var status bool
+	if sVal, ok := payloadMap["status"].(bool); ok {
+		status = sVal
+	} else {
+		status = strings.EqualFold(command, "on")
+	}
+
+	jsonRaw := json.RawMessage(fmt.Sprintf(`{"value":%v,"status":%v}`, value, status))
 
 	err = s.event.Create(intUid, did, command, jsonRaw)
 	if err != nil {
@@ -135,35 +142,9 @@ func (s *coreService) CreateEvent(uid string, data model.MQTTMessage) (err error
 		return err
 	}
 
-	var status bool
-	if command == "on" {
-		status = true
-	} else {
-		status = false
-	}
-
 	err = s.device.UpdateDeviceStatusAndData(did, status, jsonRaw)
 	if err != nil {
 		l.Printf("[CoreService] Error updating device status: %v", err)
-		return err
-	}
-
-	return nil
-}
-
-func (s *coreService) UpdateDeviceStatus(data model.MQTTMessage) (err error) {
-	payloadMap := data.Payload.(map[string]interface{})
-
-	var did int64
-	if v, ok := payloadMap["did"].(float64); ok {
-		did = int64(v)
-	}
-
-	value, _ := payloadMap["value"].(float64)
-	command, _ := payloadMap["command"].(string)
-
-	err = s.device.UpdateDeviceStatusAndData(did, command == "ON", json.RawMessage("{\"value\":"+strconv.FormatFloat(value, 'f', -1, 64)+"}"))
-	if err != nil {
 		return err
 	}
 

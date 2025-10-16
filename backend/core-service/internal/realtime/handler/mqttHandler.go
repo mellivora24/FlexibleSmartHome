@@ -102,11 +102,6 @@ func (h *MQTTHandler) onControlResp(client mqtt.Client, msg mqtt.Message) {
 		log.Printf("[MQTTHandler] Error creating event: %v", err)
 		return
 	}
-	err = h.coreService.UpdateDeviceStatus(data)
-	if err != nil {
-		log.Printf("[MQTTHandler] Error updating device status: %v", err)
-		return
-	}
 
 	wsMessage := model.WSMessage{
 		Topic:   "control_response",

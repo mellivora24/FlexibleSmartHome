@@ -37,6 +37,10 @@ func (h *MQTTHandler) Init() error {
 		return err
 	}
 
+	if err := h.mqttService.Subscribe("user/+/mcu/+/device/embedded_control", h.onControlResp); err != nil {
+		return err
+	}
+
 	if err := h.mqttService.Subscribe("user/+/mcu/+/config/request", h.onConfigDeviceRequest); err != nil {
 		return err
 	}

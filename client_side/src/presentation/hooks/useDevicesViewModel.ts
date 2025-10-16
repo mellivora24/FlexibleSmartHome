@@ -19,6 +19,8 @@ export const useDevicesViewModel = (token: string) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showErrorModal, setShowErrorModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState<string>("");
     const [openModal, setOpenModal] = useState(false);
 
     const showError = (err: unknown, fallback: string) => {
@@ -30,6 +32,11 @@ export const useDevicesViewModel = (token: string) => {
         setShowErrorModal(true);
     };
 
+    const showSuccess = (message: string) => {
+        setSuccessMessage(message);
+        setShowSuccessModal(true);
+    };
+
     const fetchDevices = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -37,7 +44,7 @@ export const useDevicesViewModel = (token: string) => {
             const result = await getAllDevices.execute(token);
             setDevices(result);
         } catch (err) {
-            showError(err, "Failed to fetch devices");
+            showError(err, "Không thể tải danh sách thiết bị");
         } finally {
             setLoading(false);
         }
@@ -47,9 +54,11 @@ export const useDevicesViewModel = (token: string) => {
         async (deviceCreate: CreateDeviceRequest) => {
             try {
                 await createDevice.execute(deviceCreate, token);
-                fetchDevices();
+                await fetchDevices();
+                setOpenModal(false);
+                showSuccess("Tạo thiết bị thành công!");
             } catch (err) {
-                showError(err, "Failed to create device");
+                showError(err, "Không thể tạo thiết bị");
             }
         },
         [token, fetchDevices]
@@ -59,9 +68,10 @@ export const useDevicesViewModel = (token: string) => {
         async (deviceUpdate: UpdateDeviceRequest) => {
             try {
                 await updateDevice.execute(deviceUpdate, token);
-                fetchDevices();
+                await fetchDevices();
+                showSuccess("Cập nhật thiết bị thành công!");
             } catch (err) {
-                showError(err, "Failed to update device");
+                showError(err, "Không thể cập nhật thiết bị");
             }
         },
         [token, fetchDevices]
@@ -71,9 +81,10 @@ export const useDevicesViewModel = (token: string) => {
         async (deviceId: number) => {
             try {
                 await deleteDevice.execute(deviceId, token);
-                fetchDevices();
+                await fetchDevices();
+                showSuccess("Xóa thiết bị thành công!");
             } catch (err) {
-                showError(err, "Failed to delete device");
+                showError(err, "Không thể xóa thiết bị");
             }
         },
         [token, fetchDevices]
@@ -91,7 +102,10 @@ export const useDevicesViewModel = (token: string) => {
         error,
         openModal,
         showErrorModal,
+        showSuccessModal,
+        successMessage,
         setShowErrorModal,
+        setShowSuccessModal,
         setOpenModal,
         handleCreateDevice,
         handleEditDevice,

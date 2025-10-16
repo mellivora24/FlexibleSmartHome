@@ -78,7 +78,6 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 8,
         marginBottom: 12,
         width: '100%',
         flexDirection: 'row',

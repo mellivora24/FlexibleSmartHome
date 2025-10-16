@@ -28,7 +28,10 @@ export const DeviceScreen: React.FC = () => {
         error,
         openModal,
         showErrorModal,
+        showSuccessModal,
+        successMessage,
         setShowErrorModal,
+        setShowSuccessModal,
         setOpenModal,
         handleCreateDevice,
         handleEditDevice,
@@ -120,7 +123,9 @@ export const DeviceScreen: React.FC = () => {
                     }}
                 >
                     <Ionicons name="alert-circle" size={60} color="#ff4d4f" />
-                    <Text style={{ fontSize: 20, fontWeight: "600", marginTop: 10 }}>Có lỗi rồi!</Text>
+                    <Text style={{ fontSize: 20, fontWeight: "600", marginTop: 10 }}>
+                        Có lỗi rồi!
+                    </Text>
                     <Text
                         style={{
                             fontSize: 16,
@@ -131,7 +136,6 @@ export const DeviceScreen: React.FC = () => {
                     >
                         {error || "Vui lòng thử lại sau."}
                     </Text>
-
                     <TouchableOpacity
                         onPress={() => setShowErrorModal(false)}
                         style={{
@@ -142,7 +146,54 @@ export const DeviceScreen: React.FC = () => {
                             marginTop: 8,
                         }}
                     >
-                        <Text style={{ color: "white", fontWeight: "600" }}>Hoan hỉ bỏ qua</Text>
+                        <Text style={{ color: "white", fontWeight: "600" }}>
+                            Hoan hỉ bỏ qua
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </Modal>
+
+            <Modal
+                isVisible={showSuccessModal}
+                onBackdropPress={() => setShowSuccessModal(false)}
+                backdropOpacity={0.5}
+                animationIn="zoomInDown"
+                animationOut="zoomOutUp"
+                useNativeDriver
+            >
+                <View
+                    style={{
+                        backgroundColor: "#fff",
+                        borderRadius: 16,
+                        padding: 20,
+                        alignItems: "center",
+                    }}
+                >
+                    <Ionicons name="checkmark-circle" size={60} color="#52c41a" />
+                    <Text style={{ fontSize: 20, fontWeight: "600", marginTop: 10 }}>
+                        Thành công!
+                    </Text>
+                    <Text
+                        style={{
+                            fontSize: 16,
+                            textAlign: "center",
+                            marginVertical: 10,
+                            color: "#333",
+                        }}
+                    >
+                        {successMessage}
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => setShowSuccessModal(false)}
+                        style={{
+                            backgroundColor: "#52c41a",
+                            paddingHorizontal: 24,
+                            paddingVertical: 10,
+                            borderRadius: 12,
+                            marginTop: 8,
+                        }}
+                    >
+                        <Text style={{ color: "white", fontWeight: "600" }}>Đóng</Text>
                     </TouchableOpacity>
                 </View>
             </Modal>

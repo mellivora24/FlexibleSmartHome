@@ -17,6 +17,8 @@ import { deviceScreenStyle } from './deviceStyle';
 export const DeviceScreen: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation();
+
+    const { token } = useAuthContext();
     const {
         loading: vmLoading,
         devices: vmDevices,
@@ -25,9 +27,7 @@ export const DeviceScreen: React.FC = () => {
         handleEditDevice,
         handleDeleteDevice,
         handleCreateDevice,
-    } = useDevicesViewModel();
-
-    const { authData } = useAuthContext();
+    } = useDevicesViewModel(token);
 
     const renderShimmer = () => (
         <>

@@ -14,7 +14,7 @@ const getAllDevices = new GetAllDevices(deviceRepository);
 const updateDevice = new UpdateDevice(deviceRepository);
 const createDevice = new CreateDevice(deviceRepository);
 
-export const useDevicesViewModel = () => {
+export const useDevicesViewModel = (token: string) => {
     const router = useRouter();
 
     const [devices, setDevices] = useState<Device[]>([]);
@@ -57,7 +57,7 @@ export const useDevicesViewModel = () => {
         setLoading(true);
         setError(null);
         try {
-            const result = await getAllDevices.execute();
+            const result = await getAllDevices.execute(token);
             setDevices(result);
         } catch (err) {
             setError("Failed to fetch devices");

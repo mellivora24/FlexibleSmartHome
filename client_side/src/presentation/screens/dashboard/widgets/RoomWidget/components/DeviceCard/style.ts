@@ -4,6 +4,7 @@ export const styles = StyleSheet.create({
     card: {
         margin: 8,
         width: 200,
+        height: "93%",
         padding: 16,
         borderRadius: 12,
         backgroundColor: '#fff',
@@ -16,6 +17,7 @@ export const styles = StyleSheet.create({
     cardActive: {
         margin: 8,
         width: 200,
+        height: "93%",
         padding: 16,
         borderRadius: 12,
         backgroundColor: '#e0f7fa',
@@ -26,6 +28,7 @@ export const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
     },
     section_header: {
+        marginBottom: 12,
         flexDirection: 'row',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
@@ -55,7 +58,7 @@ export const styles = StyleSheet.create({
     },
     section_footer: {
         padding: 4,
-        marginTop: 12,
+        marginTop: 8,
         borderRadius: 12,
         alignSelf: 'center',
         flexDirection: 'row',
@@ -98,5 +101,13 @@ export const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333',
         marginTop: 16,
-    }
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(255, 255, 255, 0.6)",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 12,
+        overflow: "hidden",
+    },
 });

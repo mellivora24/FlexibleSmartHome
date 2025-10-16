@@ -8,8 +8,7 @@ export const deviceApi = {
         console.log("Fetching all devices (running at api layer)");
         try {
             const res = await axios.get(
-                `${API_CONFIG.BASE_URL}/core/devices/`, 
-                {
+                `${API_CONFIG.BASE_URL}/core/devices/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GestureResponderEvent, PanResponder, PanResponderGestureState, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface CustomSliderProps {
@@ -18,6 +18,10 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({
     const [value, setValue] = useState(initialValue);
     const sliderRef = useRef<View>(null);
 
+    useEffect(() => {
+        setValue(initialValue);
+    }, [initialValue]);
+
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => state,
@@ -31,6 +35,11 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({
                     setValue(newValue);
                 });
             },
+            onPanResponderRelease: () => {
+                if (state && onValueChange) {
+                    onValueChange(value);
+                }
+            },
         })
     ).current;
 
@@ -39,6 +48,14 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({
         { level: 2, style: styles.block_2, top: BLOCK_HEIGHT },
         { level: 1, style: styles.block_3, top: BLOCK_HEIGHT * 2 },
     ];
+
+    const handleBlockPress = (level: number) => {
+        if (!state) return;
+        setValue(level);
+        if (onValueChange) {
+            onValueChange(level);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -50,10 +67,8 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({
                         style={[
                             value >= level && (level !== 1 || state) ? style : { ...styles.unreachedBlock, top },
                         ]}
-                        onPress={() => {
-                            state && setValue(level)
-                            state && onValueChange && onValueChange(level);
-                        }}
+                        onPress={() => handleBlockPress(level)}
+                        disabled={!state}
                     />
                 ))}
             </View>

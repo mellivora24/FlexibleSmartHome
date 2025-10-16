@@ -77,7 +77,7 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
     },
     digitalSensor: {
-        marginTop: 18,
+        marginTop: 12,
         alignItems: 'center',
     },
     digitalSensorHigh: {
@@ -97,7 +97,7 @@ export const styles = StyleSheet.create({
         backgroundColor: '#ccffcc',
     },
     digitalSensorText: {
-        fontSize: 8,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
         marginTop: 16,

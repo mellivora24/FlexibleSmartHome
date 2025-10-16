@@ -23,29 +23,57 @@ export const useDeviceControl = (deviceId: string | number) => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-    const unsubscribe = addSocketListener((data) => {
-        const { topic, payload } = data;
+        const unsubscribe_1 = addSocketListener((data) => {
+            const { topic, payload } = data;
 
-        if (topic === "control_response" && payload?.did == deviceId) {
-        setIsControlling(false);
+            if (topic === "control_response" && payload?.did === deviceId) {
+                setIsControlling(false);
 
-        const command = String(payload.command);
-        const normalizedValue = typeof payload.value === "number" ? payload.value : Number(payload.value) || 0;
-        const status = command === "on";
+                const command = String(payload.command);
+                const normalizedValue = typeof payload.value === "number"
+                    ? payload.value
+                    : Number(payload.value) || 0;
 
-        const normalizedResponse: ControlResponse = {
-            did: payload.did,
-            value: normalizedValue,
-            command,
-            status,
+                let status: boolean | undefined;
+                if (command === "on") {
+                    status = true;
+                } else if (command === "off") {
+                    status = false;
+                }
+
+                const normalizedResponse: ControlResponse = {
+                    did: payload.did,
+                    value: normalizedValue,
+                    command,
+                    status,
+                };
+
+                setLastResponse(normalizedResponse);
+                setError(null);
+            }
+        }, "control_response");
+
+        const unsubscribe_2 = addSocketListener((data) => {
+            const { topic, payload } = data;
+
+            if (topic === "sensor_data" && payload?.did === deviceId) {
+                const normalizedValue = typeof payload.value === "number"
+                    ? payload.value
+                    : Number(payload.value) || 0;
+
+                const normalizedResponse: ControlResponse = {
+                    did: payload.did,
+                    value: normalizedValue,
+                };
+
+                setLastResponse(normalizedResponse);
+            }
+        }, "sensor_data");
+
+        return () => {
+            unsubscribe_1();
+            unsubscribe_2();
         };
-
-        setLastResponse(normalizedResponse);
-        setError(null);
-        }
-    }, "control_response");
-
-    return () => unsubscribe();
     }, [deviceId]);
 
     const sendControl = useCallback(
@@ -56,8 +84,11 @@ export const useDeviceControl = (deviceId: string | number) => {
             const payload: ControlPayload = {
                 did: deviceId,
                 command,
-                value: value !== undefined ? value : 0,
             };
+
+            if (value !== undefined) {
+                payload.value = value;
+            }
 
             console.log("[WS] Sending control:", payload);
             sendSocketMessage("control", payload);

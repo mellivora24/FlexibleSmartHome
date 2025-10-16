@@ -14,23 +14,27 @@ export const DeviceCard: React.FC<{ device: Device }> = ({ device }) => {
     const { sendControl, isControlling, lastResponse } = useDeviceControl(device.id);
 
     const [deviceData, setDeviceData] = useState<DeviceData>(device.Data);
-    const [deviceStatus, setDeviceStatus] = useState<boolean>(device.status);
 
     useEffect(() => {
-    if (!lastResponse) return;
+        setDeviceData(device.Data);
+    }, [device.Data]);
 
-    setDeviceData((prev) => ({
-        ...prev,
-        value: Number(lastResponse.value ?? prev.value),
-        status:
-        typeof lastResponse.status === "boolean"
-            ? lastResponse.status
-            : lastResponse.command === "on"
-            ? true
-            : lastResponse.command === "off"
-                ? false
-                : prev.status,
-    }));
+    useEffect(() => {
+        if (!lastResponse) return;
+
+        setDeviceData((prev) => {
+            const normalizedValue = typeof lastResponse.value === "number"
+                ? lastResponse.value
+                : Number(lastResponse.value) || prev.value;
+
+            return {
+                ...prev,
+                value: normalizedValue,
+                ...(typeof lastResponse.status === "boolean" && {
+                    status: lastResponse.status
+                })
+            };
+        });
     }, [lastResponse]);
 
     const handlePress = () => {
@@ -42,22 +46,25 @@ export const DeviceCard: React.FC<{ device: Device }> = ({ device }) => {
         sendControl("set", value);
     };
 
+    const CardWrapper = device.type === "digitalDevice" ? TouchableOpacity : View;
+
     return (
         <View style={styles.card}>
-            <TouchableOpacity onPress={handlePress} disabled={isControlling}>
-                {/* Header */}
+            <CardWrapper disabled={isControlling} onPress={handlePress}>
                 <View style={styles.section_header}>
                     <Text style={styles.deviceName}>{device.name}</Text>
                 </View>
 
-                {/* Body */}
                 <View style={styles.section_body}>
                     {device.type === "analogDevice" && (
-                        <CustomSlider onValueChange={handleValueChange} />
+                        <CustomSlider
+                            initialValue={deviceData.value ?? 0}
+                            onValueChange={handleValueChange}
+                        />
                     )}
 
                     {device.type === "analogSensor" && (
-                        <Gauge value={deviceData.value ?? 0} size={150} />
+                        <Gauge value={deviceData.value ?? 0} size={130} />
                     )}
 
                     {device.type === "digitalDevice" && (
@@ -74,28 +81,22 @@ export const DeviceCard: React.FC<{ device: Device }> = ({ device }) => {
                         <View style={styles.digitalSensor}>
                             <View
                                 style={
-                                    deviceData.status
+                                    deviceData.value === 0
                                         ? styles.digitalSensorHigh
                                         : styles.digitalSensorLow
                                 }
                             />
-                            <Text style={styles.digitalSensorText}>
-                                {deviceData.status
-                                    ? t("dashboard.status.high")
-                                    : t("dashboard.status.low")}
-                            </Text>
                         </View>
                     )}
                 </View>
 
-                {/* Footer */}
                 {device.type === "digitalDevice" && (
                     <View style={[styles.section_footer, { marginTop: 12 }]}>
                         <Image source={ICONS.CARD_TAP} style={styles.tipIcon} />
                         <Text style={styles.tips}>{t("dashboard.tips.tapToControl")}</Text>
                     </View>
                 )}
-            </TouchableOpacity>
+            </CardWrapper>
 
             {isControlling && (
                 <View style={styles.overlay}>

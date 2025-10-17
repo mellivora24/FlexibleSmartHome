@@ -30,8 +30,6 @@ export const DashboardScreen: React.FC = () => {
         >
             <SafeAreaView style={dashboardStyle.container}>
                 <TopBarWidget
-                    username={authData?.name || "User"}
-                    isHavingNotification={false}
                     onAvatarPress={() => router.push("/add-on/account")}
                     onNotificationPress={() => router.push("/add-on/notification")}
                 />

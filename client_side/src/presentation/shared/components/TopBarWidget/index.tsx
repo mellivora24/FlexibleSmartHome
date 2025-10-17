@@ -1,36 +1,36 @@
 import React from "react";
-import { Image, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 
 import { ICONS } from "@constants/images";
+import { useNotificationContext } from "@hooks/NotificationContext";
+import { useAuthContext } from "@hooks/useAppContext";
 import { AccountWidget } from "../AccountWidget";
 import { topBarWidgetStyle } from "./topBarWidget";
 
 interface TopBarWidgetProps {
-    username?: string;
-    avatarUrl?: string;
-    isHavingNotification?: boolean;
     onAvatarPress?: () => void;
     onNotificationPress?: () => void;
 }
 
 export const TopBarWidget: React.FC<TopBarWidgetProps> = ({
-    username,
-    avatarUrl,
-    isHavingNotification = false,
     onAvatarPress,
     onNotificationPress,
 }) => {
-    const notificationIcon = isHavingNotification ? ICONS.NOTIFICATION_1 : ICONS.NOTIFICATION_0;
+    const { authData } = useAuthContext();
+    const { unreadCount } = useNotificationContext();
+    const notificationIcon = ICONS.NOTIFICATION_0;
 
     return (
         <View style={topBarWidgetStyle.container}>
             <AccountWidget
-                username={username}
-                avatarUrl={avatarUrl}
+                username={authData?.name || "User"}
                 onAvatarPress={onAvatarPress}
             />
-            <View>
+            <View style={topBarWidgetStyle.notificationContainer}>
                 <TouchableOpacity onPress={onNotificationPress}>
+                    {unreadCount > 0 && (
+                        <Text style={topBarWidgetStyle.notificationCount}>{unreadCount}</Text>
+                    )}
                     <Image
                         source={notificationIcon}
                         style={topBarWidgetStyle.notificationIcon}

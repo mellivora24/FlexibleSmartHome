@@ -167,7 +167,8 @@
     "confirmLogoutTitle": "Đăng xuất",
     "confirmLogoutMessage": "Bạn có chắc chắn muốn đăng xuất không?",
     "cancel": "Hủy",
-    "confirm": "Đăng xuất"
+    "confirm": "Đăng xuất",
+    "noDevice": "Chưa có thiết bị nào được kết nối."
   },
   "common": {
     "ok": "OK",

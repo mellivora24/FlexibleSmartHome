@@ -53,8 +53,6 @@ export function EventScreen() {
     >
       <SafeAreaView style={eventScreenStyle.container}>
         <TopBarWidget
-          username="Quyet Thanh"
-          isHavingNotification={false}
           onAvatarPress={() => router.push('/add-on/account')}
           onNotificationPress={() => router.push('/add-on/notification')}
         />

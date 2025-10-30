@@ -2,94 +2,159 @@ import { StyleSheet } from 'react-native';
 
 export const tableStyles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
     },
     table: {
-        borderWidth: 1,
-        borderRadius: 12,
-        borderColor: '#e0e0e0',
-        backgroundColor: '#fff',
+        borderRadius: 16,
         overflow: 'hidden',
+        backgroundColor: 'rgba(255, 255, 255, 0.95)'
     },
     headerRow: {
-        backgroundColor: '#412180'
+        backgroundColor: '#412180',
+        borderBottomWidth: 1.5,
+        borderBottomColor: 'rgba(192, 132, 252, 0.3)',
     },
     headerCell: {
-        paddingVertical: 8,
-        paddingHorizontal: 2,
+        paddingVertical: 14,
+        paddingHorizontal: 4,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRightWidth: 0.5,
-        borderRightColor: 'rgba(255,255,255,0.3)',
+        borderRightWidth: 1,
+        borderRightColor: 'rgba(255, 255, 255, 0.15)',
     },
     headerContent: {
         alignItems: 'center',
         justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 4,
     },
     headerText: {
-        fontWeight: '600',
+        fontWeight: '700',
         color: '#fff',
-        fontSize: 14,
+        fontSize: 13,
         textAlign: 'center',
-        marginBottom: 2,
-    },
-    sortIcon: {
-        color: '#fff',
-        fontSize: 10,
-        opacity: 0.8,
+        letterSpacing: 0.5,
+        textShadowColor: 'rgba(0, 0, 0, 0.3)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
     },
     row: {
         flexDirection: 'row',
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-        backgroundColor: '#fff',
+        borderBottomColor: 'rgba(224, 224, 224, 0.3)',
+        minHeight: 56,
+    },
+    evenRow: {
+        backgroundColor: '#FFFFFF',
+    },
+    oddRow: {
+        backgroundColor: '#F8F8FF',
     },
     cell: {
-        paddingVertical: 10,
-        paddingHorizontal: 2,
+        paddingVertical: 12,
+        paddingHorizontal: 4,
         justifyContent: 'center',
         borderRightWidth: 0.5,
-        borderRightColor: '#f0f0f0',
+        borderRightColor: 'rgba(192, 132, 252, 0.2)',
     },
     cellText: {
-        color: '#333',
-        fontSize: 14,
+        color: '#1a1a1a',
+        fontSize: 13,
         textAlign: 'center',
+        fontWeight: '500',
     },
     emptyContainer: {
-        padding: 20,
+        padding: 32,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f9f9f9',
-        borderRadius: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: 16,
         margin: 16,
+        borderWidth: 1.5,
+        borderColor: 'rgba(192, 132, 252, 0.3)',
     },
     emptyText: {
-        color: '#666',
-        fontSize: 14,
+        color: '#412180',
+        fontSize: 15,
         fontStyle: 'italic',
+        fontWeight: '600',
     },
     flatList: {
         width: '100%',
         height: '90%',
     },
+    paginationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 16,
+        gap: 16,
+    },
+    paginationButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: '#412180',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderColor: 'rgba(192, 132, 252, 0.3)',
+        shadowColor: '#C084FC',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+    },
+    paginationButtonDisabled: {
+        backgroundColor: 'rgba(192, 192, 192, 0.3)',
+        borderColor: 'rgba(192, 192, 192, 0.3)',
+    },
+    paginationButtonText: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: '700',
+    },
+    paginationButtonTextDisabled: {
+        color: '#999',
+    },
+    paginationInfo: {
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: 12,
+        borderWidth: 1.5,
+        borderColor: 'rgba(192, 132, 252, 0.3)',
+    },
+    paginationText: {
+        color: '#412180',
+        fontSize: 14,
+        fontWeight: '600',
+    },
 });
 
 export const columnStyles = StyleSheet.create({
     id: {
-        //
+        fontWeight: '600',
+        color: '#412180',
+        fontSize: 12,
     },
     sensorName: {
         textAlign: 'left',
-        paddingLeft: 4
+        paddingLeft: 8,
+        fontWeight: '600',
+        color: '#1a1a1a',
     },
     value: {
-        //
+        fontWeight: '700',
+        color: '#412180',
+        fontSize: 15,
     },
     unit: {
-        //
+        color: '#666',
+        fontStyle: 'italic',
+        fontSize: 12,
     },
     createdAt: {
-        //
+        fontSize: 11,
+        color: '#555',
     },
 });

@@ -14,8 +14,7 @@ interface SearchWidgetProps {
     searchTypeVisible?: boolean;
     placeholder?: string;
     searchTypeDefault?: string;
-    onSearchPress?: () => void;
-    onChangeText: (text: string) => void;
+    onSearchPress?: (searchType: string, searchText: string) => void;
     onSearchTypeChange?: (value: string) => void;
 }
 
@@ -23,7 +22,6 @@ export function SearchWidget({
     placeholder = 'Search...',
     value,
     dropdownItems,
-    onChangeText,
     onSearchPress,
     onSearchTypeChange,
     searchTypeDefault = 'all',
@@ -32,10 +30,11 @@ export function SearchWidget({
     const [searchTypeOpen, setSearchTypeOpen] = useState(false);
     const [searchTypeValue, setSearchTypeValue] = useState(searchTypeDefault);
     const [searchTypeItems, setSearchTypeItems] = useState(dropdownItems || []);
+    const [searchText, setSearchText] = useState(value);
 
     function handleSearchPress() {
         if (onSearchPress) {
-            onSearchPress();
+            onSearchPress(searchTypeValue, searchText);
         }
     }
 
@@ -54,6 +53,10 @@ export function SearchWidget({
             handleSearchTypeChange();
             return value;
         });
+    }
+
+    function onChangeText(text: string) {
+        setSearchText(text);
     }
 
     return (
@@ -80,7 +83,7 @@ export function SearchWidget({
             <TextInput
                 style={dropdownItems !== undefined && dropdownItems.length > 0 ? searchWidgetStyle.inputWithDropdown : searchWidgetStyle.input}
                 placeholder={placeholder}
-                value={value}
+                value={searchText}
                 onChangeText={onChangeText}
                 placeholderTextColor="#888"
             />

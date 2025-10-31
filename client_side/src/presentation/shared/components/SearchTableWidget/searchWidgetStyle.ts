@@ -6,7 +6,7 @@ export const searchWidgetStyle = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#transparent',
+        backgroundColor: 'transparent',
     },
     dropdownContainer: {
         width: '25%',
@@ -54,10 +54,45 @@ export const searchWidgetStyle = StyleSheet.create({
         borderRadius: 12,
         paddingHorizontal: 16,
         paddingLeft: 20,
-        // borderTopRightRadius: 12,
-        // borderBottomRightRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#007BFF',
+    },
+        timeRangeButton: {
+        justifyContent: 'center',
+        paddingHorizontal: 12,
+    },
+    timeRangeText: {
+        fontSize: 14,
+        color: '#3b3b3b67',
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(51, 51, 51, 0.4)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+    },
+    modalTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 15,
+        textAlign: 'center',
+    },
+    modalButton: {
+        marginTop: 15,
+        padding: 10,
+        backgroundColor: '#A855F7',
+        borderRadius: 16,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
 });

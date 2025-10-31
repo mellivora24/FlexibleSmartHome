@@ -14,8 +14,47 @@ export const sensorScreenStyle = StyleSheet.create({
         alignItems: 'center'
     },
     tableContainer: {
-        flex: 1,
+        flex: 6,
         width: '100%',
         marginTop: 16,
-    }
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: 14,
+        color: '#666',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    errorText: {
+        fontSize: 16,
+        color: '#FF3B30',
+        textAlign: 'center',
+        marginBottom: 12,
+    },
+    retryText: {
+        fontSize: 14,
+        color: '#007AFF',
+        fontWeight: '600',
+        textDecorationLine: 'underline',
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    emptyText: {
+        fontSize: 16,
+        color: '#999',
+        textAlign: 'center',
+    },
 });

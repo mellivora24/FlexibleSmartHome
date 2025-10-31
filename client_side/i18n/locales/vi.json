@@ -145,7 +145,8 @@
       "name": "Cảm biến",
       "timeRange": "Thời gian",
       "device": "Thiết bị"
-    }
+    },
+    "placeholder": "Nhập từ khóa tìm kiếm..."
   },
   "errors": {
     "network": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",

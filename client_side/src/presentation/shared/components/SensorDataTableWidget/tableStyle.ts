@@ -80,13 +80,16 @@ export const tableStyles = StyleSheet.create({
     },
     flatList: {
         width: '100%',
-        maxHeight: '80%',
+        maxHeight: '85%',
     },
     paginationContainer: {
+        position: 'absolute',
+        bottom: 16,
+        left: 0,
+        right: 0,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: 16,
         gap: 16,
     },
     paginationButton: {

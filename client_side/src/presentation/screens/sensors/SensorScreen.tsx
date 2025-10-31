@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { SearchWidget } from '@components/SearchTableWidget';
@@ -21,7 +21,10 @@ export function SensorScreen() {
         paginatedData,
         currentPage,
         totalPages,
+        totalItems,
         refreshing,
+        loading,
+        error,
         handleSort,
         handleSearch,
         handlePageChange,
@@ -32,7 +35,6 @@ export function SensorScreen() {
         { label: t('searchWidget.searchType.all'), value: 'all' },
         { label: t('searchWidget.searchType.name'), value: 'name' },
         { label: t('searchWidget.searchType.value'), value: 'value' },
-        { label: t('searchWidget.searchType.timeRange'), value: 'timeRange' },
     ];
 
     return (
@@ -50,25 +52,52 @@ export function SensorScreen() {
 
                 <View style={sensorScreenStyle.body}>
                     <SearchWidget
-                        placeholder="Search sensors..."
+                        placeholder={t('searchWidget.placeholder', 'Search sensors...')}
                         value=""
                         dropdownItems={searchOptions}
                         onSearchPress={handleSearch}
                     />
 
-                    <View style={sensorScreenStyle.tableContainer}>
-                        <SensorDataTableWidget
-                            data={paginatedData}
-                            currentSort={sortState}
-                            onSort={handleSort}
-                            showIdColumn={false}
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                            onRefresh={handleRefresh}
-                            refreshing={refreshing}
-                        />
-                    </View>
+                    {error && !loading && !refreshing ? (
+                        <View style={sensorScreenStyle.errorContainer}>
+                            <Text style={sensorScreenStyle.errorText}>{error}</Text>
+                            <Text 
+                                style={sensorScreenStyle.retryText}
+                                onPress={handleRefresh}
+                            >
+                                {t('common.retry')}
+                            </Text>
+                        </View>
+                    ) : loading && !refreshing ? (
+                        <View style={sensorScreenStyle.loadingContainer}>
+                            <ActivityIndicator size="large" color="#007AFF" />
+                            <Text style={sensorScreenStyle.loadingText}>
+                                {t('common.loading')}
+                            </Text>
+                        </View>
+                    ) : (
+                        <View style={sensorScreenStyle.tableContainer}>
+                            <SensorDataTableWidget
+                                data={paginatedData}
+                                currentSort={sortState}
+                                onSort={handleSort}
+                                showIdColumn={false}
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                onRefresh={handleRefresh}
+                                refreshing={refreshing}
+                            />
+                            
+                            {paginatedData.length === 0 && !loading && (
+                                <View style={sensorScreenStyle.emptyContainer}>
+                                    <Text style={sensorScreenStyle.emptyText}>
+                                        {t('sensor.noData')}
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
+                    )}
                 </View>
             </SafeAreaView>
         </LinearGradient>

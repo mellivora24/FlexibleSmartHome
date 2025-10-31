@@ -37,6 +37,16 @@ export interface GetOneSensorRequest {
 }
 
 export interface GetListSensorResponse {
+  total: number
+  list: SensorDataItem[]
+}
+
+export interface GetListByDIDResponse {
   data: SensorDataDB[]
+  success: boolean
+}
+
+export interface ApiResponse<T> {
+  data: T
   success: boolean
 }

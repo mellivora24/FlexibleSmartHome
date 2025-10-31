@@ -1,116 +1,214 @@
-import { useCallback, useMemo, useState } from 'react';
+import { GetListSensorRequest, SensorDataItem } from '@model/SensorData';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { SensorDataDB } from '@model/SensorData';
-import { mockSensorData } from 'test/mockData';
+import { GetListSensorData } from '@domain/usecase/sensorData/getListSensorData';
+import { getToken } from '@infra/storage/authStorage';
+import { SensorDataRepositoryImpl } from '@src/domain/repo/sensorDataRepo';
+import { GetListSensorDataByDID } from '@src/domain/usecase/sensorData/getListSensorDataByDID';
 
 type SortDirection = 'asc' | 'desc' | null;
 
 interface SortState {
-    column: keyof SensorDataDB | null;
+    column: keyof SensorDataItem | null;
     direction: SortDirection;
 }
 
 const ITEMS_PER_PAGE = 10;
+const sensorDataRepository = new SensorDataRepositoryImpl();
+const getListSensorDataUseCase = new GetListSensorData(sensorDataRepository);
+const getListSensorDataByDIDUseCase = new GetListSensorDataByDID(sensorDataRepository);
 
 export function useSensorViewModel() {
     const [sortState, setSortState] = useState<SortState>({
         column: null,
         direction: null,
     });
-    const [data, setData] = useState<SensorDataDB[]>(mockSensorData);
+    const [data, setData] = useState<SensorDataItem[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [refreshing, setRefreshing] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [totalItems, setTotalItems] = useState(0);
+    const [filters, setFilters] = useState<GetListSensorRequest>({
+        page: 1,
+        limit: ITEMS_PER_PAGE,
+        sortBy: 'createdAt',
+        sortType: 'desc',
+    });
 
-    const totalPages = useMemo(
-        () => Math.ceil(data.length / ITEMS_PER_PAGE),
-        [data.length]
-    );
+    const totalPages = useMemo(() => {
+        return Math.ceil(totalItems / ITEMS_PER_PAGE);
+    }, [totalItems]);
 
-    const paginatedData = useMemo(
-        () => data.slice(
-            (currentPage - 1) * ITEMS_PER_PAGE,
-            currentPage * ITEMS_PER_PAGE
-        ),
-        [data, currentPage]
-    );
-
-    const handleSort = useCallback((column: keyof SensorDataDB, direction: SortDirection) => {
-        setSortState({ column, direction });
-
-        if (!direction) {
-            setData([...mockSensorData]);
-            return;
-        }
-
-        const sortedData = [...data].sort((a, b) => {
-            const aValue = a[column];
-            const bValue = b[column];
-
-            if (aValue == null) return 1;
-            if (bValue == null) return -1;
-
-            if (typeof aValue === 'string' && typeof bValue === 'string') {
-                return direction === 'asc'
-                    ? aValue.localeCompare(bValue)
-                    : bValue.localeCompare(aValue);
-            }
-
-            if (typeof aValue === 'number' && typeof bValue === 'number') {
-                return direction === 'asc' ? aValue - bValue : bValue - aValue;
-            }
-
-            if (aValue instanceof Date && bValue instanceof Date) {
-                return direction === 'asc'
-                    ? aValue.getTime() - bValue.getTime()
-                    : bValue.getTime() - aValue.getTime();
-            }
-
-            return 0;
-        });
-
-        setData(sortedData);
-        setCurrentPage(1);
+    const paginatedData = useMemo(() => {
+        return data;
     }, [data]);
 
-    const handleSearch = useCallback((searchType: string, searchText: string) => {
-        if (searchText.trim() === '') {
-            setData([...mockSensorData]);
-        } else {
-            const filteredData = mockSensorData.filter((item) => {
-                if (searchType === 'all') {
-                    return (
-                        item.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-                        item.value?.toString().toLowerCase().includes(searchText.toLowerCase())
-                    );
-                } else if (searchType === 'name') {
-                    return item.name?.toLowerCase().includes(searchText.toLowerCase());
-                } else if (searchType === 'value') {
-                    return item.value?.toString().toLowerCase().includes(searchText.toLowerCase());
-                }
-                return false;
-            });
-            setData(filteredData);
+    const fetchData = useCallback(async (params: GetListSensorRequest) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const token = await getToken();
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
+
+            const response = await getListSensorDataUseCase.execute(params, token);
+            
+            setData(response.list || []);
+            setTotalItems(response.total || 0);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to fetch sensor data';
+            setError(errorMessage);
+            console.error('Error fetching sensor data:', err);
+            
+            setData([]);
+            setTotalItems(0);
+        } finally {
+            setLoading(false);
         }
+    }, []);
+
+    const fetchDataByDID = useCallback(async (did: number, limit: number = ITEMS_PER_PAGE) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const token = await getToken();
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
+
+            const response = await getListSensorDataByDIDUseCase.execute(did, limit, token);
+            
+            setData(response.list || []);
+            setTotalItems(response.total || 0);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to fetch sensor data';
+            setError(errorMessage);
+            console.error('Error fetching sensor data by DID:', err);
+
+            setData([]);
+            setTotalItems(0);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData(filters);
+    }, [filters, fetchData]);
+
+    const handleSort = useCallback((column: keyof SensorDataItem, direction: SortDirection) => {
+        setSortState({ column, direction });
+
+        let sortBy = column.toString();
+
+        const columnMapping: Record<string, string> = {
+            'sensorName': 'name',
+            'createdAt': 'time',
+            'value': 'value',
+            'unit': 'unit',
+            'did': 'did',
+        };
+        
+        sortBy = columnMapping[column] || column.toString();
+        
+        setFilters(prev => ({
+            ...prev,
+            sortBy: direction ? sortBy : 'createdAt',
+            sortType: direction || 'desc',
+            page: 1,
+        }));
+        setCurrentPage(1);
+    }, []);
+
+    const handleSearch = useCallback((searchType: string, searchText: string) => {
+        const searchParams: Partial<GetListSensorRequest> = {
+            page: 1,
+            name: undefined,
+            value: undefined,
+            did: undefined,
+        };
+
+        if (searchText.trim()) {
+            if (searchType === 'all') {
+                searchParams.name = searchText;
+            } else if (searchType === 'name') {
+                searchParams.name = searchText;
+            } else if (searchType === 'value') {
+                const numValue = parseFloat(searchText);
+                if (!isNaN(numValue)) {
+                    searchParams.value = numValue;
+                }
+            } else if (searchType === 'did') {
+                const didValue = parseInt(searchText);
+                if (!isNaN(didValue)) {
+                    searchParams.did = didValue;
+                }
+            }
+        }
+
+        setFilters(prev => ({
+            ...prev,
+            ...searchParams,
+        }));
         setCurrentPage(1);
     }, []);
 
     const handlePageChange = useCallback((page: number) => {
         setCurrentPage(page);
+        setFilters(prev => ({ ...prev, page }));
     }, []);
 
     const handleRefresh = useCallback(async () => {
         setRefreshing(true);
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setData([...mockSensorData]);
+            const resetFilters: GetListSensorRequest = {
+                page: 1,
+                limit: ITEMS_PER_PAGE,
+                sortBy: 'createdAt',
+                sortType: 'desc',
+            };
+            await fetchData(resetFilters);
+            setFilters(resetFilters);
             setSortState({ column: null, direction: null });
             setCurrentPage(1);
+            setError(null);
         } catch (error) {
             console.error('Error refreshing data:', error);
+            setError('Failed to refresh data');
         } finally {
             setRefreshing(false);
         }
+    }, [fetchData]);
+
+    const updateFilters = useCallback((newFilters: Partial<GetListSensorRequest>) => {
+        setFilters(prev => ({ ...prev, ...newFilters }));
+    }, []);
+
+    const clearFilters = useCallback(() => {
+        const resetFilters: GetListSensorRequest = {
+            page: 1,
+            limit: ITEMS_PER_PAGE,
+            sortBy: 'createdAt',
+            sortType: 'desc',
+        };
+        setFilters(resetFilters);
+        setCurrentPage(1);
+    }, []);
+
+    const filterByDateRange = useCallback((startTime?: string, endTime?: string) => {
+        setFilters(prev => ({
+            ...prev,
+            startTime,
+            endTime,
+            time: undefined,
+            page: 1,
+        }));
+        setCurrentPage(1);
     }, []);
 
     return {
@@ -118,10 +216,19 @@ export function useSensorViewModel() {
         paginatedData,
         currentPage,
         totalPages,
+        totalItems,
         refreshing,
+        loading,
+        error,
+        filters,
         handleSort,
         handleSearch,
         handlePageChange,
         handleRefresh,
+        updateFilters,
+        clearFilters,
+        filterByDateRange,
+        fetchData,
+        fetchDataByDID,
     };
 }

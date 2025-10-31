@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,26 +8,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { SearchWidget } from '@components/SearchTableWidget';
 import { SensorDataTableWidget } from '@components/SensorDataTableWidget';
 import { TopBarWidget } from '@components/TopBarWidget';
-import { SensorDataDB } from '@model/SensorData';
+import { useSensorViewModel } from '@hooks/useSensorViewModel';
 import { BACKGROUND } from '@theme/colors';
-import { mockSensorData } from 'test/mockData';
 import { sensorScreenStyle } from './sensorScreenStyle';
-
-type SortDirection = 'asc' | 'desc' | null;
-interface SortState {
-    column: keyof SensorDataDB | null;
-    direction: SortDirection;
-}
 
 export function SensorScreen() {
     const router = useRouter();
     const { t } = useTranslation();
 
-    const [sortState, setSortState] = useState<SortState>({
-        column: null,
-        direction: null,
-    });
-    const [data, setData] = useState<SensorDataDB[]>(mockSensorData);
+    const {
+        sortState,
+        paginatedData,
+        currentPage,
+        totalPages,
+        refreshing,
+        handleSort,
+        handleSearch,
+        handlePageChange,
+        handleRefresh,
+    } = useSensorViewModel();
 
     const searchOptions = [
         { label: t('searchWidget.searchType.all'), value: 'all' },
@@ -35,36 +34,6 @@ export function SensorScreen() {
         { label: t('searchWidget.searchType.value'), value: 'value' },
         { label: t('searchWidget.searchType.timeRange'), value: 'timeRange' },
     ];
-
-    const handleSort = (column: keyof SensorDataDB, direction: SortDirection) => {
-        setSortState({ column, direction });
-
-        // TODO: Call API to get sorted data
-        setData([...mockSensorData]);
-    };
-
-    const handleSearchPress = (searchType: string, searchText: string) => {
-        if (searchText.trim() === '') {
-            setData([...mockSensorData]);
-        } else {
-            const filteredData = mockSensorData.filter((item) => {
-                if (searchType === 'all') {
-                    return (
-                        item.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-                        item.value?.toString().toLowerCase().includes(searchText.toLowerCase())
-                    );
-                } else if (searchType === 'name') {
-                    return item.name?.toLowerCase().includes(searchText.toLowerCase());
-                } else if (searchType === 'value') {
-                    return item.value?.toString().toLowerCase().includes(searchText.toLowerCase());
-                } else {
-                    return false;
-                }
-            });
-            console.log('Filtered Data:', filteredData);
-            setData(filteredData);
-        }
-    };
 
     return (
         <LinearGradient
@@ -84,14 +53,20 @@ export function SensorScreen() {
                         placeholder="Search sensors..."
                         value=""
                         dropdownItems={searchOptions}
-                        onSearchPress={handleSearchPress}
+                        onSearchPress={handleSearch}
                     />
 
                     <View style={sensorScreenStyle.tableContainer}>
                         <SensorDataTableWidget
-                            data={data}
+                            data={paginatedData}
                             currentSort={sortState}
                             onSort={handleSort}
+                            showIdColumn={false}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            onRefresh={handleRefresh}
+                            refreshing={refreshing}
                         />
                     </View>
                 </View>

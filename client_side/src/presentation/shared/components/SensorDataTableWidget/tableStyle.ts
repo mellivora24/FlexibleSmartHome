@@ -6,8 +6,7 @@ export const tableStyles = StyleSheet.create({
     },
     table: {
         borderRadius: 16,
-        overflow: 'hidden',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)'
+        overflow: 'hidden'
     },
     headerRow: {
         backgroundColor: '#412180',
@@ -81,7 +80,7 @@ export const tableStyles = StyleSheet.create({
     },
     flatList: {
         width: '100%',
-        height: '90%',
+        maxHeight: '80%',
     },
     paginationContainer: {
         flexDirection: 'row',

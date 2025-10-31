@@ -231,7 +231,7 @@ export function SensorDataTableWidget({
         />
       </View>
       
-      {totalPages && totalPages > 1 && onPageChange && (
+      {totalPages && totalPages > 0 && onPageChange && (
         <View style={tableStyles.paginationContainer}>
           <TouchableOpacity
             style={[

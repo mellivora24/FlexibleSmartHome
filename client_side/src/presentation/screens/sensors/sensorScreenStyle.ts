@@ -14,7 +14,7 @@ export const sensorScreenStyle = StyleSheet.create({
         alignItems: 'center'
     },
     tableContainer: {
-        flex: 6,
+        flex: 1,
         width: '100%',
         marginTop: 16,
     }

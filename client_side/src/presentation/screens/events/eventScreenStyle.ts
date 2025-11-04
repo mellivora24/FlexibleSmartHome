@@ -17,5 +17,39 @@ export const eventScreenStyle = StyleSheet.create({
         flex: 6,
         width: '100%',
         marginTop: 16,
-    }
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: 16,
+        color: '#007AFF',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: {
+        fontSize: 16,
+        color: 'red',
+        marginBottom: 8,
+    },
+    retryText: {
+        fontSize: 16,
+        color: '#007AFF',
+        textDecorationLine: 'underline',
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    emptyText: {
+        fontSize: 16,
+        color: '#666666',
+        textAlign: 'center',
+    },
 });

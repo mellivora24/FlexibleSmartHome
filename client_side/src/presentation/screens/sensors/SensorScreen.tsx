@@ -35,6 +35,7 @@ export function SensorScreen() {
         { label: t('searchWidget.searchType.all'), value: 'all' },
         { label: t('searchWidget.searchType.name'), value: 'name' },
         { label: t('searchWidget.searchType.value'), value: 'value' },
+        { label: t('searchWidget.searchType.timeRange'), value: 'timeRange' },
     ];
 
     return (
@@ -88,14 +89,6 @@ export function SensorScreen() {
                                 onRefresh={handleRefresh}
                                 refreshing={refreshing}
                             />
-                            
-                            {paginatedData.length === 0 && !loading && (
-                                <View style={sensorScreenStyle.emptyContainer}>
-                                    <Text style={sensorScreenStyle.emptyText}>
-                                        {t('sensor.noData')}
-                                    </Text>
-                                </View>
-                            )}
                         </View>
                     )}
                 </View>

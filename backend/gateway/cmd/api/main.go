@@ -43,6 +43,8 @@ func main() {
 		{
 			authGroup.Any("/*path", authProxy.ProxyRequest)
 		}
+
+		api.GET("/ws", coreProxy.ProxyWebSocket)
 	}
 	api.Use(middleware.AuthMiddleware(authToken))
 	{
@@ -58,8 +60,6 @@ func main() {
 			coreGroup.Any("/*path", coreProxy.ProxyRequest)
 		}
 	}
-
-	api.GET("/ws", coreProxy.ProxyWebSocket)
 
 	serverAddr := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
 	log.Printf("Gateway server starting on %s", serverAddr)

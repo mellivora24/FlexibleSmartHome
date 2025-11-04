@@ -63,12 +63,11 @@ export const tableStyles = StyleSheet.create({
         fontWeight: '500',
     },
     emptyContainer: {
-        padding: 32,
+        padding: 20,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
         borderRadius: 16,
-        margin: 16,
         borderWidth: 1.5,
         borderColor: 'rgba(192, 132, 252, 0.3)',
     },

@@ -32,8 +32,7 @@ export function SearchWidget({
     const [searchTypeValue, setSearchTypeValue] = useState(searchTypeDefault);
     const [searchTypeItems, setSearchTypeItems] = useState(dropdownItems || []);
     const [searchText, setSearchText] = useState(value);
-    
-    // For time range
+
     const [showTimeRangePicker, setShowTimeRangePicker] = useState(false);
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);

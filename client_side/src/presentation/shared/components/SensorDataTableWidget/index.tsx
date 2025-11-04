@@ -178,7 +178,7 @@ export function SensorDataTableWidget({
   if (!data || data.length === 0) {
     return (
       <View style={tableStyles.emptyContainer}>
-        <Text style={tableStyles.emptyText}>Không có dữ liệu sensor</Text>
+        <Text style={tableStyles.emptyText}>Không có dữ liệu cảm biến</Text>
       </View>
     );
   }

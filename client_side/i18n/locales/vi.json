@@ -142,11 +142,13 @@
       "all": "Tất cả",
       "room": "Phòng",
       "value": "Giá trị",
-      "name": "Cảm biến",
+      "name": "Tên",
       "timeRange": "Thời gian",
-      "device": "Thiết bị"
+      "device": "Thiết bị",
+      "action": "Hành động"
     },
-    "placeholder": "Nhập từ khóa tìm kiếm..."
+    "placeholder": "Nhập từ khóa tìm kiếm...",
+    "action": "Hành động"
   },
   "errors": {
     "network": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",

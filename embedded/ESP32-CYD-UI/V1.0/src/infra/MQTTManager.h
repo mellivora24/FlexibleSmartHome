@@ -46,28 +46,24 @@ private:
     
     std::vector<TopicHandler> subscribers;
     std::vector<MQTTMessage> messageQueue;
-    
-    // Constants
+
     static constexpr unsigned long CONNECTION_TIMEOUT = 10000;  // 10 seconds
     static constexpr unsigned long RETRY_DELAY = 5000;          // 5 seconds
     static constexpr unsigned long KEEP_ALIVE_INTERVAL = 30000; // 30 seconds
     static constexpr int MAX_RETRY_ATTEMPTS = 3;
     static constexpr int MAX_QUEUE_SIZE = 50;
 
-    // Private constructor for Singleton
     MQTTManager() : mqttClient(wifiClient),
                    currentState(MQTTState::DISCONNECTED),
                    brokerPort(1883),
                    lastConnectionAttempt(0),
                    lastKeepAlive(0),
                    connectionAttempts(0) {
-        
-        // Set MQTT callback
+
         mqttClient.setCallback([this](char* topic, byte* payload, unsigned int length) {
             this->onMessageReceived(topic, payload, length);
         });
-        
-        // Generate unique client ID
+
         clientId = "ESP32_SmartHome_" + String(random(0xffff), HEX);
     }
 
@@ -164,7 +160,6 @@ public:
             }
             return result;
         } else {
-            // Queue message for later
             return queueMessage(topic, payload, retained, qos);
         }
     }
@@ -173,9 +168,7 @@ public:
         return publish(topic, jsonPayload, retained, 0);
     }
 
-    // Subscribing
     bool subscribe(const String& topic, std::function<void(String, String)> callback) {
-        // Add to subscribers list
         subscribers.push_back({topic, callback});
         
         if (currentState == MQTTState::CONNECTED) {
@@ -191,7 +184,6 @@ public:
     }
 
     bool unsubscribe(const String& topic) {
-        // Remove from subscribers
         subscribers.erase(
             std::remove_if(subscribers.begin(), subscribers.end(),
                 [&topic](const TopicHandler& handler) { 

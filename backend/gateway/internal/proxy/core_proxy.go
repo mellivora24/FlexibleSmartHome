@@ -105,6 +105,8 @@ func (p *CoreProxy) ProxyRequest(c *gin.Context) {
 }
 
 func (p *CoreProxy) ProxyWebSocket(c *gin.Context) {
+	timeout := 5 * time.Second
+
 	clientConn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		http.Error(c.Writer, "Failed to upgrade client connection", http.StatusBadRequest)
@@ -112,32 +114,35 @@ func (p *CoreProxy) ProxyWebSocket(c *gin.Context) {
 	}
 	defer clientConn.Close()
 
+	clientConn.SetReadDeadline(time.Now().Add(timeout))
+
 	_, msg, err := clientConn.ReadMessage()
 	if err != nil {
-		clientConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "Missing auth message"))
+		clientConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "Auth timeout"))
 		return
 	}
 
+	clientConn.SetReadDeadline(time.Time{})
+
 	var authMsg struct {
-		Type  string `json:"type"`
-		Token string `json:"token"`
+		Topic   string `json:"topic"`
+		Payload string `json:"payload"`
 	}
 
-	if err := json.Unmarshal(msg, &authMsg); err != nil || authMsg.Type != "auth" || authMsg.Token == "" {
+	if err := json.Unmarshal(msg, &authMsg); err != nil || authMsg.Topic != "auth" || authMsg.Payload == "" {
 		clientConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "Invalid auth format"))
 		return
 	}
 
 	// Delete token in test using postman
-	token := authMsg.Token
+	token := authMsg.Payload
 	if strings.HasPrefix(token, "Bearer ") {
 		token = strings.TrimPrefix(token, "Bearer ")
 	}
 
 	authResp, err := p.authService.VerifyToken(token)
 	if err != nil {
-		clientConn.WriteMessage(websocket.CloseMessage,
-			websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "Unauthorized"))
+		clientConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "Unauthorized"))
 		return
 	}
 

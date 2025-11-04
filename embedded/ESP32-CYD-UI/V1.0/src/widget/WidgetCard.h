@@ -1,5 +1,4 @@
 #pragma once
-
 #include <TFT_eSPI.h>
 
 class WidgetCard {
@@ -13,6 +12,13 @@ public:
         : tft(tft), x(x), y(y), w(w), h(h), touchable(touchable) {}
 
     virtual void render() = 0;
+    virtual void renderAt(int ox, int oy) {
+        int oldX = x, oldY = y;
+        x = ox; y = oy;
+        render();
+        x = oldX; y = oldY;
+    }
+
     virtual void onTouch(int tx, int ty) {}
     
     virtual ~WidgetCard() {}

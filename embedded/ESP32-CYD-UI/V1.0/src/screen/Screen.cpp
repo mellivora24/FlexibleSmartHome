@@ -11,8 +11,7 @@ void Screen::onTouch(int tx, int ty) {
     for (auto& w : widgets) {
         if (w->touchable && tx >= w->x && tx <= w->x + w->w && ty >= w->y && ty <= w->y + w->h) {
             w->onTouch(tx, ty);
-            w->render();
-            return;
+            break;
         }
     }
 }

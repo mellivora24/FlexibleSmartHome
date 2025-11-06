@@ -90,9 +90,9 @@ export default function RegisterScreen() {
                     />
 
                     <TextField
-                        label={t("auth.register.mcuCode")}
+                        label={t("auth.register.deviceId")}
                         icon={ICONS.DEVICE}
-                        placeholder={t("auth.register.mcuCodePlaceholder")}
+                        placeholder={t("auth.register.deviceIdPlaceholder")}
                         secureTextEntry={false}
                         onChangeText={setmcuCode}
                     />

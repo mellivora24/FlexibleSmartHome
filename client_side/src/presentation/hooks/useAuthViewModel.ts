@@ -7,14 +7,18 @@ import {
     RegisterResponse
 } from "@domain/model/Auth";
 import { AuthRepositoryImpl } from "@domain/repo/authRepo";
+import { MCURepositoryImpl } from "@domain/repo/mcuRepo";
 import { LoginUseCase } from "@domain/usecase/auth/loginUsecase";
 import { RegisterUseCase } from "@domain/usecase/auth/registerUsecase";
 import { VerifyToken } from "@domain/usecase/auth/verifyToken";
+import { CreateMCU } from "@domain/usecase/mcu/createMCU";
 
 const authRepo = new AuthRepositoryImpl();
+const mcuRepo = new MCURepositoryImpl();
 const loginUseCase = new LoginUseCase(authRepo);
 const registerUseCase = new RegisterUseCase(authRepo);
 const verifyTokenUseCase = new VerifyToken(authRepo);
+const createMCUUseCase = new CreateMCU(mcuRepo);
 
 export function useAuthViewModel() {
     const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +45,27 @@ export function useAuthViewModel() {
         setError(null);
         try {
             const response = await registerUseCase.execute(data);
+            
+            if (!response || !("data" in response)) {
+                throw new Error("Registration failed");
+            }
+
+            const token = response.token;
+            const mcuCode = response.mid;
+
+            try {
+                await createMCUUseCase.execute(
+                    {
+                        mcu_code: mcuCode,
+                        firmware_version: "1.0.0",
+                    },
+                    token
+                );
+                console.log("MCU created successfully in core_service");
+            } catch (mcuError: any) {
+                console.error("MCU creation failed in core_service:", mcuError);
+            }
+
             setIsLoading(false);
             return response;
         } catch (err: any) {

@@ -20,8 +20,11 @@ export const accountScreenStyle = StyleSheet.create({
     image: {
         width: 120,
         height: 120,
-        resizeMode: 'contain',
+        borderRadius: 75,
+        resizeMode: 'cover',
         opacity: 0.9,
+        borderWidth: 2,
+        borderColor: 'rgba(255, 255, 255, 1)',
     },
 
     glassCard: {

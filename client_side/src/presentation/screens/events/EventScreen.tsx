@@ -150,14 +150,6 @@ export function EventScreen() {
                 onRefresh={refresh}
                 refreshing={loading}
               />
-
-              {!hasEvents && !loading && (
-                <View style={eventScreenStyle.emptyContainer}>
-                  <Text style={eventScreenStyle.emptyText}>
-                    Không có dữ liệu
-                  </Text>
-                </View>
-              )}
             </View>
           )}
         </View>

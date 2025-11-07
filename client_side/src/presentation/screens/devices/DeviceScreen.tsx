@@ -24,7 +24,9 @@ export const DeviceScreen: React.FC = () => {
 
     const {
         devices,
+        availablePorts,
         loading,
+        loadingPorts,
         error,
         openModal,
         showErrorModal,
@@ -32,7 +34,8 @@ export const DeviceScreen: React.FC = () => {
         successMessage,
         setShowErrorModal,
         setShowSuccessModal,
-        setOpenModal,
+        handleOpenModal,
+        handleCloseModal,
         handleCreateDevice,
         handleEditDevice,
         handleDeleteDevice,
@@ -95,14 +98,15 @@ export const DeviceScreen: React.FC = () => {
                 {openModal && (
                     <AddModalComponent
                         visible={openModal}
-                        onClose={() => setOpenModal(false)}
+                        onClose={handleCloseModal}
                         onSave={handleCreateDevice}
-                        availablePorts={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]}
+                        availablePorts={availablePorts}
+                        loadingPorts={loadingPorts}
                     />
                 )}
             </SafeAreaView>
 
-            <FloatingActionButton onPress={() => setOpenModal(true)} />
+            <FloatingActionButton onPress={handleOpenModal} />
 
             <Modal
                 isVisible={showErrorModal}

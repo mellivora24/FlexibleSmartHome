@@ -135,7 +135,8 @@
     "selectRoom": "Chọn phòng",
     "selectPort": "Chọn cổng",
     "confirmDeleteTitle": "Xóa thiết bị",
-    "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa thiết bị này không?"
+    "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa thiết bị này không?",
+    "noPortAvailable": "Không có cổng nào khả dụng."
   },
   "searchWidget": {
     "searchType": {

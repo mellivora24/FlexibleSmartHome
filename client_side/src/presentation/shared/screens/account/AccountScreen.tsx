@@ -71,7 +71,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = () => {
                     showsVerticalScrollIndicator={false}
                 >
                     <View style={accountScreenStyle.logoContainer}>
-                        <Image source={IMAGES.LOGO_ROUNDED} style={accountScreenStyle.image} />
+                        <Image source={IMAGES.AVATAR_PLACEHOLDER} style={accountScreenStyle.image} />
                     </View>
 
                     <View style={accountScreenStyle.glassCard}>

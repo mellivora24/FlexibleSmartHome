@@ -1,22 +1,31 @@
 import { CreateDeviceRequest, Device, UpdateDeviceRequest } from "@domain/model/Device";
 import { DeviceRepositoryImpl } from "@domain/repo/deviceRepo";
+import { MCURepositoryImpl } from "@domain/repo/mcuRepo";
 import { CreateDevice } from "@src/domain/usecase/device/createDevice";
 import { DeleteDevice } from "@src/domain/usecase/device/deleteDevice";
 import { GetAllDevices } from "@src/domain/usecase/device/getAllDevices";
 import { UpdateDevice } from "@src/domain/usecase/device/updateDevice";
+import { GetAvailablePorts } from "@src/domain/usecase/mcu/getAvailablePorts";
+import { useAuthContext } from "@src/presentation/hooks/useAppContext";
 import axios from "axios";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 
 const deviceRepository = new DeviceRepositoryImpl();
+const mcuRepository = new MCURepositoryImpl();
 const deleteDevice = new DeleteDevice(deviceRepository);
 const getAllDevices = new GetAllDevices(deviceRepository);
 const updateDevice = new UpdateDevice(deviceRepository);
 const createDevice = new CreateDevice(deviceRepository);
+const getAvailablePorts = new GetAvailablePorts(mcuRepository);
 
 export const useDevicesViewModel = (token: string) => {
+    const { authData } = useAuthContext();
+    
     const [devices, setDevices] = useState<Device[]>([]);
+    const [availablePorts, setAvailablePorts] = useState<number[]>([]);
     const [loading, setLoading] = useState(false);
+    const [loadingPorts, setLoadingPorts] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -50,18 +59,42 @@ export const useDevicesViewModel = (token: string) => {
         }
     }, [token]);
 
+    const fetchAvailablePorts = useCallback(async () => {
+        setLoadingPorts(true);
+        try {
+            const ports = await getAvailablePorts.execute(123456, token);
+            setAvailablePorts(ports);
+        } catch (err) {
+            console.error("Failed to fetch available ports:", err);
+            showError(err, "Không thể tải danh sách cổng khả dụng");
+            setAvailablePorts([]);
+        } finally {
+            setLoadingPorts(false);
+        }
+    }, [authData?.mid, token]);
+
+    const handleOpenModal = useCallback(async () => {
+        setOpenModal(true);
+        await fetchAvailablePorts();
+    }, [fetchAvailablePorts]);
+
+    const handleCloseModal = useCallback(() => {
+        setOpenModal(false);
+        setAvailablePorts([]);
+    }, []);
+
     const handleCreateDevice = useCallback(
         async (deviceCreate: CreateDeviceRequest) => {
             try {
                 await createDevice.execute(deviceCreate, token);
                 await fetchDevices();
-                setOpenModal(false);
+                handleCloseModal();
                 showSuccess("Tạo thiết bị thành công!");
             } catch (err) {
                 showError(err, "Không thể tạo thiết bị");
             }
         },
-        [token, fetchDevices]
+        [token, fetchDevices, handleCloseModal]
     );
 
     const handleEditDevice = useCallback(
@@ -98,7 +131,9 @@ export const useDevicesViewModel = (token: string) => {
 
     return {
         devices,
+        availablePorts,
         loading,
+        loadingPorts,
         error,
         openModal,
         showErrorModal,
@@ -106,7 +141,8 @@ export const useDevicesViewModel = (token: string) => {
         successMessage,
         setShowErrorModal,
         setShowSuccessModal,
-        setOpenModal,
+        handleOpenModal,
+        handleCloseModal,
         handleCreateDevice,
         handleEditDevice,
         handleDeleteDevice,

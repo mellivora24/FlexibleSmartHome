@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+    ActivityIndicator,
     Modal,
     Pressable,
     Text,
@@ -22,13 +23,15 @@ const GRADIENT = ["#412180", "#2B275D", "#030912"];
 interface AddModalProps {
     visible: boolean;
     availablePorts?: number[];
+    loadingPorts?: boolean;
     onClose: () => void;
     onSave?: (device: CreateDeviceRequest) => void;
 }
 
 export const AddModalComponent: React.FC<AddModalProps> = ({
     visible,
-    availablePorts,
+    availablePorts = [],
+    loadingPorts = false,
     onSave,
     onClose
 }) => {
@@ -44,7 +47,7 @@ export const AddModalComponent: React.FC<AddModalProps> = ({
     const [roomOpen, setRoomOpen] = useState(false);
     const [typeOpen, setTypeOpen] = useState(false);
 
-    const portItems = (availablePorts || []).map((p) => ({ 
+    const portItems = availablePorts.map((p) => ({ 
         label: `Cổng ${p}`, 
         value: p 
     }));
@@ -176,7 +179,14 @@ export const AddModalComponent: React.FC<AddModalProps> = ({
                                     <Text style={addModalStyle.formLabel}>
                                         {t("deviceCard.port")}:
                                     </Text>
-                                    {portItems.length > 0 ? (
+                                    {loadingPorts ? (
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <ActivityIndicator size="small" color="#fff" />
+                                            <Text style={{ color: '#fff', marginLeft: 8 }}>
+                                                Đang tải...
+                                            </Text>
+                                        </View>
+                                    ) : portItems.length > 0 ? (
                                         <View style={addModalStyle.dropdownContainer}>
                                             <DropDownPicker
                                                 items={portItems}
@@ -305,6 +315,7 @@ export const AddModalComponent: React.FC<AddModalProps> = ({
                             <TouchableOpacity
                                 style={addModalStyle.saveButton}
                                 onPress={handleSave}
+                                disabled={loadingPorts}
                             >
                                 <Text style={addModalStyle.saveButtonText}>
                                     {t("deviceCard.addDevice") || "Thêm thiết bị"}

@@ -8,6 +8,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/model"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/realtime/service"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/shared"
 )
 
 type MQTTHandler struct {
@@ -129,6 +130,10 @@ func (h *MQTTHandler) onConfigDeviceRequest(client mqtt.Client, msg mqtt.Message
 	if err != nil {
 		log.Printf("[MQTTHandler] Error getting device list for uid=%s: %v", uid, err)
 		return
+	}
+
+	for i := range list {
+		list[i].Name = shared.RemoveVietnameseAccents(list[i].Name)
 	}
 
 	responseData := model.MQTTMessage{

@@ -144,7 +144,7 @@ func (s *wsService) HandleClientRead(client model.Client, mqttService MQTTServic
 }
 
 func (s *wsService) handleControlCommand(client model.Client, msg model.WSMessage, mqttService MQTTService) {
-	topic := "user/" + client.GetUID() + "/mcu/" + client.GetMID() + "/control"
+	topic := "user/" + client.GetUID() + "/mcu/" + client.GetMID() + "/control/request"
 	payload, err := json.Marshal(msg.Payload)
 	if err != nil {
 		log.Printf("[WSService] Marshal control command error: %v", err)

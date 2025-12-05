@@ -52,4 +52,21 @@ export const eventScreenStyle = StyleSheet.create({
         color: '#666666',
         textAlign: 'center',
     },
+    infoContainer: {
+        padding: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    infoText: {
+        fontSize: 14,
+        color: '#666',
+        fontStyle: 'italic',
+    },
+    resultText: {
+        fontSize: 12,
+        color: '#888',
+        textAlign: 'center',
+        marginTop: 8,
+        paddingBottom: 16,
+    },
 });

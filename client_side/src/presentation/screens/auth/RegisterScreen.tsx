@@ -20,8 +20,8 @@ export default function RegisterScreen() {
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [mcuCode, setmcuCode] = useState("");
+    const [password, setPassword] = useState("");
 
     const { login: loginContext } = useAuthContext();
 

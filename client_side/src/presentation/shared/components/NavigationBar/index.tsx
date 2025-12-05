@@ -1,8 +1,7 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import React, { useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
-import { ICONS } from '@constants/images';
 import { navigationBarStyle } from './navigationBar';
 
 function genarateTabBar(
@@ -62,7 +61,7 @@ export const NavigationBar: React.FC<BottomTabBarProps> = ({ state, descriptors,
             <View style={[navigationBarStyle.tabBar, (state.index === 0) ? { width: '90%' } : { width: '100%' }]}>
                 {genarateTabBar(state, descriptors, navigation)}
             </View>
-            {(state.index === 0) && (
+            {/* {(state.index === 0) && (
                 <TouchableOpacity
                     style={navigationBarStyle.voiceButton}
                     onPressIn={togglePressIn}
@@ -73,7 +72,7 @@ export const NavigationBar: React.FC<BottomTabBarProps> = ({ state, descriptors,
                         style={navigationBarStyle.voiceIcon}
                     />
                 </TouchableOpacity>
-            )}
+            )} */}
         </View>
     );
 };

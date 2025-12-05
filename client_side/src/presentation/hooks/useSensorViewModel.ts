@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GetListSensorData } from '@domain/usecase/sensorData/getListSensorData';
 import { getToken } from '@infra/storage/authStorage';
 import { SensorDataRepositoryImpl } from '@src/domain/repo/sensorDataRepo';
+import { GetByIDAndValue } from '@src/domain/usecase/sensorData/getByIdAndValue';
 import { GetListSensorDataByDID } from '@src/domain/usecase/sensorData/getListSensorDataByDID';
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -16,6 +17,7 @@ interface SortState {
 const ITEMS_PER_PAGE = 10;
 const sensorDataRepository = new SensorDataRepositoryImpl();
 const getListSensorDataUseCase = new GetListSensorData(sensorDataRepository);
+const getByIDAndValueUseCase = new GetByIDAndValue(sensorDataRepository);
 const getListSensorDataByDIDUseCase = new GetListSensorDataByDID(sensorDataRepository);
 
 export function useSensorViewModel() {
@@ -88,6 +90,32 @@ export function useSensorViewModel() {
             const errorMessage = err instanceof Error ? err.message : 'Failed to fetch sensor data';
             setError(errorMessage);
             console.error('Error fetching sensor data by DID:', err);
+
+            setData([]);
+            setTotalItems(0);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const fetchDataByDIDAndValue = useCallback(async (did: number, value: number) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const token = await getToken();
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
+
+            const response = await getByIDAndValueUseCase.execute(did, value, token);
+            
+            setData(response.list || []);
+            setTotalItems(response.total || 0);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to fetch sensor data';
+            setError(errorMessage);
+            console.error('Error fetching sensor data by DID and Value:', err);
 
             setData([]);
             setTotalItems(0);
@@ -230,5 +258,6 @@ export function useSensorViewModel() {
         filterByDateRange,
         fetchData,
         fetchDataByDID,
+        fetchDataByDIDAndValue,
     };
 }

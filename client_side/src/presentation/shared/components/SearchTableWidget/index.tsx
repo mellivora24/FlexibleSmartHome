@@ -1,5 +1,5 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
@@ -37,6 +37,18 @@ export function SearchWidget({
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);
     const [isSelectingStart, setIsSelectingStart] = useState(true);
+
+    // Sync dropdownItems with local state when it changes
+    useEffect(() => {
+        if (dropdownItems && dropdownItems.length > 0) {
+            setSearchTypeItems(dropdownItems);
+        }
+    }, [dropdownItems]);
+
+    // Sync external value with local state
+    useEffect(() => {
+        setSearchText(value);
+    }, [value]);
 
     function handleSearchPress() {
         if (onSearchPress) {
@@ -106,9 +118,20 @@ export function SearchWidget({
                         zIndex: 1000,
                         margin: 0,
                         padding: 0,
-                        borderRadius: 0
+                        borderRadius: 0,
+                        backgroundColor: '#fff',
                     }}
-                    labelProps={{ numberOfLines: 1 }}
+                    textStyle={{
+                        fontSize: 14,
+                    }}
+                    labelProps={{ 
+                        numberOfLines: 1,
+                        ellipsizeMode: 'tail',
+                    }}
+                    listMode="SCROLLVIEW"
+                    scrollViewProps={{
+                        nestedScrollEnabled: true,
+                    }}
                 />
             )}
             
@@ -146,12 +169,15 @@ export function SearchWidget({
                 <Modal
                     transparent
                     visible={showTimeRangePicker}
-                    onRequestClose={() => setShowTimeRangePicker(false)}
+                    onRequestClose={() => {
+                        setShowTimeRangePicker(false);
+                        setIsSelectingStart(true);
+                    }}
                 >
                     <View style={searchWidgetStyle.modalOverlay}>
                         <View style={searchWidgetStyle.modalContent}>
                             <Text style={searchWidgetStyle.modalTitle}>
-                                {isSelectingStart ? 'Select Start Date' : 'Select End Date'}
+                                {isSelectingStart ? t('searchWidget.selectStartDate', 'Select Start Date') : t('searchWidget.selectEndDate', 'Select End Date')}
                             </Text>
                             <DateTimePicker
                                 value={isSelectingStart ? (startDate || new Date()) : (endDate || new Date())}
@@ -166,7 +192,9 @@ export function SearchWidget({
                                     setIsSelectingStart(true);
                                 }}
                             >
-                                <Text style={searchWidgetStyle.modalButtonText}>Cancel</Text>
+                                <Text style={searchWidgetStyle.modalButtonText}>
+                                    {t('common.cancel', 'Cancel')}
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </View>

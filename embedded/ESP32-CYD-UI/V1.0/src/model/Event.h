@@ -10,11 +10,11 @@ struct Event {
     String payload;
 
     Event() : id(0), uid(0), did(0), action(""), payload("") {}
-    Event(int64_t id_, int64_t uid_, int64_t did_, const String &action_, const String &payload_)
-        : id(id_), uid(uid_), did(did_), action(action_), payload(payload_) {}
+    Event(int64_t id_, int64_t uid_, int64_t did_, const String &action_, const String &payload_) : id(id_), uid(uid_), did(did_), action(action_), payload(payload_) {}
 
     String toJson() const {
         StaticJsonDocument<300> doc;
+
         doc["id"] = id;
         doc["uid"] = uid;
         doc["did"] = did;
@@ -38,6 +38,7 @@ struct Event {
             e.action = doc["action"] | "";
             e.payload = doc["payload"] | "";
         }
+        
         return e;
     }
 };

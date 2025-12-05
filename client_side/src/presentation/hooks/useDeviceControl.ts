@@ -26,7 +26,9 @@ export const useDeviceControl = (deviceId: string | number) => {
         const unsubscribe_1 = addSocketListener((data) => {
             const { topic, payload } = data;
 
-            if (topic === "control_response" && payload?.did === deviceId) {
+            if (payload?.did === deviceId) {
+                console.log("[WS] Received control response:", data);
+
                 setIsControlling(false);
 
                 const command = String(payload.command);
@@ -35,9 +37,9 @@ export const useDeviceControl = (deviceId: string | number) => {
                     : Number(payload.value) || 0;
 
                 let status: boolean | undefined;
-                if (command === "on") {
+                if (command === "ON") {
                     status = true;
-                } else if (command === "off") {
+                } else if (command === "OFF") {
                     status = false;
                 }
 
@@ -90,8 +92,18 @@ export const useDeviceControl = (deviceId: string | number) => {
                 payload.value = value;
             }
 
-            console.log("[WS] Sending control:", payload);
-            sendSocketMessage("control", payload);
+            const message = {
+                topic: "control",
+                payload: {
+                    did: deviceId,
+                    command,
+                    value: value ?? 0,
+                    status: "pending",
+                },
+            };
+
+            console.log("[WS] Sending control:", message);
+            sendSocketMessage("control", message);
         },
         [deviceId]
     );

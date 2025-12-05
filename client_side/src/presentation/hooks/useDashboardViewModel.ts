@@ -23,6 +23,8 @@ const getDevices = new GetAllDevices(deviceRepo);
 const sensorRepo = new SensorDataRepositoryImpl();
 const getSensorData = new GetListSensorDataByDID(sensorRepo);
 
+const MAX_CHART_POINTS = 10;
+
 export const useDashboardViewModel = (token: string) => {
     const { t } = useTranslation();
 
@@ -36,6 +38,16 @@ export const useDashboardViewModel = (token: string) => {
     const [insideTemperature, setInsideTemperature] = useState<number | null>(null);
     const [humidityHistory, setHumidityHistory] = useState<number[]>([]);
     const [temperatureHistory, setTemperatureHistory] = useState<number[]>([]);
+    const [rainingHistory, setRainingHistory] = useState<number[]>([]);
+    const [windSpeedHistory, setWindSpeedHistory] = useState<number[]>([]);
+
+    // Mock data for raining and wind speed
+    useEffect(() => {
+        const mockRaining = Array.from({ length: MAX_CHART_POINTS }, () => Math.floor(Math.random() * 100));
+        const mockWindSpeed = Array.from({ length: MAX_CHART_POINTS }, () => Math.floor(Math.random() * 50));
+        setRainingHistory(mockRaining);
+        setWindSpeedHistory(mockWindSpeed);
+    }, []);
 
     const fetchWeather = useCallback(async () => {
         try {
@@ -56,18 +68,32 @@ export const useDashboardViewModel = (token: string) => {
             if (deviceList.length > 0) {
                 const humiDeviceID = deviceList.find(d => d.type === "humiditySensor")?.id;
                 const tempDeviceID = deviceList.find(d => d.type === "temperatureSensor")?.id;
+                const rainingDeviceID = deviceList.find(d => d.type === "rainingSensor")?.id;
+                const windSpeedDeviceID = deviceList.find(d => d.type === "windSpeedSensor")?.id;
 
                 const humidityData = await getSensorData.execute(humiDeviceID, 10, token);
                 const temperatureData = await getSensorData.execute(tempDeviceID, 10, token);
+                const rainingData = await getSensorData.execute(rainingDeviceID, 10, token);
+                const windSpeedData = await getSensorData.execute(windSpeedDeviceID, 10, token);
 
-                if (humidityData.success && humidityData.data.length > 0) {
-                    const values = humidityData.data.map(item => item.value).reverse();
+                if (humidityData.total && humidityData.list.length > 0) {
+                    const values = humidityData.list.map(item => item.value).reverse();
                     setHumidityHistory(values);
                 }
 
-                if (temperatureData.success && temperatureData.data.length > 0) {
-                    const values = temperatureData.data.map(item => item.value).reverse();
+                if (temperatureData.total && temperatureData.list.length > 0) {
+                    const values = temperatureData.list.map(item => item.value).reverse();
                     setTemperatureHistory(values);
+                }
+
+                if (rainingData.total && rainingData.list.length > 0) {
+                    const values = rainingData.list.map(item => item.value).reverse();
+                    setRainingHistory(values);
+                }
+
+                if (windSpeedData.total && windSpeedData.list.length > 0) {
+                    const values = windSpeedData.list.map(item => item.value).reverse();
+                    setWindSpeedHistory(values);
                 }
             }
         } catch (err: any) {
@@ -91,13 +117,47 @@ export const useDashboardViewModel = (token: string) => {
             const device = devices.find(d => d.id === did);
 
             if (!device) return;
-
+            
             if (device.type === "humiditySensor") {
                 setInsideHumidity(value);
+                setHumidityHistory(prev => {
+                    const newHistory = [...prev, value];
+                    if (newHistory.length > MAX_CHART_POINTS) {
+                        return newHistory.slice(newHistory.length - MAX_CHART_POINTS);
+                    }
+                    return newHistory;
+                });
             }
 
             if (device.type === "temperatureSensor") {
                 setInsideTemperature(value);
+                setTemperatureHistory(prev => {
+                    const newHistory = [...prev, value];
+                    if (newHistory.length > MAX_CHART_POINTS) {
+                        return newHistory.slice(newHistory.length - MAX_CHART_POINTS);
+                    }
+                    return newHistory;
+                });
+            }
+
+            if (device.type === "analogSensor" && device.name.toLowerCase().includes("mưa")) {
+                setRainingHistory(prev => {
+                    const newHistory = [...prev, value];
+                    if (newHistory.length > MAX_CHART_POINTS) {
+                        return newHistory.slice(newHistory.length - MAX_CHART_POINTS);
+                    }
+                    return newHistory;
+                });
+            }
+            
+            if (device.type === "analogSensor" && device.name.toLowerCase().includes("gió")) {
+                setWindSpeedHistory(prev => {
+                    const newHistory = [...prev, value];
+                    if (newHistory.length > MAX_CHART_POINTS) {
+                        return newHistory.slice(newHistory.length - MAX_CHART_POINTS);
+                    }
+                    return newHistory;
+                });
             }
         };
 
@@ -145,5 +205,7 @@ export const useDashboardViewModel = (token: string) => {
         insideTemperature,
         humidityHistory,
         temperatureHistory,
+        rainingHistory,
+        windSpeedHistory,
     };
 };

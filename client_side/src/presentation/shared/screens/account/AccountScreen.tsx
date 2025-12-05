@@ -8,7 +8,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextWidget } from '@components/TextWidget';
 import { ICONS, IMAGES } from '@constants/images';
 import { ROUTES } from '@constants/routes';
-import { APP_CONFIG } from '@shared/config/appConfig';
 import { useAuthContext } from '@src/presentation/hooks/useAppContext';
 import { FlexButton } from '../../components/FlexButton';
 import { accountScreenStyle } from './accountScreenStyle';
@@ -88,7 +87,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = () => {
 
                         <View style={accountScreenStyle.divider} />
 
-                        <TextWidget
+                        {/* <TextWidget
                             text={APP_CONFIG.GITHUB_REPO_URL}
                             icon={ICONS.LINK_ICON}
                             style={{ marginTop: 16, marginBottom: 12 }}
@@ -101,8 +100,8 @@ export const AccountScreen: React.FC<AccountScreenProps> = () => {
                             onPress={() => handleOpenLink(APP_CONFIG.REPORT_DOCUMENTATION_URL)}
                         />
 
-                        <View style={accountScreenStyle.divider} />
-
+                        <View style={accountScreenStyle.divider} /> */}
+{/* 
                         <View style={accountScreenStyle.firmwareContainer}>
                             <TextWidget
                                 text="Phiên bản: 1.0.0"
@@ -114,13 +113,13 @@ export const AccountScreen: React.FC<AccountScreenProps> = () => {
                                 style={accountScreenStyle.firmwareButton}
                                 onPress={handleUpdateFirmware}
                             />
-                        </View>
+                        </View> */}
 
-                        <TextWidget
+                        {/* <TextWidget
                             text={devicePinText}
                             icon={ICONS.PIN}
                             style={{ marginTop: 16, marginBottom: 24 }}
-                        />
+                        /> */}
 
                         <FlexButton
                             title={t('account.logout')}

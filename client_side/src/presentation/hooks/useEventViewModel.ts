@@ -1,11 +1,13 @@
 import { EventFilters, EventModel, EventSort, GetListEventsRequest } from '@domain/model/Event';
 import { GetEventUseCase } from '@domain/usecase/event/getEvent';
+import { GetEventByIDAndValueUseCase } from '@domain/usecase/event/getEventByIDAndValue';
 import { GetListEventsUseCase } from '@domain/usecase/event/getListEvents';
 import eventApi from '@infra/api/http/eventApi';
 import { useCallback, useEffect, useState } from 'react';
 
 const getListEventsUseCase = new GetListEventsUseCase(eventApi);
 const getEventUseCase = new GetEventUseCase(eventApi);
+const getEventByIDAndValueUseCase = new GetEventByIDAndValueUseCase(eventApi);
 
 export const useEventViewModel = () => {
     const [events, setEvents] = useState<EventModel[]>([]);
@@ -70,6 +72,22 @@ export const useEventViewModel = () => {
         } catch (err: any) {
             setError(err.message || 'Failed to fetch event');
             console.error('Error fetching event:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const fetchEventByIdAndAction = useCallback(async (did: number, action: string, token: string) => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const response = await getEventByIDAndValueUseCase.execute(did, action, token);
+            setEvents(response.list || []);
+            setTotalItems(response.total || 0);
+        } catch (err: any) {
+            setError(err.message || 'Failed to fetch events by ID and action');
+            console.error('Error fetching events by ID and action:', err);
         } finally {
             setLoading(false);
         }
@@ -158,5 +176,6 @@ export const useEventViewModel = () => {
         filterByTimeRange,
         fetchEventById,
         setSelectedEvent,
+        fetchEventByIdAndAction,
     };
 };

@@ -132,6 +132,38 @@ class EventApi implements EventRepository {
             );
         }
     }
+    async getEventByIDAndValue(did: number, action: string, token: string): Promise<GetListEventsResponse> {
+        try {
+            const headers = {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            };
+
+            const response = await axios.get(this.baseURL, {
+                headers,
+                params: {
+                    did,
+                    action,
+                },
+            });
+
+            if (response.data.success) {
+                return {
+                    total: response.data.data.total,
+                    list: response.data.data.list,
+                };
+            } else {
+                throw new Error(response.data.error || 'Failed to fetch events by DID and Action');
+            }
+        } catch (error: any) {
+            console.error('Error fetching events by DID and Action:', error);
+            throw new Error(
+                error.response?.data?.error ||
+                    error.message ||
+                    'Failed to fetch events by DID and Action'
+            );
+        }
+    }
 }
 
 export default new EventApi();

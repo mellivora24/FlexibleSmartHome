@@ -38,7 +38,7 @@ export const DeviceCard: React.FC<{ device: Device }> = ({ device }) => {
     }, [lastResponse]);
 
     const handlePress = () => {
-        const nextCommand = deviceData.status ? "off" : "on";
+        const nextCommand = deviceData.status ? "OFF" : "ON";
         sendControl(nextCommand);
     };
 

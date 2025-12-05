@@ -8,10 +8,13 @@ private:
     bool state;
     const char* label;
     uint8_t textSize;
+    int deviceId;
+    void (*onStateChangeCallback)(int);
 
 public:
-    DigitalDevice(TFT_eSPI* tft, int x, int y, int w, int h, const char* label, uint8_t textSize)
-        : WidgetCard(tft, x, y, w, h, true), state(false), label(label), textSize(textSize) {}
+    DigitalDevice(TFT_eSPI* tft, int x, int y, int w, int h, const char* label, uint8_t textSize, int deviceId = -1)
+        : WidgetCard(tft, x, y, w, h, true), state(false), label(label), textSize(textSize), 
+          deviceId(deviceId), onStateChangeCallback(nullptr) {}
 
     void setState(bool s) { 
         state = s; 
@@ -19,6 +22,12 @@ public:
     }
 
     bool getState() { return state; }
+    
+    int getDeviceId() { return deviceId; }
+    
+    void setOnStateChangeCallback(void (*callback)(int)) {
+        onStateChangeCallback = callback;
+    }
 
     void render() override {
         tft->fillRect(x, y, w, h, TFT_WHITE);
@@ -46,5 +55,10 @@ public:
 
     void onTouch(int tx, int ty) override {
         state = !state;
+        
+        // Gọi callback nếu có
+        if (onStateChangeCallback && deviceId != -1) {
+            onStateChangeCallback(deviceId);
+        }
     }
 };

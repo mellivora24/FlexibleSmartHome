@@ -7,6 +7,8 @@ private:
     const char* label;
     uint8_t textSize;
     bool isOn;
+    int deviceId;
+    void (*onStateChangeCallback)(int);
     
     uint16_t getLevelColor(uint8_t lvl) {
         switch(lvl) {
@@ -18,12 +20,14 @@ private:
     }
 
 public:
-    AnalogDevice(TFT_eSPI* tft, int x, int y, int w, int h, const char* label, uint8_t textSize)
+    AnalogDevice(TFT_eSPI* tft, int x, int y, int w, int h, const char* label, uint8_t textSize, int deviceId = -1)
         : WidgetCard(tft, x, y, w, h, true), 
-          level(0), label(label), textSize(textSize), isOn(false) {}
+          level(0), label(label), textSize(textSize), isOn(false), 
+          deviceId(deviceId), onStateChangeCallback(nullptr) {}
 
     int getLevel() { return level; }
     bool getStatus() { return isOn; }
+    int getDeviceId() { return deviceId; }
     
     void setLevel(uint8_t newLevel) {
         level = constrain(newLevel, 0, 2);
@@ -35,6 +39,10 @@ public:
     
     void toggle() {
         isOn = !isOn;
+    }
+    
+    void setOnStateChangeCallback(void (*callback)(int)) {
+        onStateChangeCallback = callback;
     }
 
     void render() override {
@@ -114,6 +122,11 @@ public:
                         ty >= buttonY && ty <= buttonY + buttonH) {
                         setLevel(i);
                         touchedButton = true;
+                        
+                        // Gọi callback khi thay đổi level
+                        if (onStateChangeCallback && deviceId != -1) {
+                            onStateChangeCallback(deviceId);
+                        }
                         break;
                     }
                 }
@@ -121,6 +134,11 @@ public:
 
             if (!touchedButton) {
                 toggle();
+                
+                // Gọi callback khi toggle ON/OFF
+                if (onStateChangeCallback && deviceId != -1) {
+                    onStateChangeCallback(deviceId);
+                }
             }
         }
         delay(100);

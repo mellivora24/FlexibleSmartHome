@@ -10,6 +10,7 @@ import (
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/device"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/event"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/log"
+	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/mcu"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/notification"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/pendingActions"
 	"github.com/mellivora24/flexiblesmarthome/core-service/internal/feature/sensorData"
@@ -22,11 +23,13 @@ type CoreService interface {
 	CreateEvent(uid string, data model.MQTTMessage) (err error)
 	GetDeviceList(uid string, mcuCode string) (devices []device.MQTTGetDeviceData, err error)
 	CreateNotification(uid string, mcuCode string, title string, message string) (err error)
+	GetUIDByMCUCode(mcuCode string) (string, error)
 }
 
 type coreService struct {
 	log           log.Service
 	event         event.Service
+	mcu           mcu.Service
 	device        device.Service
 	sensorData    sensorData.Service
 	notification  notification.Service
@@ -35,6 +38,7 @@ type coreService struct {
 
 func NewCoreService(
 	log log.Service,
+	mcu mcu.Service,
 	event event.Service,
 	device device.Service,
 	sensorData sensorData.Service,
@@ -43,6 +47,7 @@ func NewCoreService(
 ) CoreService {
 	return &coreService{
 		log:           log,
+		mcu:           mcu,
 		event:         event,
 		device:        device,
 		sensorData:    sensorData,
@@ -198,4 +203,20 @@ func (s *coreService) CreateNotification(uid string, mcuCode string, title strin
 	}
 
 	return nil
+}
+
+func (s *coreService) GetUIDByMCUCode(mcuCode string) (string, error) {
+	intMcuCode, convErr := strconv.ParseInt(mcuCode, 10, 64)
+	if convErr != nil {
+		l.Printf("Error converting mcuCode to int64: %v", convErr)
+		return "", convErr
+	}
+	uid, err := s.mcu.GetUIDByMCUCode(intMcuCode)
+	if err != nil {
+		l.Printf("[CoreService] Error getting UID by MCU code: %v", err)
+		return "", err
+	}
+
+	strUid := strconv.FormatInt(uid, 10)
+	return strUid, nil
 }

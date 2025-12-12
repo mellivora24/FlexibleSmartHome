@@ -7,11 +7,13 @@ import (
 )
 
 type Service interface {
-	CreateMCU(uid int64, mcu *MCURequest) (*McuDB, error)
-	FirmwareUpdate(mcu *MCURequest) (*McuDB, error)
+	CreateMCU(uid int64, mcu *MCURequest) (*MCUResponse, error)
+	UpdateMCU(req *UpdateMCURequest) (*MCUResponse, error)
+	FirmwareUpdate(mcu *MCURequest) (*MCUResponse, error)
 	DeleteMCU(mcuCode int) error
 	GetAvailablePorts(mcuCode int) ([]int, error)
 	GetMcuByUID(uid string) (int64, error)
+	GetUIDByMCUCode(mcuCode int64) (int64, error)
 }
 
 type service struct {
@@ -22,7 +24,7 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) CreateMCU(uid int64, mcu *MCURequest) (*McuDB, error) {
+func (s *service) CreateMCU(uid int64, mcu *MCURequest) (*MCUResponse, error) {
 	availablePorts := make(pq.Int64Array, 13)
 	for i := int64(1); i <= 13; i++ {
 		availablePorts[i-1] = i
@@ -41,15 +43,52 @@ func (s *service) CreateMCU(uid int64, mcu *MCURequest) (*McuDB, error) {
 		return nil, err
 	}
 
-	return created, nil
+	response := &MCUResponse{
+		ID:              created.ID,
+		UID:             created.UID,
+		McuCode:         created.McuCode,
+		AvailablePort:   created.AvailablePort,
+		FirmwareVersion: created.FirmwareVersion,
+		CreatedAt:       created.CreatedAt,
+	}
+
+	return response, nil
 }
 
-func (s *service) FirmwareUpdate(mcu *MCURequest) (*McuDB, error) {
+func (s *service) UpdateMCU(req *UpdateMCURequest) (*MCUResponse, error) {
+	updated, err := s.repo.Update(req)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &MCUResponse{
+		ID:              updated.ID,
+		UID:             updated.UID,
+		McuCode:         updated.McuCode,
+		AvailablePort:   updated.AvailablePort,
+		FirmwareVersion: updated.FirmwareVersion,
+		CreatedAt:       updated.CreatedAt,
+	}
+
+	return response, nil
+}
+
+func (s *service) FirmwareUpdate(mcu *MCURequest) (*MCUResponse, error) {
 	updated, err := s.repo.UpdateFirmware(mcu.McuCode, mcu.FirmwareVersion)
 	if err != nil {
 		return nil, err
 	}
-	return updated, nil
+
+	response := &MCUResponse{
+		ID:              updated.ID,
+		UID:             updated.UID,
+		McuCode:         updated.McuCode,
+		AvailablePort:   updated.AvailablePort,
+		FirmwareVersion: updated.FirmwareVersion,
+		CreatedAt:       updated.CreatedAt,
+	}
+
+	return response, nil
 }
 
 func (s *service) DeleteMCU(mcuCode int) error {
@@ -67,4 +106,12 @@ func (s *service) GetAvailablePorts(mcuCode int) ([]int, error) {
 func (s *service) GetMcuByUID(uid string) (int64, error) {
 	mcuId, _ := s.repo.FindByUID(uid)
 	return mcuId, nil
+}
+
+func (s *service) GetUIDByMCUCode(mcuCode int64) (int64, error) {
+	uid, err := s.repo.GetUIDByMCUCode(mcuCode)
+	if err != nil {
+		return 0, err
+	}
+	return uid, nil
 }

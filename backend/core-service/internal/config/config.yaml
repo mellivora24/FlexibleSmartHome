@@ -11,11 +11,11 @@ mosquitto:
   username: ${MQTT_BROKER_USER}
   password: ${MQTT_BROKER_PASS}
   client_id: core_service
-  config_topic: user/+/mcu/+/config
-  firmware_topic: user/+/mcu/+/firmware
-  data_topic: user/+/mcu/+/data
-  control_topic: user/+/mcu/+/control
-  control_response_topic: user/+/mcu/+/control/response
+  config_topic: mcu/+/config
+  firmware_topic: mcu/+/firmware
+  data_topic: mcu/+/data
+  control_topic: mcu/+/control
+  control_response_topic: mcu/+/control/response
 
 server:
   host: 0.0.0.0

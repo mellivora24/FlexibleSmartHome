@@ -20,6 +20,7 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	mcus := rg.Group("/mcus")
 	{
 		mcus.POST("/", h.AssignMCU)
+		mcus.PUT("/", h.UpdateMCU)
 		mcus.DELETE("/:mcu_code", h.DeleteMCU)
 		mcus.PUT("/firmware", h.FirmwareUpdate)
 		mcus.GET("/:mcu_code/available-ports", h.AvailablePort)
@@ -55,6 +56,13 @@ func (h *Handler) AssignMCU(c *gin.Context) {
 
 	res, err := h.service.CreateMCU(intUid, &req)
 	if err != nil {
+		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "already exists") {
+			c.JSON(http.StatusConflict, gin.H{
+				"success": false,
+				"error":   "MCU code already exists",
+			})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"error":   err.Error(),
@@ -63,6 +71,66 @@ func (h *Handler) AssignMCU(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"data":    res,
+	})
+}
+
+func (h *Handler) UpdateMCU(c *gin.Context) {
+	var req UpdateMCURequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// ✅ Validate that either ID or CurrentMcuCode is provided
+	if req.ID == nil && req.CurrentMcuCode == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "either id or current_mcu_code is required",
+		})
+		return
+	}
+
+	// Validate that at least one field to update is provided
+	if req.McuCode == nil && req.FirmwareVersion == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "at least one field to update is required",
+		})
+		return
+	}
+
+	res, err := h.service.UpdateMCU(&req)
+
+	if err != nil && strings.Contains(err.Error(), "not found") {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"error":   "MCU not found",
+		})
+		return
+	}
+
+	if err != nil && strings.Contains(err.Error(), "already exists") {
+		c.JSON(http.StatusConflict, gin.H{
+			"success": false,
+			"error":   "MCU code already exists",
+		})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data":    res,
 	})

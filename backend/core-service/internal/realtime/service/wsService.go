@@ -21,13 +21,11 @@ type WebSocketService interface {
 type wsService struct {
 	mu      sync.RWMutex
 	clients map[string][]model.Client
-	//coreService CoreService
 }
 
 func NewWebSocketService() WebSocketService {
 	return &wsService{
 		clients: make(map[string][]model.Client),
-		//coreService: service,
 	}
 }
 
@@ -144,18 +142,12 @@ func (s *wsService) HandleClientRead(client model.Client, mqttService MQTTServic
 }
 
 func (s *wsService) handleControlCommand(client model.Client, msg model.WSMessage, mqttService MQTTService) {
-	topic := "user/" + client.GetUID() + "/mcu/" + client.GetMID() + "/control/request"
+	topic := "mcu/" + client.GetMID() + "/control/request"
 	payload, err := json.Marshal(msg.Payload)
 	if err != nil {
 		log.Printf("[WSService] Marshal control command error: %v", err)
 		return
 	}
-
-	//err = s.coreService.CreatePendingAction(client.GetUID(), client.GetMID(), msg)
-	//if err != nil {
-	//	log.Printf("[WSService] Create pending action error: %v", err)
-	//	return
-	//}
 
 	if err := mqttService.Publish(topic, payload); err != nil {
 		log.Printf("[WSService] MQTT publish error: %v", err)

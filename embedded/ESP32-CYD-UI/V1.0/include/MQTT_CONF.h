@@ -1,11 +1,11 @@
 #define MQTT_PORT     1883
 #define MQTT_PASS     "13M09Q24T"
 #define MQTT_USER     "core-service"
-#define MQTT_SERVER   "172.20.10.11"
+#define MQTT_SERVER   "192.168.1.100"
 #define MQTT_CLIENT_ID    "EmbeddedDevice_001"
 
 #define USER_ID           "1"
-#define MCU_CODE          "123456"
+#define MCU_CODE          "123123"
 
 #define MQTT_TOPIC_HEALTH_REQ                 "/health/request"
 #define MQTT_TOPIC_HEALTH_RESP                "/health/response"

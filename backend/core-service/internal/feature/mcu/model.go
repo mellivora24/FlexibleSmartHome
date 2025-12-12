@@ -27,3 +27,19 @@ type MCURequest struct {
 	McuCode         int    `json:"mcu_code" binding:"required"`
 	FirmwareVersion string `json:"firmware_version"`
 }
+
+type UpdateMCURequest struct {
+	ID              *int64  `json:"id"`
+	CurrentMcuCode  *int    `json:"current_mcu_code"`
+	McuCode         *int    `json:"mcu_code"`
+	FirmwareVersion *string `json:"firmware_version"`
+}
+
+type MCUResponse struct {
+	ID              int64     `json:"id"`
+	UID             int64     `json:"uid"`
+	McuCode         int       `json:"mcu_code"`
+	AvailablePort   []int64   `json:"available_port"`
+	FirmwareVersion string    `json:"firmware_version"`
+	CreatedAt       time.Time `json:"created_at"`
+}

@@ -60,6 +60,7 @@ func main() {
 
 	coreService := service.NewCoreService(
 		logService,
+		mcuService,
 		eventService,
 		deviceService,
 		sensorDataService,

@@ -1,0 +1,75 @@
+{
+    "topic": "config",
+    "payload": [
+        {
+            "id": 4,
+            "name": "Den ngu",
+            "type": "digitalDevice",
+            "port": 8,
+            "status": true,
+            "data": {
+                "value": 1,
+                "status": true
+            }
+        },
+        {
+            "id": 2,
+            "name": "Cam bien nhiet do",
+            "type": "temperatureSensor",
+            "port": 3,
+            "status": true,
+            "data": {
+                "unit": "%",
+                "value": 26.6,
+                "status": true
+            }
+        },
+        {
+            "id": 3,
+            "name": "Cam bien do am",
+            "type": "humiditySensor",
+            "port": 4,
+            "status": true,
+            "data": {
+                "unit": "%",
+                "value": 57.1,
+                "status": true
+            }
+        },
+        {
+            "id": 5,
+            "name": "Cam bien luong mua",
+            "type": "analogSensor",
+            "port": 5,
+            "status": true,
+            "data": {
+                "unit": "%",
+                "value": 34,
+                "status": true
+            }
+        },
+        {
+            "id": 6,
+            "name": "Cam bien gio",
+            "type": "analogSensor",
+            "port": 6,
+            "status": true,
+            "data": {
+                "unit": "%",
+                "value": 100,
+                "status": true
+            }
+        },
+        {
+            "id": 1,
+            "name": "Thiet bi 1",
+            "type": "digitalDevice",
+            "port": 2,
+            "status": true,
+            "data": {
+                "value": 1,
+                "status": true
+            }
+        }
+    ]
+}

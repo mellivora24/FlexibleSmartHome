@@ -139,6 +139,19 @@ export const AccountScreen: React.FC<AccountScreenProps> = () => {
                 }
             }
         } catch (error: any) {
+            const mcuRepo = new MCURepositoryImpl();
+
+            const createMCUUseCase = new CreateMCU(mcuRepo);
+
+            // Tạo MCU mới với token hiện tại
+            await createMCUUseCase.execute(
+                {
+                    mcu_code: IntMcuCode,
+                    firmware_version: "1.0.0",
+                },
+                authData?.token || ''
+            );
+
             console.error('MCU update failed:', error);
             Alert.alert('Lỗi', error.message || 'Không thể cập nhật mã thiết bị');
         } finally {

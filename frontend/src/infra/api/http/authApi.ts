@@ -11,7 +11,13 @@ export const authApi = {
             console.log("Login URL:", url); // Debugging line --- IGNORE ---
 
             const res = await axios.post(url, data);
-            return res.data;
+            return {
+                data: {
+                    ...res.data.data,
+                    mid: res.data.data.mcu_code,
+                },
+                success: res.data.success
+            }
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;

@@ -5,6 +5,7 @@ import axios from "axios";
 export const deviceApi = {
     getAllDevices: async (token: string): Promise<Device[]> => {
         console.log("Fetching all devices (running at api layer)");
+        console.log("Using token:", token);
         try {
             const res = await axios.get(`${API_CONFIG.BASE_URL}/core/devices/`, {
                 headers: {

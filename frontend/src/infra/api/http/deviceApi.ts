@@ -33,7 +33,6 @@ export const deviceApi = {
                 const status = error.response?.status;
                 if (status === 401) throw new Error("Unauthorized access");
                 if (status === 404) {
-                    console.log("API not found");
                     return [];
                 }
                 console.log("API other error");

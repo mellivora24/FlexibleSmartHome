@@ -1,118 +1,136 @@
 #include <Arduino.h>
+#include <DHT.h>
 
-String input = "";
+String buffer = "";
+bool reading = false;
 
-// Convert A0..A5 → 14..19
-int normalizePin(String p) {
-  p.trim();
-  if (p.length() == 2 && (p[0] == 'A' || p[0] == 'a')) {
-    int n = p.substring(1).toInt();
-    if (n >= 0 && n <= 5) return 14 + n;
-  }
-  return p.toInt();
+void sendSuccess() { Serial.println("{\"success\":true}"); }
+void sendFail(const char* msg) {
+    Serial.print("{\"success\":false,\"error\":\"");
+    Serial.print(msg);
+    Serial.println("\"}");
+}
+void sendValue(int v) {
+    Serial.print("{\"success\":true,\"data\":{\"value\":");
+    Serial.print(v);
+    Serial.println("}}");
+}
+void sendDHT(float t, float h) {
+    Serial.print("{\"success\":true,\"data\":{\"temperature\":");
+    Serial.print(t);
+    Serial.print(",\"humidity\":");
+    Serial.print(h);
+    Serial.println("}}");
 }
 
-bool parseCommand(const String &s, int &pin, int &mode, int &value, bool &hasValue) {
-  if (s.length() < 5) return false;
-  if (s[0] != '(' || s[s.length()-1] != ')') return false;
+void processCommand(int pin, int mode, int value, bool hasValue) {
 
-  String body = s.substring(1, s.length()-1);
+    switch(mode) {
 
-  String parts[3];
-  int idx = 0;
+        case 1: {   // digital output
+            if (!hasValue) return sendFail("missing_value");
 
-  int start = 0;
-  for (int i = 0; i < body.length(); i++) {
-    if (body[i] == ',') {
-      if (idx > 2) return false;
-      parts[idx++] = body.substring(start, i);
-      start = i + 1;
+            pinMode(pin, OUTPUT);
+            digitalWrite(pin, value ? HIGH : LOW);
+            sendSuccess();
+            break;
+        }
+
+        case 2: {   // digital input
+            pinMode(pin, INPUT);
+            int v = digitalRead(pin);
+            sendValue(v);
+            break;
+        }
+
+        case 3: {   // PWM output
+            if (!hasValue) return sendFail("missing_value");
+
+            pinMode(pin, OUTPUT);
+            analogWrite(pin, value);
+            sendSuccess();
+            break;
+        }
+
+        case 4: {   // analog input
+            int v = analogRead(pin);
+            sendValue(v);
+            break;
+        }
+
+        case 5: {   // DHT11: return temp + humidity
+            DHT dht(pin, DHT11);
+            dht.begin();
+            delay(100);
+
+            float t = dht.readTemperature();
+            float h = dht.readHumidity();
+
+            if (isnan(t) || isnan(h)) {
+                sendFail("read_failed");
+            } else {
+                sendDHT(t, h);
+            }
+            break;
+        }
+
+        default:
+            sendFail("invalid_mode");
+            break;
     }
-  }
-  if (start < body.length()) {
-    parts[idx++] = body.substring(start);
-  }
+}
 
-  if (idx < 2) return false;
+void parseCommand(String cmd) {
+    cmd.trim();
+    if (cmd.length() < 4) return;
 
-  pin = normalizePin(parts[0]);
-  mode = parts[1].toInt();
+    cmd.remove(0, 1);
+    cmd.remove(cmd.length() - 1, 1);
 
-  hasValue = (idx == 3);
-  if (hasValue) value = parts[2].toInt();
+    int parts[3] = {0, 0, 0};
+    int idx = 0;
 
-  return true;
+    char temp[32];
+    cmd.toCharArray(temp, sizeof(temp));
+
+    char* token = strtok(temp, ",");
+    while (token && idx < 3) {
+        parts[idx++] = atoi(token);
+        token = strtok(NULL, ",");
+    }
+
+    int pin   = parts[0];
+    int mode  = parts[1];
+    int value = parts[2];
+    bool hasValue = (idx == 3);
+
+    if (pin < 2 || pin > 13) {
+        sendFail("invalid_pin");
+        return;
+    }
+
+    processCommand(pin, mode, value, hasValue);
 }
 
 void setup() {
-  Serial.begin(115200);
+    Serial.begin(115200);
 }
 
 void loop() {
-  while (Serial.available()) {
-    char c = Serial.read();
-    if (c == '\n' || c == '\r') continue;
+    while (Serial.available()) {
+        char c = Serial.read();
 
-    input += c;
-
-    if (c == ')') {
-      int pin, mode, value;
-      bool hasValue;
-
-      if (!parseCommand(input, pin, mode, value, hasValue)) {
-        Serial.println("{\"status\":\"failed\",\"error\":\"invalid_format\"}");
-        input = "";
-        return;
-      }
-
-      // digital pins 2–13, analog pins 14–19
-      if (!((pin >= 2 && pin <= 13) || (pin >= 14 && pin <= 19))) {
-        Serial.println("{\"status\":\"failed\",\"error\":\"invalid_pin\"}");
-        input = "";
-        return;
-      }
-
-      // Mode xử lý
-      if (mode == 1) {  // Digital output
-        if (!hasValue) {
-          Serial.println("{\"status\":\"failed\",\"error\":\"missing_value\"}");
-        } else {
-          pinMode(pin, OUTPUT);
-          digitalWrite(pin, value ? HIGH : LOW);
-          Serial.println("{\"status\":\"success\"}");
+        if (c == '(') {
+            buffer = "";
+            reading = true;
         }
-      }
 
-      else if (mode == 2) { // Digital input
-        pinMode(pin, INPUT);
-        int v = digitalRead(pin);
-        Serial.print("{\"status\":\"success\",\"value\":");
-        Serial.print(v);
-        Serial.println("}");
-      }
+        if (reading) buffer += c;
 
-      else if (mode == 3) { // PWM output
-        if (!hasValue) {
-          Serial.println("{\"status\":\"failed\",\"error\":\"missing_value\"}");
-        } else {
-          pinMode(pin, OUTPUT);
-          analogWrite(pin, constrain(value, 0, 255));
-          Serial.println("{\"status\":\"success\"}");
+        if (c == ')') {
+            reading = false;
+            parseCommand(buffer);
+            buffer = "";
         }
-      }
-
-      else if (mode == 4) { // Analog input A0–A5
-        int raw = analogRead(pin);
-        Serial.print("{\"status\":\"success\",\"value\":");
-        Serial.print(raw);
-        Serial.println("}");
-      }
-
-      else {
-        Serial.println("{\"status\":\"failed\",\"error\":\"invalid_mode\"}");
-      }
-
-      input = "";
     }
-  }
 }

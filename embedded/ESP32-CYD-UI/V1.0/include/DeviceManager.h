@@ -21,6 +21,7 @@ private:
 
     std::map<int, WidgetCard*> widgetMap;
 
+public:
     struct DeviceInfo {
         int id;
         String name;
@@ -29,7 +30,6 @@ private:
     };
     std::map<int, DeviceInfo> deviceInfoMap;
 
-public:
     DeviceManager(PubSubClient* client) 
         : mqttClient(client), changeCallback(nullptr) {}
 
@@ -55,7 +55,7 @@ public:
         WidgetCard* widget = widgetMap[deviceId];
         String type = deviceInfoMap[deviceId].type;
         
-        if (type == "temperatureSensor" || type == "humiditySensor") {
+        if (type == "temperatureSensor" || type == "humiditySensor" || type == "analogSensor") {
             AnalogSensor* sensor = static_cast<AnalogSensor*>(widget);
             sensor->setValue(value);
             sensor->render();
@@ -83,10 +83,10 @@ public:
             device->render();
         }
 
-        DynamicJsonDocument doc(256);
+        JsonDocument doc;
         doc["topic"] = "control_response";
 
-        JsonObject payload = doc.createNestedObject("payload");
+        JsonObject payload = doc["payload"].to<JsonObject>();
         payload["did"] = deviceId;
         payload["value"] = status ? 1 : 0;
         payload["status"] = "success";
@@ -168,10 +168,10 @@ public:
         
         DeviceInfo info = deviceInfoMap[deviceId];
         
-        DynamicJsonDocument doc(512);
+        JsonDocument doc;
         doc["topic"] = "control_response";
 
-        JsonObject payload = doc.createNestedObject("payload");
+        JsonObject payload = doc["payload"].to<JsonObject>();
         payload["did"] = deviceId;
         
         if (info.type == "digitalDevice") {
@@ -206,10 +206,10 @@ public:
             }
         }
 
-        DynamicJsonDocument doc(256);
+        JsonDocument doc;
         doc["topic"] = "sensor_data";
 
-        JsonObject payload = doc.createNestedObject("payload");
+        JsonObject payload = doc["payload"].to<JsonObject>();
         payload["did"] = deviceId;
         payload["value"] = value;
         payload["unit"] = unit;
@@ -218,18 +218,15 @@ public:
         serializeJson(doc, output);
         
         mqttClient->publish(MQTT_TOPIC_PUB_DATA, output.c_str());
-        
-        Serial.print("Published sensor data: ");
-        Serial.println(output);
     }
     
     void publishAlert(String title, String message) {
         if (!mqttClient) return;
         
-        DynamicJsonDocument doc(256);
+        JsonDocument doc;
         doc["topic"] = "alert";
 
-        JsonObject payload = doc.createNestedObject("payload");
+        JsonObject payload = doc["payload"].to<JsonObject>();
         payload["title"] = title;
         payload["message"] = message;
         
@@ -237,9 +234,6 @@ public:
         serializeJson(doc, output);
         
         mqttClient->publish(MQTT_TOPIC_PUB_ALERT, output.c_str());
-        
-        Serial.print("Published alert: ");
-        Serial.println(output);
     }
     
     void clear() {

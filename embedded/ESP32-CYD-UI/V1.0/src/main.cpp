@@ -20,6 +20,9 @@
 #include "widget/DigitalSensor.h"
 #include "DeviceManager.h"
 
+// UART0 for Arduino communication
+#define UART_TIMEOUT 1000
+
 TFT_eSPI screen = TFT_eSPI();
 SPIClass touchSpi = SPIClass(VSPI);
 XPT2046_Touchscreen touchscreen(XPT2046_CS, XPT2046_IRQ);
@@ -44,7 +47,117 @@ std::vector<WidgetCard*> deviceWidgets;
 int rainSensorId = -1;
 int windSensorId = -1;
 
+// Arduino UART Communication Functions
+String sendArduinoCommand(int pin, int mode, int value = 0) {
+    // Build command: (pin,mode,value)
+    String cmd = "(";
+    cmd += String(pin);
+    cmd += ",";
+    cmd += String(mode);
+    if (mode == 1 || mode == 3) {  // Only send value for output modes
+        cmd += ",";
+        cmd += String(value);
+    }
+    cmd += ")";
+    
+    // Clear any existing data
+    while (Serial.available()) {
+        Serial.read();
+    }
+    
+    // Send command
+    Serial.println(cmd);
+    
+    // Wait for response
+    unsigned long startTime = millis();
+    String response = "";
+    
+    while (millis() - startTime < UART_TIMEOUT) {
+        if (Serial.available()) {
+            char c = Serial.read();
+            response += c;
+            if (c == '\n') {
+                break;
+            }
+        }
+        delay(1);
+    }
+    
+    return response;
+}
+
+bool parseArduinoResponse(String response, int& value, float& temp, float& hum) {
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, response);
+    
+    if (error) {
+        return false;
+    }
+    
+    bool success = doc["success"] | false;
+    if (!success) {
+        return false;
+    }
+    
+    if (doc["data"].is<JsonObject>()) {
+        JsonObject data = doc["data"];
+        if (data["value"].is<int>()) {
+            value = data["value"];
+        }
+        if (data["temperature"].is<float>()) {
+            temp = data["temperature"];
+            hum = data["humidity"];
+        }
+    }
+    
+    return true;
+}
+
+void controlArduinoDevice(int pin, int mode, int value) {
+    String response = sendArduinoCommand(pin, mode, value);
+    int dummy = 0;
+    float t = 0, h = 0;
+    parseArduinoResponse(response, dummy, t, h);
+}
+
+void readArduinoSensor(int deviceId, int pin, int mode) {
+    String response = sendArduinoCommand(pin, mode);
+    int value = 0;
+    float temp = 0, hum = 0;
+    
+    if (parseArduinoResponse(response, value, temp, hum)) {
+        if (mode == 5) {  // DHT11
+            // Update temperature sensor with temp value
+            deviceManager.updateFromMQTT(deviceId, (int)temp);
+        } else if (mode == 2) {  // Digital input
+            deviceManager.updateFromMQTT(deviceId, (bool)value);
+        } else if (mode == 4) {  // Analog input
+            deviceManager.updateFromMQTT(deviceId, value);
+        }
+    }
+}
+
 void onDeviceChanged(int deviceId, String type, int value) {
+    // Get device info from DeviceManager
+    if (deviceManager.deviceInfoMap.find(deviceId) == deviceManager.deviceInfoMap.end()) {
+        deviceManager.publishDeviceState(deviceId);
+        return;
+    }
+    
+    auto deviceInfo = deviceManager.deviceInfoMap[deviceId];
+    if (deviceInfo.port > 0) {
+        int pin = deviceInfo.port;
+        
+        if (type == "digitalDevice") {
+            // Mode 1: Digital Output
+            controlArduinoDevice(pin, 1, value);
+        } else if (type == "analogDevice") {
+            // Mode 3: PWM Output (map 0-2 level to 0-255)
+            int pwmValue = map(value, 0, 2, 0, 255);
+            controlArduinoDevice(pin, 3, pwmValue);
+        }
+    }
+    
     deviceManager.publishDeviceState(deviceId);
 }
 
@@ -61,7 +174,7 @@ void clearWidgets() {
     windSensorId = -1;
 }
 
-void createWidgetFromJson(DynamicJsonDocument doc) {
+void createWidgetFromJson(JsonDocument& doc) {
     clearWidgets();
 
     JsonArray payload = doc["payload"];
@@ -82,9 +195,9 @@ void createWidgetFromJson(DynamicJsonDocument doc) {
         int value = 0;
         int level = 0;
         
-        if (item.containsKey("status")) status = item["status"];
-        if (item.containsKey("value")) value = item["value"];
-        if (item.containsKey("level")) level = item["level"];
+        if (item["status"].is<bool>()) status = item["status"];
+        if (item["value"].is<int>()) value = item["value"];
+        if (item["level"].is<int>()) level = item["level"];
 
         WidgetCard* widget = nullptr;
 
@@ -186,13 +299,9 @@ void createWidgetFromJson(DynamicJsonDocument doc) {
 
             if (name.indexOf("luong mua") != -1 || name.indexOf("mua") != -1) {
                 rainSensorId = id;
-                Serial.print("Rain sensor detected: ID = ");
-                Serial.println(id);
             }
             if (name.indexOf("gio") != -1) {
                 windSensorId = id;
-                Serial.print("Wind sensor detected: ID = ");
-                Serial.println(id);
             }
 
             homeIndex++;
@@ -211,16 +320,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
         message += (char)payload[i];
     }
 
-    Serial.print("Received topic: ");
-    Serial.println(topic);
-    Serial.print("Message: ");
-    Serial.println(message);
-
-    DynamicJsonDocument doc(4096);
+    JsonDocument doc;
     DeserializationError error = deserializeJson(doc, message);
     if (error) {
-        Serial.print("JSON parse error: ");
-        Serial.println(error.c_str());
         return;
     }
 
@@ -229,7 +331,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     if (String(topic) == MQTT_TOPIC_PUB_CONFIG_RESP && msgTopic == "config") {
         JsonArray devices = payloadData.as<JsonArray>();
-        DynamicJsonDocument configDoc(4096);
+        JsonDocument configDoc;
         configDoc["payload"] = devices;
         
         createWidgetFromJson(configDoc);
@@ -238,12 +340,42 @@ void callback(char* topic, byte* payload, unsigned int length) {
         String command = payloadData["command"].as<String>();
         bool shouldBeOn = command.equalsIgnoreCase("ON");
 
+        // Update UI
         deviceManager.updateFromMQTT(deviceId, shouldBeOn);
 
-        if (payloadData.containsKey("value")) {
-            int value = payloadData["value"];
-            if (value >= 0 && value <= 2) {
-                deviceManager.updateLevel(deviceId, value);
+        // Get device info and send command to Arduino
+        if (deviceManager.deviceInfoMap.find(deviceId) != deviceManager.deviceInfoMap.end()) {
+            auto deviceInfo = deviceManager.deviceInfoMap[deviceId];
+            int pin = deviceInfo.port;
+            String type = deviceInfo.type;
+            
+            if (pin > 0) {
+                if (type == "digitalDevice") {
+                    // Mode 1: Digital Output
+                    controlArduinoDevice(pin, 1, shouldBeOn ? 1 : 0);
+                } 
+                else if (type == "analogDevice") {
+                    // Get current level or from MQTT if provided
+                    int level = deviceManager.getAnalogDeviceLevel(deviceId);
+                    
+                    // Check if value/level provided in MQTT message
+                    if (payloadData["value"].is<int>()) {
+                        int value = payloadData["value"];
+                        if (value >= 0 && value <= 2) {
+                            level = value;
+                            deviceManager.updateLevel(deviceId, level);
+                        }
+                    }
+                    
+                    if (shouldBeOn) {
+                        // Mode 3: PWM Output (map 0-2 level to 0-255)
+                        int pwmValue = map(level, 0, 2, 0, 255);
+                        controlArduinoDevice(pin, 3, pwmValue);
+                    } else {
+                        // Turn off
+                        controlArduinoDevice(pin, 3, 0);
+                    }
+                }
             }
         }
 
@@ -258,15 +390,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
         deviceManager.updateFromMQTT(deviceId, (int)value);
 
         if (deviceId == rainSensorId && value > 50) {
-            Serial.write('1');
-            Serial.println();
-            Serial.println("Alert: Rain sensor > 50! Blink LED1");
+            // No serial output - avoid conflict with UART
         }
         
         if (deviceId == windSensorId && value > 50) {
-            Serial.write('2');
-            Serial.println();
-            Serial.println("Alert: Wind sensor > 50! Blink LED2");
+            // No serial output - avoid conflict with UART
         }
 
         if (tabId == 0) {
@@ -279,16 +407,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 void reconnect() {
     while (!client.connected()) {
-        Serial.print("Attempting MQTT connection...");
         if (client.connect(MQTT_CLIENT_ID, MQTT_USER, MQTT_PASS)) {
-            Serial.println("connected");
             client.subscribe(MQTT_TOPIC_PUB_CONFIG_RESP);
             client.subscribe(MQTT_TOPIC_SUB_CONTROL_REQ);
             client.subscribe(MQTT_TOPIC_PUB_DATA);
             client.publish(MQTT_TOPIC_SUB_CONFIG_REQ, "");
         } else {
-            Serial.print("failed, rc=");
-            Serial.println(client.state());
             delay(2000);
         }
     }
@@ -300,9 +424,7 @@ void setup() {
     WiFi.begin(WIFI_SSID, WIFI_PASS);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
-        Serial.print(".");
     }
-    Serial.println("\nWiFi connected");
 
     client.setBufferSize(2049);
     client.setServer(MQTT_SERVER, MQTT_PORT);
@@ -330,25 +452,58 @@ void loop() {
     client.loop();
 
     static unsigned long lastPublish = 0;
-    if (millis() - lastPublish > 5000) {
+    if (millis() - lastPublish > 3000) {
         lastPublish = millis();
 
+        // Read sensors from Arduino
         auto tempSensors = deviceManager.getDeviceIdsByType("temperatureSensor");
         for (int id : tempSensors) {
-            float randomTemp = random(200, 350) / 10.0;
-            deviceManager.publishSensorData(id, randomTemp);
+            if (deviceManager.deviceInfoMap.find(id) != deviceManager.deviceInfoMap.end()) {
+                auto info = deviceManager.deviceInfoMap[id];
+                if (info.port > 0) {
+                    readArduinoSensor(id, info.port, 5);  // Mode 5 = DHT11
+                } else {
+                    // Fallback to random data if no port assigned
+                    float randomTemp = random(200, 350) / 10.0;
+                    deviceManager.publishSensorData(id, randomTemp);
+                }
+            }
         }
 
         auto humSensors = deviceManager.getDeviceIdsByType("humiditySensor");
         for (int id : humSensors) {
-            float randomHum = random(400, 900) / 10.0;
-            deviceManager.publishSensorData(id, randomHum);
+            if (deviceManager.deviceInfoMap.find(id) != deviceManager.deviceInfoMap.end()) {
+                auto info = deviceManager.deviceInfoMap[id];
+                if (info.port > 0) {
+                    readArduinoSensor(id, info.port, 5);  // Mode 5 = DHT11
+                } else {
+                    float randomHum = random(400, 900) / 10.0;
+                    deviceManager.publishSensorData(id, randomHum);
+                }
+            }
         }
 
         auto analogSensors = deviceManager.getDeviceIdsByType("analogSensor");
         for (int id : analogSensors) {
-            float value = random(0, 101);
-            deviceManager.publishSensorData(id, value);
+            if (deviceManager.deviceInfoMap.find(id) != deviceManager.deviceInfoMap.end()) {
+                auto info = deviceManager.deviceInfoMap[id];
+                if (info.port > 0) {
+                    readArduinoSensor(id, info.port, 4);  // Mode 4 = Analog input
+                } else {
+                    float value = random(0, 101);
+                    deviceManager.publishSensorData(id, value);
+                }
+            }
+        }
+
+        auto digitalSensors = deviceManager.getDeviceIdsByType("digitalSensor");
+        for (int id : digitalSensors) {
+            if (deviceManager.deviceInfoMap.find(id) != deviceManager.deviceInfoMap.end()) {
+                auto info = deviceManager.deviceInfoMap[id];
+                if (info.port > 0) {
+                    readArduinoSensor(id, info.port, 2);  // Mode 2 = Digital input
+                }
+            }
         }
 
         if (tabId == 0) {

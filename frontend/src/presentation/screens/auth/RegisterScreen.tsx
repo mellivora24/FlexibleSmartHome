@@ -17,7 +17,6 @@ import { style } from "./authStyle";
 export default function RegisterScreen() {
     const { t } = useTranslation();
     const router = useRouter();
-    const mcuCode = "999999"; // Default MCU code for registration
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -27,15 +26,24 @@ export default function RegisterScreen() {
 
     const { register } = useAuthViewModel();
 
+    const mcuCode = "999999";
+    const IntMcuCode = parseInt(mcuCode, 10);
+
     async function handleRegister() {
-        const IntMcuCode = parseInt(mcuCode, 10);
+        console.log("=== Starting Registration ===");
+        console.log("Data:", { mcu_code: IntMcuCode, name, email, password: "***" });
         try {
             const response = await register({ mcu_code: IntMcuCode, name, email, password });
-            if ("data" in response) {
+            console.log("Registration response:", response);
+            if (response && "data" in response) {
                 await loginContext(response.data as any);
                 router.replace(ROUTES.TABS.DASHBOARD);
+            } else {
+                console.log("Registration failed: response is null or no data");
+                Alert.alert("Registration Error", "Đăng ký thất bại. Vui lòng thử lại.");
             }
         } catch (error) {
+            console.error("Registration error:", error);
             Alert.alert("Registration Error", (error as Error).message);
         }
     }

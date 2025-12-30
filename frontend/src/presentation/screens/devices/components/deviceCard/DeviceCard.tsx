@@ -18,8 +18,6 @@ interface DeviceCardProps {
     onEdit?: (deviceUpdate: UpdateDeviceRequest) => void;
 }
 
-const availablePorts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
 export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onEdit, onDelete }) => {
     const {
         expanded,
@@ -108,7 +106,6 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onEdit, onDelete
                 status={device.status}
                 UpdatedAt={device.UpdatedAt}
                 RunningTime={device.RunningTime}
-                availablePorts={availablePorts}
                 onSaveEdit={handleEdit}
                 onClose={handleClose}
                 onDelete={handleDelete}

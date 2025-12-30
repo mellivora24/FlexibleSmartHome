@@ -13,6 +13,7 @@ import {
 import { DEVICE_TYPES, DEVICE_TYPE_LIST } from "@constants/deviceType";
 import { ROOM_LIST } from "@constants/rooms";
 import { UpdateDeviceRequest } from '@src/domain/model/Device';
+import { portToLabel } from '@src/domain/utils/portUtils';
 import { useAuthContext } from '@src/presentation/hooks/useAppContext';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { modalStyle } from "./ModalStyle";
@@ -65,9 +66,15 @@ export const ModalComponent: React.FC<ModalProps> = ({
     const [roomOpen, setRoomOpen] = useState(false);
     const [typeOpen, setTypeOpen] = useState(false);
 
-    const portItems = (availablePorts || []).map((p) => ({ 
-        label: `Cổng ${p}`, 
-        value: p 
+    const uniquePorts = Array.from(new Set(
+        (availablePorts || [])
+            .filter((p) => p !== null && p !== undefined && !isNaN(Number(p)))
+            .map(p => Number(p))
+    ));
+    
+    const portItems = uniquePorts.map((p) => ({ 
+        label: `Cổng ${portToLabel(p)}`, 
+        value: p
     }));
 
     const roomItems = ROOM_LIST.map((room) => ({ 
@@ -255,7 +262,7 @@ export const ModalComponent: React.FC<ModalProps> = ({
                                             />
                                         </View>
                                     ) : (
-                                        <Text style={modalStyle.detailValue}>{port}</Text>
+                                        <Text style={modalStyle.detailValue}>{port ? portToLabel(port) : ''}</Text>
                                     )}
                                 </View>
 

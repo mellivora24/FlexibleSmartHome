@@ -60,9 +60,15 @@ export const useDevicesViewModel = (token: string) => {
     }, [token]);
 
     const fetchAvailablePorts = useCallback(async () => {
+        if (!authData?.mid) {
+            console.error("MCU code not available in auth context");
+            setAvailablePorts([]);
+            return;
+        }
+        
         setLoadingPorts(true);
         try {
-            const ports = await getAvailablePorts.execute(123456, token);
+            const ports = await getAvailablePorts.execute(authData.mid, token);
             setAvailablePorts(ports);
         } catch (err) {
             console.error("Failed to fetch available ports:", err);
@@ -81,20 +87,20 @@ export const useDevicesViewModel = (token: string) => {
     const handleCloseModal = useCallback(() => {
         setOpenModal(false);
         setAvailablePorts([]);
-    }, []);
+        fetchDevices();
+        showSuccess("Thao tác thành công!");
+    }, [fetchDevices]);
 
     const handleCreateDevice = useCallback(
         async (deviceCreate: CreateDeviceRequest) => {
             try {
                 await createDevice.execute(deviceCreate, token);
-                await fetchDevices();
-                handleCloseModal();
-                showSuccess("Tạo thiết bị thành công!");
             } catch (err) {
                 showError(err, "Không thể tạo thiết bị");
+                throw err;
             }
         },
-        [token, fetchDevices, handleCloseModal]
+        [token]
     );
 
     const handleEditDevice = useCallback(

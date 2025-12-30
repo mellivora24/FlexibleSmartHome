@@ -13,6 +13,7 @@ type DeviceDB struct {
 	Name        string          `gorm:"column:name;type:varchar(255)"`
 	Type        string          `gorm:"column:type;type:varchar(255)"`
 	Port        int             `gorm:"column:port"`
+	PortLabel   string          `gorm:"-" json:"port_label"`
 	Status      bool            `gorm:"column:status"`
 	Data        json.RawMessage `gorm:"column:data;type:jsonb"`
 	RunningTime int             `gorm:"column:running_time;default:0"`
@@ -22,6 +23,18 @@ type DeviceDB struct {
 
 func (DeviceDB) TableName() string {
 	return "tbl_device"
+}
+
+func (d *DeviceDB) SetPortLabel() {
+	if d.Port >= 14 && d.Port <= 19 {
+		d.PortLabel = "A" + string(rune('0'+(d.Port-14)))
+	} else {
+		if d.Port < 10 {
+			d.PortLabel = string(rune('0' + d.Port))
+		} else {
+			d.PortLabel = string(rune('0'+d.Port/10)) + string(rune('0'+d.Port%10))
+		}
+	}
 }
 
 type CreateDeviceRequest struct {

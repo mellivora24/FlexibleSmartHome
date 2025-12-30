@@ -1,6 +1,7 @@
 import { IMAGES } from '@constants/images';
 import { useNotificationContext } from '@hooks/NotificationContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from 'expo-router';
 import React, { useCallback } from 'react';
 import {
     ActivityIndicator,
@@ -41,6 +42,12 @@ export const NotificationScreen: React.FC = () => {
     const handleNotificationPress = useCallback(
         (id: number) => markAsRead(id),
         [markAsRead]
+    );
+    
+    useFocusEffect(
+        useCallback(() => {
+            fetchNotifications();
+        }, [fetchNotifications])
     );
 
     if (error && !loading) {

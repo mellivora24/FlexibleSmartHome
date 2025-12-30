@@ -23,7 +23,17 @@ void Screen::onTouch(int tx, int ty) {
 }
 
 void Screen::render() {
-    screen->fillRect(0, 0, screen->width(), screen->height() - tabBarHeight - buttonHeight, TFT_WHITE);
+    render(true);
+}
+
+void Screen::render(bool clearBackground) {
+    if (clearBackground) {
+        screen->fillRect(0, 0, screen->width(), screen->height() - tabBarHeight - buttonHeight, TFT_WHITE);
+        
+        for (auto& widget : widgets) {
+            widget->onScreenCleared();
+        }
+    }
 
     int startIdx = currentPage * itemsPerPage;
     int endIdx = min(startIdx + itemsPerPage, (int)widgets.size());
@@ -50,11 +60,10 @@ void Screen::drawNavigationButtons() {
     if (totalPages <= 1) return;
 
     int screenContentHeight = screen->height() - tabBarHeight;
-    int buttonY = (screenContentHeight - buttonHeight) / 2;
-    int buttonWidth = 30;
+    int buttonWidth = 50;
     int margin = 10;
+    int buttonY = screenContentHeight - buttonHeight - 5;
     
-    // Left button [<]
     uint16_t leftBgColor = (currentPage > 0) ? TFT_BLUE : TFT_DARKGREY;
     screen->fillRoundRect(margin, buttonY, buttonWidth, buttonHeight, 8, leftBgColor);
     screen->drawRoundRect(margin, buttonY, buttonWidth, buttonHeight, 8, TFT_WHITE);
@@ -63,7 +72,6 @@ void Screen::drawNavigationButtons() {
     screen->setTextSize(2);
     screen->drawString("<", margin + buttonWidth/2, buttonY + buttonHeight/2);
     
-    // Right button [>]
     int rightButtonX = screen->width() - buttonWidth - margin;
     uint16_t rightBgColor = (currentPage < totalPages - 1) ? TFT_BLUE : TFT_DARKGREY;
     screen->fillRoundRect(rightButtonX, buttonY, buttonWidth, buttonHeight, 8, rightBgColor);
@@ -76,17 +84,19 @@ void Screen::drawNavigationButtons() {
 
 bool Screen::isTouchOnButton(int tx, int ty, bool isLeftButton) {
     int screenContentHeight = screen->height() - tabBarHeight;
-    int buttonY = (screenContentHeight - buttonHeight) / 2;
-    int buttonWidth = 30;
+    int buttonWidth = 50;
     int margin = 10;
+    int buttonY = screenContentHeight - buttonHeight - 5;
     
-    if (ty < buttonY || ty > buttonY + buttonHeight) return false;
+    int touchPadding = 15;
+    
+    if (ty < buttonY - touchPadding || ty > buttonY + buttonHeight + touchPadding) return false;
     
     if (isLeftButton) {
-        return (tx >= margin && tx <= margin + buttonWidth);
+        return (tx >= margin - touchPadding && tx <= margin + buttonWidth + touchPadding);
     } else {
         int rightButtonX = screen->width() - buttonWidth - margin;
-        return (tx >= rightButtonX && tx <= rightButtonX + buttonWidth);
+        return (tx >= rightButtonX - touchPadding && tx <= rightButtonX + buttonWidth + touchPadding);
     }
 }
 
@@ -127,4 +137,16 @@ int Screen::getCurrentPage() {
 int Screen::getTotalPages() {
     if (widgets.empty()) return 1;
     return (widgets.size() + itemsPerPage - 1) / itemsPerPage;
+}
+
+bool Screen::isWidgetVisible(WidgetCard* widget) {
+    int startIdx = currentPage * itemsPerPage;
+    int endIdx = min(startIdx + itemsPerPage, (int)widgets.size());
+    
+    for (int i = startIdx; i < endIdx; i++) {
+        if (widgets[i] == widget) {
+            return true;
+        }
+    }
+    return false;
 }

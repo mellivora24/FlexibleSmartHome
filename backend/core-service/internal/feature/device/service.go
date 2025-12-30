@@ -27,6 +27,11 @@ func (s *service) ListDevices(uid int64, mcuCode int64) ([]DeviceDB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	for i := range devices {
+		devices[i].SetPortLabel()
+	}
+
 	return devices, nil
 }
 
@@ -54,7 +59,13 @@ func (s *service) CreateDevice(uid int64, mcuCode int64, device *CreateDeviceReq
 		RunningTime: 0,
 	}
 
-	return s.repo.Create(d)
+	created, err := s.repo.Create(d)
+	if err != nil {
+		return nil, err
+	}
+
+	created.SetPortLabel()
+	return created, nil
 }
 
 func (s *service) UpdateDevice(device *UpdateDeviceRequest) (*DeviceDB, error) {
@@ -70,7 +81,13 @@ func (s *service) UpdateDevice(device *UpdateDeviceRequest) (*DeviceDB, error) {
 		Port: device.Port,
 	}
 
-	return s.repo.Update(db)
+	updated, err := s.repo.Update(db)
+	if err != nil {
+		return nil, err
+	}
+
+	updated.SetPortLabel()
+	return updated, nil
 }
 
 func (s *service) UpdateDeviceStatusAndData(id int64, status bool, data json.RawMessage) error {

@@ -95,6 +95,35 @@ func (s *coreService) CreateSensorData(uid string, data model.MQTTMessage) (err 
 
 	payloadMap := data.Payload.(map[string]interface{})
 
+	if temp, hasTemp := payloadMap["temperature"].(float64); hasTemp {
+		if humidity, hasHumidity := payloadMap["humidity"].(float64); hasHumidity {
+			var tempDID, humidityDID int64
+
+			if v, ok := payloadMap["temp_did"].(float64); ok {
+				tempDID = int64(v)
+			}
+			if v, ok := payloadMap["humidity_did"].(float64); ok {
+				humidityDID = int64(v)
+			}
+
+			if tempDID > 0 {
+				err = s.sensorData.Create(intUid, tempDID, temp, "°C")
+				if err != nil {
+					l.Printf("[CoreService] Error creating temperature sensor data: %v", err)
+				}
+			}
+
+			if humidityDID > 0 {
+				err = s.sensorData.Create(intUid, humidityDID, humidity, "%")
+				if err != nil {
+					l.Printf("[CoreService] Error creating humidity sensor data: %v", err)
+				}
+			}
+
+			return nil
+		}
+	}
+
 	var did int64
 	if v, ok := payloadMap["did"].(float64); ok {
 		did = int64(v)

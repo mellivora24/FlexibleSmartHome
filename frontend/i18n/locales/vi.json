@@ -113,7 +113,9 @@
       "analogDevice": "Thiết bị analog",
       "digitalDevice": "Thiết bị kỹ thuật số",
       "temperatureSensor": "Cảm biến nhiệt độ",
-      "humiditySensor": "Cảm biến độ ẩm"
+      "humiditySensor": "Cảm biến độ ẩm",
+      "dht11Sensor": "Cảm biến DHT11 (Nhiệt độ & Độ ẩm)",
+      "unknownType": "Không xác định"
     },
     "status": {
       "status": "Trạng thái",

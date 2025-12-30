@@ -52,13 +52,14 @@ void processCommand(int pin, int mode, int value, bool hasValue) {
             break;
         }
 
-        case 4: {   // analog input
-            int v = analogRead(pin);
-            sendValue(v);
+        case 4: {
+            int rawValue = analogRead(pin);
+            int percentage = map(rawValue, 0, 1023, 0, 100);
+            sendValue(percentage);
             break;
         }
 
-        case 5: {   // DHT11: return temp + humidity
+        case 5: {
             DHT dht(pin, DHT11);
             dht.begin();
             delay(100);
@@ -104,11 +105,10 @@ void parseCommand(String cmd) {
     int value = parts[2];
     bool hasValue = (idx == 3);
 
-    if (pin < 2 || pin > 13) {
+    if (pin < 2 || pin > 19) {
         sendFail("invalid_pin");
         return;
     }
-
     processCommand(pin, mode, value, hasValue);
 }
 

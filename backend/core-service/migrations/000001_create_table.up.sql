@@ -1,4 +1,4 @@
--- Active: 1759524272308@@127.0.0.1@5434@core_db
+-- Active: 1767105231021@@127.0.0.1@5434@core_db
 CREATE TABLE IF NOT EXISTS tbl_mcu (
     id SERIAL PRIMARY KEY,
     uid INT UNIQUE NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS tbl_device (
     rid INT,
     name VARCHAR(255),
     type VARCHAR(255),
-    port INT UNIQUE,
+    port INT,
     status BOOLEAN,
     data JSONB,
     running_time INT DEFAULT 0,
@@ -94,9 +94,11 @@ CREATE INDEX IF NOT EXISTS idx_pending_actions_created_at ON pending_actions (cr
 CREATE OR REPLACE FUNCTION fn_device_insert()
     RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE tbl_mcu
-    SET available_port = array_remove(available_port, NEW.port)
-    WHERE id = NEW.mid;
+    IF NEW.type IN ('digitalDevice', 'analogDevice') THEN
+        UPDATE tbl_mcu
+        SET available_port = array_remove(available_port, NEW.port)
+        WHERE id = NEW.mid;
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -104,9 +106,11 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION fn_device_delete()
     RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE tbl_mcu
-    SET available_port = array_append(available_port, OLD.port)
-    WHERE id = OLD.mid;
+    IF OLD.type IN ('digitalDevice', 'analogDevice') THEN
+        UPDATE tbl_mcu
+        SET available_port = array_append(available_port, OLD.port)
+        WHERE id = OLD.mid;
+    END IF;
     RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
@@ -115,9 +119,11 @@ CREATE OR REPLACE FUNCTION fn_device_update()
     RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.port <> OLD.port THEN
-        UPDATE tbl_mcu
-        SET available_port = array_remove(array_append(available_port, OLD.port), NEW.port)
-        WHERE id = NEW.mid;
+        IF NEW.type IN ('digitalDevice', 'analogDevice') THEN
+            UPDATE tbl_mcu
+            SET available_port = array_remove(array_append(available_port, OLD.port), NEW.port)
+            WHERE id = NEW.mid;
+        END IF;
     END IF;
     RETURN NEW;
 END;

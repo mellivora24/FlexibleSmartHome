@@ -40,12 +40,10 @@ func (r *repository) Update(req *UpdateMCURequest) (*McuDB, error) {
 	mcu := &McuDB{}
 
 	if req.ID != nil {
-		// Find by ID (original behavior)
 		if err := r.DB.First(mcu, *req.ID).Error; err != nil {
 			return nil, fmt.Errorf("MCU not found")
 		}
 	} else if req.CurrentMcuCode != nil {
-		// Find by current mcu_code (new feature)
 		if err := r.DB.Where("mcu_code = ?", *req.CurrentMcuCode).First(mcu).Error; err != nil {
 			return nil, fmt.Errorf("MCU not found")
 		}
@@ -53,11 +51,9 @@ func (r *repository) Update(req *UpdateMCURequest) (*McuDB, error) {
 		return nil, fmt.Errorf("either ID or CurrentMcuCode is required")
 	}
 
-	// Build update map
 	updates := make(map[string]interface{})
 
 	if req.McuCode != nil {
-		// Check if new mcu_code already exists (excluding current MCU)
 		var existingMCU McuDB
 		if err := r.DB.Where("mcu_code = ? AND id != ?", *req.McuCode, mcu.ID).First(&existingMCU).Error; err == nil {
 			return nil, fmt.Errorf("MCU code already exists")
@@ -69,14 +65,12 @@ func (r *repository) Update(req *UpdateMCURequest) (*McuDB, error) {
 		updates["firmware_version"] = *req.FirmwareVersion
 	}
 
-	// Perform update
 	if len(updates) > 0 {
 		if err := r.DB.Model(mcu).Updates(updates).Error; err != nil {
 			return nil, err
 		}
 	}
 
-	// Reload the updated MCU
 	if err := r.DB.First(mcu, mcu.ID).Error; err != nil {
 		return nil, err
 	}

@@ -25,9 +25,14 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) CreateMCU(uid int64, mcu *MCURequest) (*MCUResponse, error) {
-	availablePorts := make(pq.Int64Array, 13)
-	for i := int64(1); i <= 13; i++ {
-		availablePorts[i-1] = i
+	availablePorts := make(pq.Int64Array, 18)
+
+	for i := int64(2); i <= 13; i++ {
+		availablePorts[i-2] = i
+	}
+
+	for i := int64(14); i <= 19; i++ {
+		availablePorts[i-2] = i
 	}
 
 	newMcu := &McuDB{

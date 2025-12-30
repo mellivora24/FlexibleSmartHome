@@ -23,6 +23,7 @@ public:
     void addWidget(WidgetCard* widget);
     void onTouch(int tx, int ty);
     void render();
+    void render(bool clearBackground);  // Overload: cho phép render không clear background
     void clearWidgets();
     void push_back(WidgetCard* widget);
 
@@ -31,4 +32,5 @@ public:
     int getCurrentPage();
     int getTotalPages();
     bool handleNavigationTouch(int tx, int ty);
+    bool isWidgetVisible(WidgetCard* widget);
 };

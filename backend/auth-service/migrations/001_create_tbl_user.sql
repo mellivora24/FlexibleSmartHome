@@ -1,7 +1,15 @@
 -- Active: 1749601700368@@localhost@5433@auth_db
 CREATE TABLE tbl_user (
     id SERIAL PRIMARY KEY,
-    mcu_code INT DEFAULT -1,
+    mcu_code INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    hash_password TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);: 1767106238791@@127.0.0.1@5433@auth_db
+CREATE TABLE tbl_user (
+    id SERIAL PRIMARY KEY,
+    mcu_code INT,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     hash_password TEXT NOT NULL,

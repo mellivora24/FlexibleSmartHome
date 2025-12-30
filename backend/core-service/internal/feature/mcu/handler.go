@@ -86,7 +86,6 @@ func (h *Handler) UpdateMCU(c *gin.Context) {
 		return
 	}
 
-	// ✅ Validate that either ID or CurrentMcuCode is provided
 	if req.ID == nil && req.CurrentMcuCode == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -95,7 +94,6 @@ func (h *Handler) UpdateMCU(c *gin.Context) {
 		return
 	}
 
-	// Validate that at least one field to update is provided
 	if req.McuCode == nil && req.FirmwareVersion == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -255,8 +253,26 @@ func (h *Handler) AvailablePort(c *gin.Context) {
 		return
 	}
 
+	format := c.Query("format")
+
+	if format == "simple" {
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"data":    ports,
+		})
+		return
+	}
+
+	portInfos := make([]PortInfo, len(ports))
+	for i, port := range ports {
+		portInfos[i] = PortInfo{
+			Port:  port,
+			Label: PortToLabel(port),
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"data":    ports,
+		"data":    portInfos,
 	})
 }

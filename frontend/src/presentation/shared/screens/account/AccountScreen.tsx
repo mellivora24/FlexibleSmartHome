@@ -98,30 +98,33 @@ export const AccountScreen: React.FC<AccountScreenProps> = () => {
         try {
             const mcuRepo = new MCURepositoryImpl();
 
-            if (!authData?.mid) {
-                const createMCUUseCase = new CreateMCU(mcuRepo);
-
-                // Tạo MCU mới với token hiện tại
-                await createMCUUseCase.execute(
-                    {
-                        mcu_code: IntMcuCode,
-                        firmware_version: "1.0.0",
-                    },
-                    authData?.token || ''
-                );
-            } else {
-                // Nếu đã có MCU, chỉ cần cập nhật mã thiết bị
+            // Luôn thử UPDATE trước, nếu fail thì CREATE
+            try {
                 const updateMCUUseCase = new UpdateMCU(mcuRepo);
                 await updateMCUUseCase.execute(
                     {
-                        current_mcu_code: authData.mid,
+                        current_mcu_code: authData?.mid || 999999,
                         mcu_code: IntMcuCode,
                     },
                     authData?.token || ''
                 );
+            } catch (updateError: any) {
+                // Nếu MCU chưa tồn tại trong Core Service, tạo mới
+                if (updateError.message?.includes('not found') || updateError.message?.includes('404')) {
+                    const createMCUUseCase = new CreateMCU(mcuRepo);
+                    await createMCUUseCase.execute(
+                        {
+                            mcu_code: IntMcuCode,
+                            firmware_version: "1.0.0",
+                        },
+                        authData?.token || ''
+                    );
+                } else {
+                    throw updateError;
+                }
             }
 
-            // Cập nhật MCU code trên backend
+            // Cập nhật MCU code trên Auth Service
             if (authData?.id && updateUser) {
                 const updateResult = await updateUser(
                     {
@@ -133,25 +136,12 @@ export const AccountScreen: React.FC<AccountScreenProps> = () => {
 
                 if (updateResult) {
                     // Cập nhật vào context
-                    await updateUserInfo({ mid: updateResult.mcu_code });
+                    await updateUserInfo({ mid: updateResult.mid });
                     Alert.alert('Thành công', 'Đã cập nhật mã thiết bị thành công');
                     handleCloseMCUModal();
                 }
             }
         } catch (error: any) {
-            const mcuRepo = new MCURepositoryImpl();
-
-            const createMCUUseCase = new CreateMCU(mcuRepo);
-
-            // Tạo MCU mới với token hiện tại
-            await createMCUUseCase.execute(
-                {
-                    mcu_code: IntMcuCode,
-                    firmware_version: "1.0.0",
-                },
-                authData?.token || ''
-            );
-
             console.error('MCU update failed:', error);
             Alert.alert('Lỗi', error.message || 'Không thể cập nhật mã thiết bị');
         } finally {

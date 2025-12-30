@@ -134,11 +134,7 @@ func (p *CoreProxy) ProxyWebSocket(c *gin.Context) {
 		return
 	}
 
-	// Delete token in test using postman
-	token := authMsg.Payload
-	if strings.HasPrefix(token, "Bearer ") {
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
+	token := strings.TrimPrefix(authMsg.Payload, "Bearer ")
 
 	authResp, err := p.authService.VerifyToken(token)
 	if err != nil {

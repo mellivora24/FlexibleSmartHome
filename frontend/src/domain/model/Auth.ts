@@ -20,9 +20,9 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
+    mcu_code: number;
     name: string;
     email: string;
-    mcu_code: number;
     password: string;
 }
 
@@ -39,6 +39,7 @@ export interface UpdateUserRequest {
 
 export interface UpdateUserResponse {
     id: number;
+    mid: number;
     mcu_code: number;
     name: string;
     email: string;

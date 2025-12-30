@@ -1,3 +1,4 @@
+-- Active: 1767105231021@@127.0.0.1@5434@core_db
 DROP TRIGGER IF EXISTS trg_device_insert ON tbl_device;
 DROP TRIGGER IF EXISTS trg_device_delete ON tbl_device;
 DROP TRIGGER IF EXISTS trg_device_update ON tbl_device;

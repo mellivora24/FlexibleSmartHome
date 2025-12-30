@@ -38,7 +38,6 @@ public:
         deviceInfoMap[deviceId] = {deviceId, name, type, port};
     }
     
-    // Lấy danh sách device ID theo type
     std::vector<int> getDeviceIdsByType(String type) {
         std::vector<int> result;
         for (auto& pair : deviceInfoMap) {
@@ -58,7 +57,6 @@ public:
         if (type == "temperatureSensor" || type == "humiditySensor" || type == "analogSensor") {
             AnalogSensor* sensor = static_cast<AnalogSensor*>(widget);
             sensor->setValue(value);
-            sensor->render();
         }
     }
     
@@ -71,16 +69,14 @@ public:
         if (type == "gasSensor" || type == "digitalSensor") {
             DigitalSensor* sensor = static_cast<DigitalSensor*>(widget);
             sensor->setStatus(status);
-            sensor->render();
         }
         else if (type == "digitalDevice") {
             DigitalDevice* device = static_cast<DigitalDevice*>(widget);
-            device->setState(status);
+            device->setState(status, false);
         }
         else if (type == "analogDevice") {
             AnalogDevice* device = static_cast<AnalogDevice*>(widget);
             device->setStatus(status);
-            device->render();
         }
 
         JsonDocument doc;
@@ -107,7 +103,6 @@ public:
         if (type == "analogDevice") {
             AnalogDevice* device = static_cast<AnalogDevice*>(widget);
             device->setLevel(level);
-            device->render();
         }
     }
 

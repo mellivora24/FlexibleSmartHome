@@ -121,6 +121,7 @@ public:
                     if (tx >= buttonX && tx <= buttonX + buttonW && 
                         ty >= buttonY && ty <= buttonY + buttonH) {
                         setLevel(i);
+                        render();  // Render ngay để thấy feedback
                         touchedButton = true;
                         
                         // Gọi callback khi thay đổi level
@@ -134,6 +135,7 @@ public:
 
             if (!touchedButton) {
                 toggle();
+                render();  // Render ngay để thấy feedback
                 
                 // Gọi callback khi toggle ON/OFF
                 if (onStateChangeCallback && deviceId != -1) {

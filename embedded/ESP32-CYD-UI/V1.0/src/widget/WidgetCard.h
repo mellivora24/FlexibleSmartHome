@@ -18,6 +18,8 @@ public:
         render();
         x = oldX; y = oldY;
     }
+    
+    virtual void onScreenCleared() {}
 
     virtual void onTouch(int tx, int ty) {}
     

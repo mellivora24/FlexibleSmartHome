@@ -14,6 +14,7 @@ import {
 import { DEVICE_TYPES, DEVICE_TYPE_LIST } from "@constants/deviceType";
 import { ROOM_LIST } from "@constants/rooms";
 import { CreateDeviceRequest } from '@src/domain/model/Device';
+import { portToLabel } from '@src/domain/utils/portUtils';
 import { useAuthContext } from '@src/presentation/hooks/useAppContext';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { addModalStyle } from "./addModalStyle";
@@ -25,7 +26,7 @@ interface AddModalProps {
     availablePorts?: number[];
     loadingPorts?: boolean;
     onClose: () => void;
-    onSave?: (device: CreateDeviceRequest) => void;
+    onSave?: (device: CreateDeviceRequest) => Promise<void>;
 }
 
 export const AddModalComponent: React.FC<AddModalProps> = ({
@@ -47,9 +48,15 @@ export const AddModalComponent: React.FC<AddModalProps> = ({
     const [roomOpen, setRoomOpen] = useState(false);
     const [typeOpen, setTypeOpen] = useState(false);
 
-    const portItems = availablePorts.map((p) => ({ 
-        label: `Cổng ${p}`, 
-        value: p 
+    const uniquePorts = Array.from(new Set(
+        availablePorts
+            .filter((p) => p !== null && p !== undefined && !isNaN(Number(p)))
+            .map(p => Number(p))
+    ));
+    
+    const portItems = uniquePorts.map((p) => ({ 
+        label: `Cổng ${portToLabel(p)}`, 
+        value: p
     }));
 
     const roomItems = ROOM_LIST.map((room) => ({ 
@@ -81,7 +88,7 @@ export const AddModalComponent: React.FC<AddModalProps> = ({
         onClose();
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!nameState.trim()) {
             alert(t("deviceCard.validation.nameRequired") || "Vui lòng nhập tên thiết bị");
             return;
@@ -102,21 +109,56 @@ export const AddModalComponent: React.FC<AddModalProps> = ({
             return;
         }
 
-        const newDevice: CreateDeviceRequest = {
-            mid: authData?.mid || 0,
-            rid: ridState,
-            name: nameState.trim(),
-            type: typeState,
-            port: portState,
-        };
+        try {
+            if (typeState === DEVICE_TYPES.DHT11_SENSOR) {
+                const tempDevice: CreateDeviceRequest = {
+                    mid: authData?.mid || 0,
+                    rid: ridState,
+                    name: `${nameState.trim()} - Nhiệt độ`,
+                    type: DEVICE_TYPES.TEMPERATURE_SENSOR,
+                    port: portState,
+                };
 
-        onSave?.(newDevice);
-        
-        setPortOpen(false);
-        setRoomOpen(false);
-        setTypeOpen(false);
-        
-        handleClose();
+                const humDevice: CreateDeviceRequest = {
+                    mid: authData?.mid || 0,
+                    rid: ridState,
+                    name: `${nameState.trim()} - Độ ẩm`,
+                    type: DEVICE_TYPES.HUMIDITY_SENSOR,
+                    port: portState,
+                };
+
+                if (onSave) {
+                    console.log('[AddModal] Creating temperature device:', tempDevice);
+                    await onSave(tempDevice);
+                    console.log('[AddModal] Temperature device created successfully');
+                    
+                    console.log('[AddModal] Creating humidity device:', humDevice);
+                    await onSave(humDevice);
+                    console.log('[AddModal] Humidity device created successfully');
+                    console.log('[AddModal] DHT11 sensor setup complete - both devices created');
+                }
+            } else {
+                const newDevice: CreateDeviceRequest = {
+                    mid: authData?.mid || 0,
+                    rid: ridState,
+                    name: nameState.trim(),
+                    type: typeState,
+                    port: portState,
+                };
+
+                if (onSave) {
+                    await onSave(newDevice);
+                }
+            }
+            
+            setPortOpen(false);
+            setRoomOpen(false);
+            setTypeOpen(false);
+            
+            handleClose();
+        } catch (error) {
+            console.error('[AddModal] Error creating device:', error);
+        }
     };
 
     const onPortOpen = () => {

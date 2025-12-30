@@ -20,7 +20,36 @@ func (McuDB) TableName() string {
 }
 
 type PortInfo struct {
-	Port int `json:"port"`
+	Port  int    `json:"port"`
+	Label string `json:"label"`
+}
+
+func PortToLabel(port int) string {
+	if port >= 14 && port <= 19 {
+		return "A" + string(rune('0'+(port-14)))
+	}
+
+	if port < 10 {
+		return string(rune('0' + port))
+	}
+
+	return string(rune('0'+port/10)) + string(rune('0'+port%10))
+}
+
+func LabelToPort(label string) int {
+	if len(label) > 0 && label[0] == 'A' {
+		if len(label) == 2 && label[1] >= '0' && label[1] <= '5' {
+			return 14 + int(label[1]-'0')
+		}
+	}
+
+	port := 0
+	for _, c := range label {
+		if c >= '0' && c <= '9' {
+			port = port*10 + int(c-'0')
+		}
+	}
+	return port
 }
 
 type MCURequest struct {

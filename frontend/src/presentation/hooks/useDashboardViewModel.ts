@@ -24,6 +24,7 @@ const sensorRepo = new SensorDataRepositoryImpl();
 const getSensorData = new GetListSensorDataByDID(sensorRepo);
 
 const MAX_CHART_POINTS = 10;
+const ALERT_COOLDOWN_MS = 30000;
 
 export const useDashboardViewModel = (token: string) => {
     const { t } = useTranslation();
@@ -33,6 +34,8 @@ export const useDashboardViewModel = (token: string) => {
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [location] = useState("Ha Noi, Viet Nam");
 
+    const lastAlertTimeRef = useState<{ [key: string]: number }>({})[0];
+
     const [devices, setDevices] = useState<Device[]>([]);
     const [insideHumidity, setInsideHumidity] = useState<number | null>(null);
     const [insideTemperature, setInsideTemperature] = useState<number | null>(null);
@@ -41,7 +44,6 @@ export const useDashboardViewModel = (token: string) => {
     const [rainingHistory, setRainingHistory] = useState<number[]>([]);
     const [windSpeedHistory, setWindSpeedHistory] = useState<number[]>([]);
 
-    // Mock data for raining and wind speed
     useEffect(() => {
         const mockRaining = Array.from({ length: MAX_CHART_POINTS }, () => Math.floor(Math.random() * 100));
         const mockWindSpeed = Array.from({ length: MAX_CHART_POINTS }, () => Math.floor(Math.random() * 50));
@@ -162,12 +164,23 @@ export const useDashboardViewModel = (token: string) => {
         };
 
         const handleAlert = (msg: WSMessage) => {
+            const { title, message } = msg.payload;
+            const alertKey = `${title}:${message}`;
+            const now = Date.now();
+            
+            if (lastAlertTimeRef[alertKey] && (now - lastAlertTimeRef[alertKey]) < ALERT_COOLDOWN_MS) {
+                console.log(`[Alert] Skipping duplicate alert (cooldown active): ${message}`);
+                return;
+            }
+
+            lastAlertTimeRef[alertKey] = now;
+            
             const pattern = [0, 100, 200, 500];
             Vibration.vibrate(pattern, true);
 
             Alert.alert(
-                t("common.alert"),
-                msg.payload.message,
+                title || t("common.alert"),
+                message,
                 [
                     {
                         text: t("common.ok"),

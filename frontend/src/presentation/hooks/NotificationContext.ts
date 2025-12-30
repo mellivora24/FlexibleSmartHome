@@ -3,6 +3,8 @@ import { useAuthToken } from '@hooks/useAppContext';
 import { Notification, NotificationEntity } from '@model/Notification';
 import { GetNotifications } from '@usecase/notification/getNotifications';
 import { MarkAsRead } from '@usecase/notification/markAsReadUsecase';
+import { addSocketListener, initSocket } from '@src/infra/api/websocket/socketClient';
+import { WSMessage } from '@model/Websocket';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 const notificationRepository = new NotificationRepositoryImpl();
@@ -64,6 +66,25 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (token) {
             fetchNotifications();
         }
+    }, [token, fetchNotifications]);
+
+    // Listen to WebSocket alerts to update notification count in real-time
+    useEffect(() => {
+        if (!token) return;
+
+        initSocket(token);
+
+        const handleAlert = (msg: WSMessage) => {
+            // When a new alert comes in, refresh notifications
+            console.log('[NotificationContext] New alert received via WebSocket');
+            fetchNotifications();
+        };
+
+        const unsubscribe = addSocketListener(handleAlert, "alert");
+
+        return () => {
+            unsubscribe();
+        };
     }, [token, fetchNotifications]);
 
     const markAsRead = useCallback(

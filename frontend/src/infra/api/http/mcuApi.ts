@@ -179,7 +179,7 @@ export const mcuApi = {
         console.log("Fetching available ports (running at api layer)");
         try {
             const res = await axios.get(
-                `${API_CONFIG.BASE_URL}/core/mcus/${mcuCode}/available-ports`,
+                `${API_CONFIG.BASE_URL}/core/mcus/${mcuCode}/available-ports?format=simple`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

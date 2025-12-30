@@ -31,13 +31,20 @@ export const authApi = {
                     throw new Error('Lỗi không xác định');
                 }
             }
+            throw new Error('Lỗi không xác định');
         }
     },
 
     register: async (data: RegisterRequest) => {
         try {
             const res = await axios.post(`${API_CONFIG.BASE_URL}/auth/users/register`, data);
-            return res.data;
+            return {
+                data: {
+                    ...res.data.data,
+                    mid: res.data.data.mcu_code,
+                },
+                success: res.data.success
+            };
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;
@@ -49,6 +56,7 @@ export const authApi = {
                     throw new Error("Đã xảy ra lỗi. Vui lòng thử lại.");
                 }
             }
+            throw new Error("Đã xảy ra lỗi. Vui lòng thử lại.");
         }
     },
 
@@ -73,6 +81,7 @@ export const authApi = {
                     throw new Error("Đã xảy ra lỗi. Vui lòng thử lại.");
                 }
             }
+            throw new Error("Đã xảy ra lỗi. Vui lòng thử lại.");
         }
     },
 
@@ -87,7 +96,10 @@ export const authApi = {
                     },
                 }
             );
-            return res.data.data;
+            return {
+                ...res.data.data,
+                mid: res.data.data.mcu_code,
+            };
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;
